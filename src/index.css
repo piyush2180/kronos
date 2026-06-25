@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ============================================================
+   KRONOS CHESS V2 — Premium Dark Walnut Design System
+   ============================================================ */
+
+:root {
+  --color-bg-base:         #15100c; /* Deep walnut base */
+  --color-bg-surface:      #221a14; /* Medium walnut panels */
+  --color-bg-elevated:     #2d231b; /* Light walnut details */
+  
+  --color-brand-primary:   #d4af37; /* Metallic Gold */
+  --color-brand-hover:     #e5c158; /* Warm yellow-gold */
+  --color-brand-bronze:    #a67c52; /* Soft Bronze */
+  
+  --color-text-primary:    #fffff0; /* Ivory */
+  --color-text-secondary:  #bdaea4; /* Subdued beige */
+  --color-text-dim:        #7a6a5f; /* Muted brown-gray */
+  
+  --color-border-subtle:   #34281e;
+  --color-border-default:  #4c3d31;
+  --color-border-bright:   #8a715a;
+  
+  --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBARS
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-default);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand-primary);
+}
+
+/* ============================================================
+   TRANSITIONS & ANIMATIONS
+   ============================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   CHESS BOARD HIGHLIGHT OVERRIDES (react-chessboard)
+   ============================================================ */
+.highlight-square {
+  background-color: rgba(212, 175, 55, 0.22) !important; /* Gold transparent highlight */
+}
+
+.check-square {
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.6) 0%, rgba(220, 38, 38, 0.15) 70%, transparent 100%) !important; /* Crimson check indicator */
+}
+
+.selected-square {
+  background-color: rgba(212, 175, 55, 0.28) !important;
+  box-shadow: inset 0 0 0 2px var(--color-brand-primary) !important;
+}
+
+/* Custom styled scroll panels */
+.scroll-panel {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) var(--color-bg-base);
+}
+
+/* Common Card/Panel Styles */
+.panel-card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Utility buttons */
+.btn-gold {
+  background-color: var(--color-brand-primary);
+  color: #1a130e;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+.btn-gold:hover {
+  background-color: var(--color-brand-hover);
+  transform: translateY(-1px);
+}
+.btn-gold:active {
+  transform: translateY(0);
+}
+
+.btn-bronze {
+  background-color: transparent;
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+.btn-bronze:hover {
+  border-color: var(--color-brand-bronze);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+   DASHBOARD & CARD POLISH
+   ============================================================ */
+.panel-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.panel-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-brand-primary) !important;
+  box-shadow: 0 12px 30px rgba(212, 175, 55, 0.15) !important;
+}
+
+.profile-quick-btn {
+  transition: all 0.2s ease;
+}
+.profile-quick-btn:hover {
+  border-color: var(--color-brand-primary) !important;
+  color: var(--color-brand-primary) !important;
+  background-color: rgba(212, 175, 55, 0.04) !important;
+}
+
+/* ============================================================
+   OPENING EXPLORER HOVERS
+   ============================================================ */
+.close-explorer-btn {
+  transition: all 0.2s ease;
+}
+.close-explorer-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.explorer-resource-link {
+  transition: all 0.2s ease;
+}
+.explorer-resource-link:hover {
+  border-color: var(--color-brand-primary) !important;
+  color: var(--color-brand-primary) !important;
+  background-color: rgba(212, 175, 55, 0.04) !important;
+}
+
+/* ============================================================
+   DASHBOARD CARD GRID HOVER
+   ============================================================ */
+.dashboard-card {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  background: none;
+  font-family: var(--font-sans);
+}
+.dashboard-card:hover {
+  transform: translateY(-6px) !important;
+  border-color: var(--color-brand-primary) !important;
+  box-shadow: 0 18px 48px rgba(212, 175, 55, 0.18) !important;
+}
+
+/* ============================================================
+   MOVE HISTORY PANEL - PROPER SCROLL CONTAINMENT
+   ============================================================ */
+.move-history-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-default) transparent;
+}
