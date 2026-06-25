@@ -4,7 +4,6 @@
 [![Vite Tooling](https://img.shields.io/badge/Vite-8.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
 [![Chess.js](https://img.shields.io/badge/Chess.js-1.4.0-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jhlywa/chess.js)
 [![Stockfish](https://img.shields.io/badge/Stockfish.js-10.0-E15E2C?style=for-the-badge&logo=github&logoColor=white)](https://github.com/niklasf/stockfish.js)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)](https://github.com/piyush2180/kronos)
 
 Kronos Chess is a desktop-first, feature-rich modern chess platform. It bridges the gap between clean, responsive web design and advanced computational chess systems. Driven by a custom chess engine running concurrently on background threads, Kronos offers high-tier visual evaluation, real-time puzzle training, custom position editing, and integrated Stockfish diagnostics.
