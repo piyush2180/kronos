@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "benchmark": "node benchmark/runner.js tournament",
     "benchmark:positions": "node benchmark/runner.js position",
-    "benchmark:calibrate": "node benchmark/runner.js calibrate"
+    "benchmark:calibrate": "node benchmark/runner.js calibrate",
+    "benchmark:suite": "node benchmark/runFullSuite.js"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

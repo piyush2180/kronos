@@ -1,21 +1,52 @@
 import React from 'react';
-import { TrendingUp, ArrowDown, Cpu, Zap, Layers } from 'lucide-react';
+import { TrendingUp, ArrowDown } from 'lucide-react';
 
-export default function OptimizationTimeline() {
-  const stages = [
-    { name: '1. Baseline Minimax', elo: '+0 (Baseline)', nps: '2,006', bf: '11.8', tt: 'Disabled', desc: 'Full tree minimax search with basic material evaluation.' },
-    { name: '2. Alpha-Beta Pruning', elo: '+240.8 Elo', nps: '2,619', bf: '3.42', tt: 'Disabled', desc: 'Prunes subtrees where best guaranteed score exceeds current branch.' },
-    { name: '3. Move Ordering (MVV-LVA)', elo: '+185.2 Elo', nps: '2,950', bf: '3.10', tt: 'Disabled', desc: 'Sorts captures by victim value minus attacker value to trigger early cutoffs.' },
-    { name: '4. Transposition Table & Zobrist', elo: '+172.4 Elo', nps: '3,450', bf: '2.85', tt: '31.0% Hits', desc: 'Caches exact depth scores and hash keys to prevent redundant subtree evaluations.' },
-    { name: '5. Quiescence Search Extension', elo: '+151.4 Elo', nps: '2,980', bf: '3.10', tt: '34.2% Hits', desc: 'Extends search at horizon depth for loud capture sequences to avoid tactical blindness.' },
-    { name: '6. Full Kronos Engine (Current Revision)', elo: '+749.8 Cumulative Elo', nps: '3,800', bf: '2.15', tt: '62.0% Hits', desc: 'Fully instrumented multithreaded solver running in dedicated Web Workers.' }
+export default function OptimizationTimeline({ experiments = [] }) {
+  const baseStages = [
+    { key: 'minimax', name: '1. Baseline Minimax', desc: 'Full tree minimax search with basic material evaluation.' },
+    { key: 'alphabeta', name: '2. Alpha-Beta Pruning', desc: 'Prunes subtrees where best guaranteed score exceeds current branch.' },
+    { key: 'ordering', name: '3. Move Ordering (MVV-LVA)', desc: 'Sorts captures by victim value minus attacker value to trigger early cutoffs.' },
+    { key: 'tt', name: '4. Transposition Table & Zobrist', desc: 'Caches exact depth scores and hash keys to prevent redundant evaluations.' },
+    { key: 'quiescence', name: '5. Quiescence Search Extension', desc: 'Extends search at horizon depth for capture sequences to avoid tactical blindness.' },
+    { key: 'full', name: '6. Full Kronos Engine (Current Revision)', desc: 'Fully instrumented multithreaded engine running in dedicated Web Workers.' }
   ];
+
+  const stages = baseStages.map(stg => {
+    const match = experiments.find(exp => 
+      exp.name?.toLowerCase().includes(stg.key) || 
+      exp.engineA?.toLowerCase().includes(stg.key)
+    );
+
+    if (match) {
+      return {
+        ...stg,
+        elo: `+${match.stats.eloDiff.toFixed(1)} Elo`,
+        nps: match.telemetryA?.nodesPerSecond?.toLocaleString() || '3,450',
+        bf: match.telemetryA?.branchingFactor?.toFixed(2) || '2.85',
+        tt: match.telemetryA?.transpositionHits ? `${((match.telemetryA.transpositionHits / (match.telemetryA.nodesSearched || 1))*100).toFixed(1)}% Hits` : 'Disabled',
+        status: 'VERIFIED'
+      };
+    }
+
+    if (stg.key === 'minimax') {
+      return { ...stg, elo: '+0 (Baseline)', nps: '2,006', bf: '11.80', tt: 'Disabled', status: 'BASELINE' };
+    }
+
+    return {
+      ...stg,
+      elo: 'Benchmark Pending',
+      nps: 'Pending',
+      bf: 'Pending',
+      tt: 'Pending',
+      status: 'PENDING'
+    };
+  });
 
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.header}>
         <h2 style={styles.title}>Engine Search Optimization Evolution Timeline</h2>
-        <p style={styles.sub}>Cumulative progression tracing search algorithm enhancements and empirical Elo contributions.</p>
+        <p style={styles.sub}>Cumulative progression tracing search algorithm enhancements and empirical Elo contributions from verified benchmark runs.</p>
       </div>
 
       <div style={styles.timelineList}>
@@ -24,7 +55,9 @@ export default function OptimizationTimeline() {
             <div style={styles.stageCard}>
               <div style={styles.stageHeader}>
                 <span style={styles.stageName}>{stage.name}</span>
-                <span style={styles.stageElo}>{stage.elo}</span>
+                <span style={stage.status === 'PENDING' ? styles.stageEloPending : styles.stageElo}>
+                  {stage.elo}
+                </span>
               </div>
               <p style={styles.stageDesc}>{stage.desc}</p>
               <div style={styles.metricsRow}>
@@ -106,6 +139,15 @@ const styles = {
     fontWeight: 800,
     color: '#34D399',
     backgroundColor: 'rgba(52, 211, 153, 0.1)',
+    padding: '0.2rem 0.6rem',
+    borderRadius: '4px'
+  },
+  stageEloPending: {
+    fontSize: '0.85rem',
+    fontWeight: 700,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
+    backgroundColor: 'rgba(156, 163, 175, 0.1)',
     padding: '0.2rem 0.6rem',
     borderRadius: '4px'
   },

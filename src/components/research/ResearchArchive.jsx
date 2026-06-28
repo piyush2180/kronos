@@ -1,13 +1,56 @@
-import React, { useState } from 'react';
-import { Search, Filter, Eye, Download, Trash2, Copy, FileText } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, Filter, Eye, Download, Trash2, Upload, FileText } from 'lucide-react';
 import EmptyState from './EmptyState';
+import { BenchmarkDataService } from '../../services/benchmarkService';
 
-export default function ResearchArchive({ experiments = [], onInspect, onDelete }) {
+export default function ResearchArchive({ experiments = [], onInspect, onDelete, onImportJson }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCert, setFilterCert] = useState('ALL');
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && onImportJson) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        onImportJson(event.target.result);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleExport = (exp) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(BenchmarkDataService.exportExperimentAsJson(exp));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `${exp.id}_summary.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
 
   if (experiments.length === 0) {
-    return <EmptyState title="Research Archive Empty" message="No generated benchmark experiment packages found in benchmark/output/." />;
+    return (
+      <div style={styles.container}>
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          accept=".json" 
+          onChange={handleFileUpload} 
+        />
+        <div style={styles.header}>
+          <div>
+            <h2 style={styles.title}>Research Archive Index</h2>
+            <p style={styles.sub}>Empirical datasets loaded dynamically from benchmark artifact folders.</p>
+          </div>
+          <button style={styles.importBtn} onClick={() => fileInputRef.current?.click()}>
+            <Upload size={14} /> Import Benchmark Summary (JSON)
+          </button>
+        </div>
+        <EmptyState title="No benchmark datasets available yet." message="Run a tournament benchmark or import a summary JSON artifact." />
+      </div>
+    );
   }
 
   const filtered = experiments.filter(exp => {
@@ -19,11 +62,21 @@ export default function ResearchArchive({ experiments = [], onInspect, onDelete 
 
   return (
     <div style={styles.container} className="animate-fade-in">
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        accept=".json" 
+        onChange={handleFileUpload} 
+      />
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>Research Archive Index</h2>
           <p style={styles.sub}>Empirical datasets loaded dynamically from benchmark artifact folders.</p>
         </div>
+        <button style={styles.importBtn} onClick={() => fileInputRef.current?.click()}>
+          <Upload size={14} /> Import Benchmark Summary (JSON)
+        </button>
       </div>
 
       <div style={styles.toolbar}>
@@ -84,6 +137,9 @@ export default function ResearchArchive({ experiments = [], onInspect, onDelete 
                     <button style={styles.iconBtn} onClick={() => onInspect(exp)} title="Inspect Experiment">
                       <Eye size={14} color="#d4af37" />
                     </button>
+                    <button style={styles.iconBtn} onClick={() => handleExport(exp)} title="Export Summary JSON">
+                      <Download size={14} color="#34D399" />
+                    </button>
                     {onDelete && (
                       <button style={styles.iconBtn} onClick={() => onDelete(exp.id)} title="Delete Package">
                         <Trash2 size={14} color="#f56565" />
@@ -107,6 +163,9 @@ const styles = {
     gap: '1.25rem'
   },
   header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingBottom: '1rem',
     borderBottom: '1px solid var(--color-border-subtle, #34281e)'
   },
@@ -120,6 +179,19 @@ const styles = {
     fontSize: '0.825rem',
     color: 'var(--color-text-secondary, #bdaea4)',
     margin: '0.2rem 0 0 0'
+  },
+  importBtn: {
+    backgroundColor: 'var(--color-bg-surface, #1e1712)',
+    color: '#d4af37',
+    border: '1px solid rgba(212, 175, 55, 0.3)',
+    borderRadius: '5px',
+    padding: '0.5rem 0.85rem',
+    fontSize: '0.8rem',
+    fontWeight: 700,
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.4rem'
   },
   toolbar: {
     display: 'flex',

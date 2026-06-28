@@ -1,0 +1,11 @@
+{
+  "name": "Full Kronos (No Quiescence)",
+  "description": "Ablation study: Full Kronos search engine with Quiescence search disabled.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": true,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": false
+}

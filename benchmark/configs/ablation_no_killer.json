@@ -1,0 +1,11 @@
+{
+  "name": "Full Kronos (No Killer Moves)",
+  "description": "Ablation study: Full Kronos search engine with Killer Moves disabled.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": true,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": false,
+  "useTranspositionTable": true,
+  "useQuiescence": true
+}

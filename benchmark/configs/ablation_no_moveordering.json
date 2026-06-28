@@ -1,0 +1,11 @@
+{
+  "name": "Full Kronos (No Move Ordering)",
+  "description": "Ablation study: Full Kronos search engine with MVV-LVA move ordering disabled.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": true,
+  "useMoveOrdering": false,
+  "useMVVLVA": false,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": true
+}

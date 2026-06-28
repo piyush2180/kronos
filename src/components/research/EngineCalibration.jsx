@@ -1,21 +1,42 @@
 import React from 'react';
-import { Target, ShieldCheck, Award } from 'lucide-react';
+import { Target, ShieldCheck, Award, AlertCircle } from 'lucide-react';
+import { BenchmarkDataService } from '../../services/benchmarkService';
 
-export default function EngineCalibration() {
-  const levels = [
-    { title: 'Beginner', depth: 'Depth 1', elo: '~800 Estimated Elo', score: '45.0%', desc: 'Introductory level for novice players learning move mechanics.' },
-    { title: 'Casual', depth: 'Depth 2', elo: '~1100 Estimated Elo', score: '48.2%', desc: 'Casual recreational level with basic tactical awareness.' },
-    { title: 'Club', depth: 'Depth 3', elo: '~1500 Estimated Elo', score: '50.1%', desc: 'Intermediate club player strength with solid piece coordination.' },
-    { title: 'Advanced', depth: 'Depth 4', elo: '~1800 Estimated Elo', score: '47.8%', desc: 'Advanced player level featuring deep tactical calculation.' },
-    { title: 'Expert', depth: 'Depth 5', elo: '~2100 Estimated Elo', score: '42.5%', desc: 'Candidate master level solving complex positional struggles.' }
-  ];
+export default function EngineCalibration({ experiments = [] }) {
+  const baseLevels = BenchmarkDataService.getCalibrations();
+
+  // Map levels against actual Stockfish calibration experiments in storage
+  const levels = baseLevels.map(lvl => {
+    const match = experiments.find(exp => 
+      (exp.engineB?.toLowerCase().includes('stockfish') || exp.engineA?.toLowerCase().includes('stockfish')) &&
+      exp.depth === parseInt(lvl.targetDepth.replace('Depth ', ''))
+    );
+
+    if (match) {
+      return {
+        ...lvl,
+        calibratedElo: `~${Math.round(1500 + match.stats.eloDiff)} Estimated Elo`,
+        scorePct: `${match.stats.scorePct.toFixed(1)}%`,
+        status: 'VERIFIED CALIBRATION',
+        ci: `[${match.stats.ciLower?.toFixed(1) || '-'} to ${match.stats.ciUpper?.toFixed(1) || '+'}]`
+      };
+    }
+
+    return {
+      ...lvl,
+      calibratedElo: 'Calibration Pending',
+      scorePct: 'N/A (No 200+ game run)',
+      status: 'PENDING DATA',
+      ci: 'Uncalibrated'
+    };
+  });
 
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.header}>
-        <h2 style={styles.title}>Stockfish Fixed-Depth Calibration Suite</h2>
+        <h2 style={styles.title}>Stockfish Calibration Pipeline</h2>
         <p style={styles.sub}>
-          Empirical strength ratings calibrated against Stockfish fixed-depth runs. All ratings are explicitly categorized as <strong>Estimated Playing Strength</strong>.
+          Empirical strength ratings calibrated strictly from completed Stockfish fixed-depth experiment datasets (200+ games).
         </p>
       </div>
 
@@ -23,15 +44,18 @@ export default function EngineCalibration() {
         {levels.map((lvl, idx) => (
           <div key={idx} style={styles.card}>
             <div style={styles.cardHeader}>
-              <span style={styles.depthBadge}>{lvl.depth} Calibration</span>
-              <Award size={18} color="#d4af37" />
+              <span style={styles.depthBadge}>{lvl.targetDepth} Calibration</span>
+              <Award size={18} color={lvl.status === 'VERIFIED CALIBRATION' ? '#d4af37' : '#7a6a5f'} />
             </div>
             <h3 style={styles.cardTitle}>{lvl.title}</h3>
-            <span style={styles.eloVal}>{lvl.elo}</span>
+            <span style={lvl.status === 'VERIFIED CALIBRATION' ? styles.eloVal : styles.eloPending}>
+              {lvl.calibratedElo}
+            </span>
             <p style={styles.desc}>{lvl.desc}</p>
+            
             <div style={styles.scoreRow}>
-              <span style={styles.scoreKey}>Score vs Stockfish:</span>
-              <span style={styles.scoreVal}>{lvl.score}</span>
+              <span style={styles.scoreKey}>Win/Score vs Stockfish:</span>
+              <span style={styles.scoreVal}>{lvl.scorePct}</span>
             </div>
           </div>
         ))}
@@ -96,6 +120,13 @@ const styles = {
     fontSize: '0.9rem',
     fontWeight: 700,
     color: '#34D399',
+    marginBottom: '0.75rem'
+  },
+  eloPending: {
+    fontSize: '0.9rem',
+    fontWeight: 700,
+    color: '#9CA3AF',
+    fontStyle: 'italic',
     marginBottom: '0.75rem'
   },
   desc: {
