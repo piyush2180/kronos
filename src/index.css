@@ -215,3 +215,274 @@ h1, h2, h3, h4, h5, h6 {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-default) transparent;
 }
+
+/* ============================================================
+   GLOBAL DESIGN SYSTEM UTILITIES (UX/UI POLISH PASS)
+   ============================================================ */
+
+/* Layout & Spacing Container */
+.app-layout-container {
+  max-width: 1560px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Typography Hierarchy */
+.heading-page {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+.heading-section {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.text-subtitle {
+  font-size: 0.825rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+.text-dim {
+  color: var(--color-text-dim);
+  font-size: 0.75rem;
+}
+.text-mono {
+  font-family: monospace;
+  font-size: 0.8rem;
+}
+
+/* Card System — Developer Tool Aesthetics (Reduced Box Borders) */
+.card-primary {
+  background-color: var(--color-bg-surface);
+  border: 1px solid rgba(76, 61, 49, 0.35);
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.card-secondary {
+  background-color: #1a140f;
+  border: 1px solid rgba(52, 40, 30, 0.4);
+  border-radius: 6px;
+  padding: 1rem;
+}
+.card-flat {
+  background-color: var(--color-bg-base);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+/* Button System Hierarchy */
+.btn-primary {
+  background-color: var(--color-brand-primary);
+  color: #15100c;
+  border: none;
+  border-radius: 5px;
+  padding: 0.55rem 1rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.18s ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-brand-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-radius: 5px;
+  padding: 0.55rem 1rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.18s ease;
+}
+.btn-secondary:hover {
+  border-color: var(--color-brand-primary);
+  color: var(--color-brand-primary);
+  background-color: rgba(212, 175, 55, 0.04);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.18s ease;
+}
+.btn-ghost:hover {
+  color: var(--color-brand-primary);
+  background-color: rgba(212, 175, 55, 0.05);
+}
+
+.btn-danger {
+  background-color: #EF4444;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5px;
+  padding: 0.55rem 1rem;
+  font-size: 0.825rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.18s ease;
+}
+.btn-danger:hover {
+  background-color: #DC2626;
+}
+
+/* Form System */
+.select-field, .input-field {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 5px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.825rem;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+.select-field:focus, .input-field:focus {
+  border-color: var(--color-brand-primary);
+}
+
+/* Table System */
+.table-research {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.825rem;
+}
+.table-research th {
+  background-color: var(--color-bg-base);
+  color: var(--color-text-dim);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  font-size: 0.75rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.table-research td {
+  padding: 0.85rem 1rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+.table-research tr:nth-child(even) td {
+  background-color: rgba(255, 255, 255, 0.015);
+}
+.table-research tr:hover td {
+  background-color: rgba(212, 175, 55, 0.03);
+}
+.table-research .num-col {
+  text-align: right;
+  font-family: monospace;
+}
+
+/* ============================================================
+   PUZZLE TRAINER WORKSTATION STYLES
+   ============================================================ */
+.puzzles-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+.puzzle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--color-border-subtle);
+  padding-bottom: 0.75rem;
+}
+.puzzle-hdr-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.puzzle-stat-box {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.puzzle-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 1024px) {
+  .puzzle-main-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.puzzle-board-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.puzzle-info-bar {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(21, 16, 12, 0.4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 4px;
+}
+.puzzle-board-card {
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1;
+  background-color: #1b120c;
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  padding: 2px;
+}
+.puzzle-bank-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+.puzzle-bank-btn:hover {
+  background-color: var(--color-bg-base);
+}
+
+

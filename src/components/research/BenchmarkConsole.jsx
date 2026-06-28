@@ -45,7 +45,7 @@ export default function BenchmarkConsole({ logs = [], onClear }) {
       <div style={styles.consoleHeader} onClick={() => setIsCollapsed(!isCollapsed)}>
         <div style={styles.headerLeft}>
           <Terminal size={14} color="#d4af37" />
-          <span style={styles.consoleTitle}>BENCHMARK EXECUTION TERMINAL</span>
+          <span style={styles.consoleTitle}>Benchmark execution console</span>
           <span style={styles.logCount}>({activeLogs.length} events)</span>
         </div>
         
@@ -80,8 +80,8 @@ export default function BenchmarkConsole({ logs = [], onClear }) {
 
 const styles = {
   consoleContainer: {
-    backgroundColor: '#0A0D14',
-    borderTop: '1px solid var(--color-border-default, #34281e)',
+    backgroundColor: '#080B10',
+    borderTop: '1px solid rgba(52, 40, 30, 0.4)',
     display: 'flex',
     flexDirection: 'column',
     userSelect: 'none'
@@ -93,7 +93,7 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     cursor: 'pointer',
-    borderBottom: '1px solid var(--color-border-subtle, #34281e)'
+    borderBottom: '1px solid rgba(52, 40, 30, 0.3)'
   },
   headerLeft: {
     display: 'flex',
@@ -101,14 +101,13 @@ const styles = {
     gap: '0.6rem'
   },
   consoleTitle: {
-    fontSize: '0.72rem',
-    fontWeight: 700,
-    color: '#fffff0',
-    letterSpacing: '0.06em'
+    fontSize: '0.75rem',
+    fontWeight: 600,
+    color: 'var(--color-text-primary)'
   },
   logCount: {
-    fontSize: '0.68rem',
-    color: '#8c7a6b'
+    fontSize: '0.7rem',
+    color: 'var(--color-text-dim)'
   },
   headerRight: {
     display: 'flex',
@@ -124,7 +123,7 @@ const styles = {
     alignItems: 'center'
   },
   consoleBody: {
-    height: '135px',
+    height: '160px',
     overflowY: 'auto',
     padding: '0.6rem 1rem',
     fontFamily: '"Fira Code", "JetBrains Mono", Menlo, Consolas, monospace',
@@ -132,7 +131,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '0.3rem',
-    backgroundColor: '#080B10'
+    backgroundColor: '#06080C'
   },
   logLine: {
     display: 'flex',
@@ -145,7 +144,7 @@ const styles = {
     fontSize: '0.72rem'
   },
   logLevel: {
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: '0.7rem',
     width: '65px'
   },

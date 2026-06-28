@@ -2,7 +2,6 @@ import React from 'react';
 import { Cpu, GitBranch, Terminal, HardDrive, ShieldCheck, Database } from 'lucide-react';
 
 export default function MetadataPanel({ experimentCount = 0, latestExperiment = null }) {
-  // Dynamically retrieve system and environment details
   const nodeVersion = typeof process !== 'undefined' && process.version ? process.version : 'v20.11.0';
   const platform = typeof process !== 'undefined' && process.platform ? process.platform : 'win32-x64';
 
@@ -10,11 +9,11 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
     <aside style={styles.panel}>
       <div style={styles.header}>
         <Cpu size={14} color="#d4af37" />
-        <span style={styles.headerTitle}>Metadata Inspector</span>
+        <span style={styles.headerTitle}>Metadata inspector</span>
       </div>
 
       <div style={styles.section}>
-        <span style={styles.sectionLabel}>REPOSITORY & ENGINE</span>
+        <span style={styles.sectionLabel}>Repository & engine</span>
         
         <div style={styles.itemRow}>
           <span style={styles.itemKey}><GitBranch size={12} /> Status</span>
@@ -28,25 +27,21 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
           <span style={styles.itemKey}>Commit</span>
           <span style={styles.itemVal}>HEAD</span>
         </div>
-        <div style={styles.itemRow}>
-          <span style={styles.itemKey}>Framework</span>
-          <span style={styles.itemValSuccess}>Ready</span>
-        </div>
       </div>
 
       <div style={styles.section}>
-        <span style={styles.sectionLabel}>DATASETS & BENCHMARKS</span>
+        <span style={styles.sectionLabel}>Datasets & benchmarks</span>
         
         <div style={styles.itemRow}>
           <span style={styles.itemKey}><Database size={12} /> Datasets</span>
           <span style={styles.itemValBold}>{experimentCount} Loaded</span>
         </div>
         <div style={styles.itemRow}>
-          <span style={styles.itemKey}>Stockfish</span>
-          <span style={styles.itemVal}>Worker Active</span>
+          <span style={styles.itemKey}>Stockfish worker</span>
+          <span style={styles.itemValSuccess}>Active</span>
         </div>
         <div style={styles.itemRow}>
-          <span style={styles.itemKey}>Latest Run</span>
+          <span style={styles.itemKey}>Latest run</span>
           <span style={styles.itemValCode}>
             {latestExperiment ? latestExperiment.id.slice(0, 12) + '...' : 'None'}
           </span>
@@ -54,7 +49,7 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
       </div>
 
       <div style={styles.section}>
-        <span style={styles.sectionLabel}>RUNTIME ENVIRONMENT</span>
+        <span style={styles.sectionLabel}>Runtime environment</span>
         
         <div style={styles.itemRow}>
           <span style={styles.itemKey}><Terminal size={12} /> Node.js</span>
@@ -68,7 +63,7 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
 
       <div style={styles.footerBadge}>
         <ShieldCheck size={13} color="#34D399" />
-        <span>PIPELINE VERIFIED</span>
+        <span>Pipeline verified</span>
       </div>
     </aside>
   );
@@ -76,15 +71,15 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
 
 const styles = {
   panel: {
-    width: '17%',
+    width: '18%',
     minWidth: '200px',
     maxWidth: '260px',
     backgroundColor: 'var(--color-bg-surface, #1e1712)',
-    borderLeft: '1px solid var(--color-border-subtle, #34281e)',
-    padding: '1.25rem 0.85rem',
+    borderLeft: '1px solid rgba(52, 40, 30, 0.4)',
+    padding: '1.25rem 1rem',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.25rem',
+    gap: '1.5rem',
     fontSize: '0.8rem',
     userSelect: 'none',
     boxSizing: 'border-box'
@@ -94,53 +89,51 @@ const styles = {
     alignItems: 'center',
     gap: '0.5rem',
     paddingBottom: '0.6rem',
-    borderBottom: '1px solid var(--color-border-subtle, #34281e)'
+    borderBottom: '1px solid rgba(52, 40, 30, 0.4)'
   },
   headerTitle: {
-    fontSize: '0.8rem',
-    fontWeight: 700,
-    color: '#fffff0',
-    letterSpacing: '0.03em'
+    fontSize: '0.825rem',
+    fontWeight: 600,
+    color: 'var(--color-text-primary)'
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.2rem'
+    gap: '0.35rem'
   },
   sectionLabel: {
-    fontSize: '0.62rem',
-    fontWeight: 700,
-    color: '#8c7a6b',
-    letterSpacing: '0.06em',
-    marginBottom: '0.3rem'
+    fontSize: '0.68rem',
+    fontWeight: 600,
+    color: 'var(--color-text-dim)',
+    marginBottom: '0.2rem',
+    textTransform: 'capitalize'
   },
   itemRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '0.4rem 0',
-    borderBottom: '1px solid var(--color-border-subtle, #2a2018)'
+    padding: '0.25rem 0'
   },
   itemKey: {
-    color: '#bdaea4',
+    color: 'var(--color-text-secondary)',
     display: 'flex',
     alignItems: 'center',
     gap: '0.35rem',
     fontSize: '0.75rem'
   },
   itemVal: {
-    color: '#fffff0',
-    fontWeight: 600,
+    color: 'var(--color-text-primary)',
+    fontWeight: 500,
     fontSize: '0.75rem'
   },
   itemValBold: {
     color: '#d4af37',
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: '0.75rem'
   },
   itemValSuccess: {
     color: '#34D399',
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: '0.75rem'
   },
   itemValCode: {
@@ -154,11 +147,10 @@ const styles = {
     alignItems: 'center',
     gap: '0.4rem',
     backgroundColor: 'rgba(52, 211, 153, 0.06)',
-    border: '1px solid rgba(52, 211, 153, 0.2)',
     padding: '0.45rem 0.6rem',
     borderRadius: '4px',
     color: '#34D399',
-    fontSize: '0.68rem',
-    fontWeight: 700
+    fontSize: '0.7rem',
+    fontWeight: 600
   }
 };

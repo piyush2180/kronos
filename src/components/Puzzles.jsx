@@ -291,72 +291,72 @@ export default function Puzzles({ boardTheme, onBack }) {
 
   if (isLoading) {
     return (
-      <div style={styles.loadingWrapper} className="animate-fade-in">
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '60vh', gap: '12px' }} className="animate-fade-in">
         <RotateCcw className="animate-spin" size={24} style={{ color: 'var(--color-brand-primary)' }} />
-        <div style={styles.loadingText}>Loading {selectedRange} Puzzles...</div>
+        <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--color-text-secondary)' }}>Loading {selectedRange} Puzzles...</div>
       </div>
     );
   }
 
   if (!activePuzzle) {
     return (
-      <div style={styles.empty}>No puzzles found matching this filter.</div>
+      <div style={{ textAlign: 'center', padding: '40px', color: 'var(--color-text-dim)' }}>No puzzles found matching this filter.</div>
     );
   }
 
   const orientation = activePuzzle.sideToMove; // 'white' or 'black'
 
   return (
-    <div style={styles.puzzlesWrapper} className="animate-fade-in">
+    <div className="puzzles-wrapper animate-fade-in">
       
       {/* Header bar */}
-      <div style={styles.header}>
-        <div style={styles.hdrLeft}>
-          <button onClick={onBack} style={styles.backBtn} className="btn-bronze">
+      <div className="puzzle-header">
+        <div className="puzzle-hdr-left">
+          <button onClick={onBack} className="btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>
             <ArrowLeft size={13} /> Lobby
           </button>
           <div>
-            <h2 style={styles.title}>Tactical Puzzle Trainer</h2>
-            <p style={styles.subtitle}>Solve real-game tactics step-by-step.</p>
+            <h2 className="heading-page" style={{ color: 'var(--color-brand-primary)' }}>Tactical Puzzle Trainer</h2>
+            <p className="text-subtitle">Solve real-game tactics step-by-step.</p>
           </div>
         </div>
 
-        <div style={styles.hdrRight}>
-          <div style={styles.statBox}>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <div className="puzzle-stat-box">
             <Trophy size={14} color="var(--color-brand-primary)" />
             <span>Session: {sessionCount} solved</span>
           </div>
-          <div style={styles.statBox}>
+          <div className="puzzle-stat-box">
             <Star size={14} color="var(--color-brand-primary)" />
             <span>Total: {solvedIds.length} solved</span>
           </div>
         </div>
       </div>
 
-      <div style={styles.mainGrid}>
+      <div className="puzzle-main-grid">
         
         {/* Left column: board & status */}
-        <div style={styles.boardCol}>
+        <div className="puzzle-board-col">
           
           {/* Puzzle Info Header */}
-          <div style={styles.puzzleInfoBar}>
+          <div className="puzzle-info-bar">
             <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
-              <div style={styles.puzzleIndex}>
+              <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: '700' }}>
                 Puzzle {currentIndex + 1} of {filteredPuzzles.length}
                 {activePuzzle.opening && ` • ${activePuzzle.opening}`}
               </div>
-              <div style={styles.puzzleTitle}>{activePuzzle.title}</div>
+              <div style={{ fontSize: '0.9rem', fontWeight: '700', color: 'var(--color-brand-primary)', marginTop: '1px' }}>{activePuzzle.title}</div>
             </div>
-            <div style={styles.tagsRow}>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexShrink: 0 }}>
               {activePuzzle.themes && activePuzzle.themes.slice(0, 1).map(theme => (
-                <span key={theme} style={styles.themeTag}>{theme}</span>
+                <span key={theme} style={{ fontSize: '0.68rem', fontWeight: '700', padding: '2px 6px', backgroundColor: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', color: 'var(--color-brand-primary)', borderRadius: '3px' }}>{theme}</span>
               ))}
-              <span style={styles.ratingTag}>★ {activePuzzle.rating}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', padding: '2px 6px', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)', borderRadius: '3px' }}>★ {activePuzzle.rating}</span>
             </div>
           </div>
 
           {/* Board */}
-          <div style={styles.boardCard} className="panel-card">
+          <div className="puzzle-board-card panel-card">
             <Chessboard
               options={{
                 id: 'PuzzleBoard',
@@ -373,7 +373,7 @@ export default function Puzzles({ boardTheme, onBack }) {
 
           {/* Status Displays */}
           {status !== 'idle' && (
-            <div style={styles.statusBanner(status)}>
+            <div style={{ width: '100%', maxWidth: '520px', padding: '8px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600', border: '1px solid', backgroundColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(72, 187, 120, 0.08)', borderColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(72, 187, 120, 0.25)', color: status === 'wrong' ? '#fc8181' : '#68d391' }}>
               {status === 'correct_partial' && 'Correct move! Keep calculating...'}
               {status === 'correct_complete' && 'Brilliant! Tactics solved successfully!'}
               {status === 'wrong' && 'Incorrect. Review the position and try again.'}
@@ -382,34 +382,34 @@ export default function Puzzles({ boardTheme, onBack }) {
           )}
 
           {showHintMsg && (
-            <div style={styles.hintBanner}>
+            <div style={{ width: '100%', maxWidth: '520px', padding: '8px 12px', backgroundColor: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.15)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-brand-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Lightbulb size={14} />
               <span>{activePuzzle.hint}</span>
             </div>
           )}
 
           {/* Actions Row */}
-          <div style={styles.actionsRow}>
-            <button onClick={handleReset} style={styles.actBtn} className="btn-bronze">
+          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', gap: '6px' }}>
+            <button onClick={handleReset} style={{ flex: 1, height: '34px' }} className="btn-secondary">
               <RotateCcw size={12} /> Reset
             </button>
             <button 
               onClick={handleHint} 
-              style={styles.actBtn} 
-              className="btn-bronze"
+              style={{ flex: 1, height: '34px' }} 
+              className="btn-secondary"
               disabled={hintsUsed >= 2 || status === 'revealed' || status === 'correct_complete'}
             >
               <Lightbulb size={12} /> Hint {hintsUsed > 0 ? `(${2 - hintsUsed} left)` : ''}
             </button>
             <button 
               onClick={handleReveal} 
-              style={styles.actBtn} 
-              className="btn-bronze"
+              style={{ flex: 1, height: '34px' }} 
+              className="btn-secondary"
               disabled={status === 'revealed' || status === 'correct_complete'}
             >
               <Eye size={12} /> Solution
             </button>
-            <button onClick={handleNext} style={styles.nextBtn} className="btn-gold">
+            <button onClick={handleNext} style={{ flex: 1.5, height: '34px' }} className="btn-primary">
               Next <ChevronRight size={13} />
             </button>
           </div>
@@ -417,18 +417,23 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={styles.sidebarCol}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
           
           {/* Rating Selection Grid */}
-          <div style={styles.sidebarCard} className="panel-card">
-            <div style={styles.sidebarTitle}><Trophy size={11} /> Select Rating Band</div>
-            <div style={styles.filterGrid}>
+          <div className="panel-card" style={{ padding: '12px' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Trophy size={11} /> Select Rating Band</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
               {RATING_BANDS.map(band => (
                 <button
                   key={band.value}
                   onClick={() => setSelectedRange(band.label)}
                   style={{
-                    ...styles.filterBtn,
+                    height: '26px',
+                    fontSize: '0.72rem',
+                    fontWeight: '600',
+                    border: '1px solid',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
                     backgroundColor: selectedRange === band.label ? 'rgba(212, 175, 55, 0.12)' : 'var(--color-bg-base)',
                     borderColor: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
                     color: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
@@ -441,12 +446,13 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Theme Dropdown */}
-          <div style={styles.sidebarCard} className="panel-card">
-            <div style={styles.sidebarTitle}><Filter size={11} /> Filter by Theme</div>
+          <div className="panel-card" style={{ padding: '12px' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Filter size={11} /> Filter by Theme</div>
             <select
               value={selectedTheme}
               onChange={(e) => setSelectedTheme(e.target.value)}
-              style={styles.selectFilter}
+              className="select-field"
+              style={{ width: '100%' }}
             >
               {availableThemes.map(theme => (
                 <option key={theme} value={theme}>{theme}</option>
@@ -455,31 +461,30 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Puzzle List Bank */}
-          <div className="panel-card" style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', ...styles.sidebarCard }}>
-            <div style={styles.sidebarTitle}>Puzzle Bank ({filteredPuzzles.length})</div>
-            <div style={styles.puzzlesList} className="scroll-panel">
+          <div className="panel-card" style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', padding: '12px' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Puzzle Bank ({filteredPuzzles.length})</div>
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px' }} className="scroll-panel">
               {paginatedPuzzles.map((p, idx) => {
                 const isSolved = solvedIds.includes(p.id);
-                // Calculate absolute index in filteredPuzzles
                 const absIndex = (currentPage - 1) * pageSize + idx;
                 const isCurrent = absIndex === currentIndex;
                 return (
                   <button
                     key={p.id}
                     onClick={() => handleSelectPuzzle(p)}
+                    className="puzzle-bank-btn"
                     style={{
-                      ...styles.puzzleBankBtn,
                       backgroundColor: isCurrent ? 'var(--color-bg-elevated)' : 'transparent',
                       borderLeft: isCurrent ? '3px solid var(--color-brand-primary)' : '3px solid transparent',
                       color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
                     }}
                   >
-                    <div style={styles.bankLeft}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       {isSolved ? <CheckCircle2 size={13} color="#48bb78" /> : <Play size={10} color="var(--color-text-dim)" />}
-                      <span style={styles.bankTitle}>Puzzle #{p.id}</span>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Puzzle #{p.id}</span>
                     </div>
-                    <div style={styles.bankRight}>
-                      <span style={styles.bankRating}>★{p.rating}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '6px' }}>
+                      <span style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-brand-primary)' }}>★{p.rating}</span>
                     </div>
                   </button>
                 );
@@ -488,21 +493,23 @@ export default function Puzzles({ boardTheme, onBack }) {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div style={styles.paginationRow}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 10px 4px 10px', borderTop: '1px solid var(--color-border-subtle)', marginTop: '6px' }}>
                 <button 
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  style={styles.pageBtn(currentPage === 1)}
+                  className="btn-ghost"
+                  style={{ opacity: currentPage === 1 ? 0.4 : 1 }}
                 >
                   Prev
                 </button>
-                <span style={styles.pageInfo}>
+                <span style={{ fontSize: '0.72rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>
                   {currentPage} / {totalPages}
                 </span>
                 <button 
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  style={styles.pageBtn(currentPage === totalPages)}
+                  className="btn-ghost"
+                  style={{ opacity: currentPage === totalPages ? 0.4 : 1 }}
                 >
                   Next
                 </button>
@@ -512,325 +519,7 @@ export default function Puzzles({ boardTheme, onBack }) {
 
         </div>
 
-      </div>
+        </div>
     </div>
   );
 }
-
-const styles = {
-  puzzlesWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-    width: '100%',
-    padding: '20px',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottom: '1px solid var(--color-border-subtle)',
-    paddingBottom: '12px',
-  },
-  hdrLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  backBtn: {
-    padding: '6px 12px',
-    fontSize: '11px',
-    fontWeight: '700',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px',
-  },
-  title: {
-    fontFamily: 'var(--font-display)',
-    fontSize: '20px',
-    fontWeight: '800',
-    color: 'var(--color-brand-primary)',
-  },
-  subtitle: {
-    fontSize: '12px',
-    color: 'var(--color-text-secondary)',
-    marginTop: '2px',
-  },
-  hdrRight: {
-    display: 'flex',
-    gap: '10px',
-  },
-  statBox: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
-    fontSize: '11px',
-    fontWeight: '700',
-    color: 'var(--color-text-primary)',
-  },
-  mainGrid: {
-    display: 'grid',
-    gridTemplateColumns: '70% 30%',
-    gap: '30px',
-    alignItems: 'start',
-  },
-  boardCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '12px',
-  },
-  puzzleInfoBar: {
-    width: '100%',
-    maxWidth: '520px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '8px 12px',
-    backgroundColor: 'rgba(21, 16, 12, 0.4)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
-  },
-  puzzleIndex: {
-    fontSize: '8px',
-    color: 'var(--color-text-dim)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    fontWeight: '800',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  puzzleTitle: {
-    fontSize: '13px',
-    fontWeight: '800',
-    color: 'var(--color-brand-primary)',
-    marginTop: '1px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  tagsRow: {
-    display: 'flex',
-    gap: '6px',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  themeTag: {
-    fontSize: '9px',
-    fontWeight: '800',
-    padding: '2px 6px',
-    backgroundColor: 'rgba(212, 175, 55, 0.08)',
-    border: '1px solid rgba(212, 175, 55, 0.25)',
-    color: 'var(--color-brand-primary)',
-    borderRadius: '3px',
-  },
-  ratingTag: {
-    fontSize: '9px',
-    fontWeight: '700',
-    padding: '2px 6px',
-    backgroundColor: 'var(--color-bg-elevated)',
-    border: '1px solid var(--color-border-default)',
-    color: 'var(--color-text-secondary)',
-    borderRadius: '3px',
-  },
-  boardCard: {
-    width: '100%',
-    maxWidth: '520px',
-    aspectRatio: '1',
-    backgroundColor: '#1b120c',
-    border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
-    padding: '2px',
-  },
-  statusBanner: (status) => ({
-    width: '100%',
-    maxWidth: '520px',
-    padding: '8px 12px',
-    borderRadius: '4px',
-    fontSize: '11px',
-    fontWeight: '700',
-    border: '1px solid',
-    backgroundColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(72, 187, 120, 0.08)',
-    borderColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(72, 187, 120, 0.25)',
-    color: status === 'wrong' ? '#fc8181' : '#68d391',
-    lineHeight: '1.3',
-  }),
-  hintBanner: {
-    width: '100%',
-    maxWidth: '520px',
-    padding: '8px 12px',
-    backgroundColor: 'rgba(212, 175, 55, 0.05)',
-    border: '1px solid rgba(212, 175, 55, 0.15)',
-    borderRadius: '4px',
-    fontSize: '11px',
-    color: 'var(--color-brand-primary)',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  actionsRow: {
-    width: '100%',
-    maxWidth: '520px',
-    display: 'flex',
-    gap: '6px',
-  },
-  actBtn: {
-    flex: 1,
-    height: '32px',
-    fontSize: '11px',
-    fontWeight: '750',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '5px',
-  },
-  nextBtn: {
-    flex: 1.5,
-    height: '32px',
-    fontSize: '11px',
-    fontWeight: '750',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '5px',
-  },
-  sidebarCol: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '12px',
-    height: '100%',
-  },
-  sidebarCard: {
-    padding: '12px',
-  },
-  sidebarTitle: {
-    fontSize: '9px',
-    color: 'var(--color-text-dim)',
-    fontWeight: '800',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    marginBottom: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '5px',
-  },
-  filterGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '4px',
-  },
-  filterBtn: {
-    height: '24px',
-    fontSize: '9px',
-    fontWeight: '700',
-    border: '1px solid',
-    borderRadius: '3px',
-    cursor: 'pointer',
-    textAlign: 'center',
-  },
-  selectFilter: {
-    width: '100%',
-    padding: '6px 10px',
-    backgroundColor: 'var(--color-bg-base)',
-    border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
-    color: 'var(--color-text-primary)',
-    fontSize: '11px',
-    fontWeight: '600',
-    outline: 'none',
-    cursor: 'pointer',
-  },
-  puzzlesList: {
-    flex: 1,
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '2px',
-    maxHeight: '280px',
-  },
-  puzzleBankBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '8px 10px',
-    borderRadius: '3px',
-    border: 'none',
-    cursor: 'pointer',
-    textAlign: 'left',
-    transition: 'all 0.1s ease',
-    ':hover': { backgroundColor: 'var(--color-bg-base)' }
-  },
-  bankLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    minWidth: 0,
-  },
-  bankTitle: {
-    fontSize: '11px',
-    fontWeight: '600',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  bankRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    flexShrink: 0,
-    marginLeft: '6px',
-  },
-  bankRating: {
-    fontSize: '9px',
-    fontWeight: '700',
-    color: 'var(--color-brand-primary)',
-  },
-  paginationRow: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '8px 10px 4px 10px',
-    borderTop: '1px solid var(--color-border-subtle)',
-    marginTop: '6px',
-  },
-  pageBtn: (isDisabled) => ({
-    padding: '4px 8px',
-    fontSize: '10px',
-    fontWeight: '700',
-    backgroundColor: 'var(--color-bg-elevated)',
-    border: '1px solid var(--color-border-default)',
-    color: 'var(--color-text-secondary)',
-    borderRadius: '3px',
-    cursor: isDisabled ? 'not-allowed' : 'pointer',
-    opacity: isDisabled ? 0.4 : 1,
-  }),
-  pageInfo: {
-    fontSize: '10px',
-    fontWeight: '750',
-    color: 'var(--color-text-dim)',
-    fontFamily: 'monospace',
-  },
-  loadingWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '60vh',
-    gap: '12px',
-  },
-  loadingText: {
-    fontSize: '13px',
-    fontWeight: '700',
-    color: 'var(--color-text-secondary)',
-  },
-  empty: {
-    textAlign: 'center',
-    padding: '40px',
-    color: 'var(--color-text-dim)',
-  }
-};
