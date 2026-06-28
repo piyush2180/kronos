@@ -67,7 +67,7 @@ const styles = {
   topBar: {
     height: '36px',
     backgroundColor: 'var(--color-bg-surface, #1e1712)',
-    borderBottom: '1px solid var(--color-border-subtle, #34281e)',
+    borderBottom: '1px solid rgba(52, 40, 30, 0.4)',
     display: 'flex',
     alignItems: 'center',
     padding: '0 1.25rem',
@@ -80,27 +80,28 @@ const styles = {
   },
   ideBadge: {
     fontSize: '0.72rem',
-    fontWeight: 800,
-    color: '#d4af37',
-    letterSpacing: '0.08em'
+    fontWeight: 600,
+    color: '#d4af37'
   },
   divider: {
-    color: '#5c4a3e',
+    color: 'var(--color-text-dim)',
     fontSize: '0.8rem'
   },
   currentViewName: {
     fontSize: '0.72rem',
-    fontWeight: 700,
-    color: '#bdaea4',
-    letterSpacing: '0.04em'
+    fontWeight: 500,
+    color: 'var(--color-text-secondary)',
+    textTransform: 'capitalize'
   },
   middleWorkspace: {
     display: 'flex',
     flex: 1,
-    overflow: 'hidden'
+    overflow: 'hidden',
+    minHeight: 0
   },
   centerWorkspace: {
     flex: 1,
+    minWidth: 0,
     padding: '1.75rem 2.25rem',
     overflowY: 'auto',
     backgroundColor: 'var(--color-bg-base, #120e0a)'

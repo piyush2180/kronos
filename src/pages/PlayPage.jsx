@@ -11,24 +11,24 @@ import { DIFFICULTY_SETTINGS } from '../hooks/useChessGame';
 import { Shuffle, PlayCircle, ChevronDown } from 'lucide-react';
 
 // ── Lobby Setup Screen ────────────────────────────────────────────────────────
-function GameLobby({ onStart, defaultDifficulty, defaultTimeControl }) {
+function GameLobby({ onStart, defaultDifficulty, defaultTimeControl, boardTheme }) {
   const [selectedColor, setSelectedColor] = useState('w');
   const [selectedDifficulty, setSelectedDifficulty] = useState(defaultDifficulty || 'club');
   const [selectedTime, setSelectedTime] = useState(defaultTimeControl || '10+0');
 
   const COLORS = [
-    { value: 'w',      label: 'White', symbol: '♔', desc: 'Move first' },
-    { value: 'b',      label: 'Black', symbol: '♚', desc: 'Move second' },
+    { value: 'w', label: 'White', symbol: '♔', desc: 'Move first' },
+    { value: 'b', label: 'Black', symbol: '♚', desc: 'Move second' },
     { value: 'random', label: 'Random', symbol: '⚄', desc: 'Surprise me' },
-    { value: 'simulate', label: 'Spectate', symbol: '👁', desc: 'Watch Kronos vs Kronos' },
+    { value: 'simulate', label: 'Spectate', symbol: '👁', desc: 'Engine vs Engine' },
   ];
 
   const TIME_OPTIONS = [
-    { value: '1+0',  label: '1 min',   type: 'Bullet' },
-    { value: '3+0',  label: '3 min',   type: 'Blitz' },
-    { value: '5+0',  label: '5 min',   type: 'Blitz' },
-    { value: '10+0', label: '10 min',  type: 'Rapid' },
-    { value: '30+0', label: '30 min',  type: 'Classical' },
+    { value: '1+0', label: '1 min', type: 'Bullet' },
+    { value: '3+0', label: '3 min', type: 'Blitz' },
+    { value: '5+0', label: '5 min', type: 'Blitz' },
+    { value: '10+0', label: '10 min', type: 'Rapid' },
+    { value: '30+0', label: '30 min', type: 'Classical' },
     { value: 'casual', label: 'Casual', type: 'Untimed' },
   ];
 
@@ -39,98 +39,115 @@ function GameLobby({ onStart, defaultDifficulty, defaultTimeControl }) {
     onStart(resolvedColor, selectedDifficulty, selectedTime);
   };
 
+  const previewOrientation = selectedColor === 'b' ? 'black' : 'white';
+
   return (
-    <div style={lobby.overlay} className="animate-fade-in">
-      <div style={lobby.card} className="panel-card">
+    <div style={styles.splitGrid} className="animate-fade-in">
+      {/* Left Column: Board Preview */}
+      <div style={styles.boardColumn}>
+        <ChessBoard
+          fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+          boardOrientation={previewOrientation}
+          boardTheme={boardTheme}
+          evalScore="+0.3"
+          isSearching={false}
+          gameStatus="idle"
+          playerColor={selectedColor === 'random' ? 'w' : selectedColor}
+          makeMove={() => {}}
+        />
+      </div>
 
-        {/* Header */}
-        <div style={lobby.header}>
-          <div style={lobby.headerIcon}>♞</div>
-          <div>
-            <h2 style={lobby.title}>Play vs Engine</h2>
-            <p style={lobby.subtitle}>Configure your match settings, then start when ready.</p>
+      {/* Right Column: Engine Configuration */}
+      <div style={styles.sidebarColumn}>
+        <div style={lobby.configPanel} className="card-primary">
+          <div style={lobby.configHeader}>
+            <div>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#d4af37', textTransform: 'capitalize' }}>Engine match setup</span>
+              <h2 style={{ fontSize: '1.35rem', fontWeight: '700', color: 'var(--color-text-primary)', margin: '0.1rem 0' }}>Engine Configuration</h2>
+            </div>
+          </div>
+
+          <div style={lobby.scrollBody}>
+            {/* Color Selection */}
+            <div style={lobby.section}>
+              <div style={lobby.sectionLabel}>Color Selection</div>
+              <div style={lobby.colorGrid}>
+                {COLORS.map(c => (
+                  <button
+                    key={c.value}
+                    onClick={() => setSelectedColor(c.value)}
+                    style={{
+                      ...lobby.colorChip,
+                      backgroundColor: selectedColor === c.value ? 'rgba(212, 175, 55, 0.12)' : 'var(--color-bg-base)',
+                      borderColor: selectedColor === c.value ? 'var(--color-brand-primary)' : 'rgba(52, 40, 30, 0.4)',
+                      color: selectedColor === c.value ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'
+                    }}
+                  >
+                    <span style={{ fontSize: '1.1rem' }}>{c.symbol}</span>
+                    <span style={{ fontWeight: '600', fontSize: '0.8rem' }}>{c.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Difficulty Chips */}
+            <div style={lobby.section}>
+              <div style={lobby.sectionLabel}>Difficulty Level</div>
+              <div style={lobby.chipRow}>
+                {Object.entries(DIFFICULTY_SETTINGS).map(([key, cfg]) => (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedDifficulty(key)}
+                    style={{
+                      ...lobby.chipBtn,
+                      backgroundColor: selectedDifficulty === key ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-base)',
+                      borderColor: selectedDifficulty === key ? 'var(--color-brand-primary)' : 'rgba(52, 40, 30, 0.4)',
+                      color: selectedDifficulty === key ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
+                    }}
+                  >
+                    {cfg.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Time Control Chips */}
+            <div style={lobby.section}>
+              <div style={lobby.sectionLabel}>Time Control</div>
+              <div style={lobby.chipRow}>
+                {TIME_OPTIONS.map(t => (
+                  <button
+                    key={t.value}
+                    onClick={() => setSelectedTime(t.value)}
+                    style={{
+                      ...lobby.chipBtn,
+                      backgroundColor: selectedTime === t.value ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-base)',
+                      borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'rgba(52, 40, 30, 0.4)',
+                      color: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
+                    }}
+                  >
+                    <span>{t.label}</span>
+                    <span style={{ fontSize: '0.68rem', opacity: 0.7, marginLeft: '0.2rem' }}>({t.type})</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Engine Details */}
+            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+              <span style={{ fontWeight: '600', color: 'var(--color-text-secondary)' }}>Engine details</span>
+              <span>Stockfish 16 Multithreaded Worker • SHA256 Verified Engine Pipeline</span>
+            </div>
+          </div>
+
+          {/* Start Button Fixed at Bottom */}
+          <div style={lobby.fixedFooter}>
+            <button onClick={handleStart} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '0.9rem' }}>
+              <PlayCircle size={16} />
+              <span>Start Game</span>
+            </button>
           </div>
         </div>
-
-        <div style={lobby.divider} />
-
-        {/* Color Selection */}
-        <div style={lobby.section}>
-          <div style={lobby.sectionLabel}>Play as</div>
-          <div style={lobby.colorRow}>
-            {COLORS.map(c => (
-              <button
-                key={c.value}
-                onClick={() => setSelectedColor(c.value)}
-                style={{
-                  ...lobby.colorBtn,
-                  backgroundColor: selectedColor === c.value
-                    ? (c.value === 'w' ? 'rgba(255,255,240,0.08)' : c.value === 'b' ? 'rgba(21,16,12,0.6)' : 'rgba(212,175,55,0.08)')
-                    : 'var(--color-bg-elevated)',
-                  borderColor: selectedColor === c.value ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
-                  boxShadow: selectedColor === c.value ? '0 0 0 2px rgba(212,175,55,0.2)' : 'none',
-                }}
-              >
-                <span style={{ ...lobby.colorSymbol, color: c.value === 'w' ? '#f0e8d0' : c.value === 'b' ? '#aaa' : 'var(--color-brand-primary)' }}>
-                  {c.symbol}
-                </span>
-                <span style={lobby.colorLabel}>{c.label}</span>
-                <span style={lobby.colorDesc}>{c.desc}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Difficulty Selection */}
-        <div style={lobby.section}>
-          <div style={lobby.sectionLabel}>Difficulty</div>
-          <div style={lobby.difficultyGrid}>
-            {Object.entries(DIFFICULTY_SETTINGS).map(([key, cfg]) => (
-              <button
-                key={key}
-                onClick={() => setSelectedDifficulty(key)}
-                style={{
-                  ...lobby.diffBtn,
-                  backgroundColor: selectedDifficulty === key ? 'rgba(212,175,55,0.1)' : 'var(--color-bg-elevated)',
-                  borderColor: selectedDifficulty === key ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
-                  color: selectedDifficulty === key ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
-                }}
-              >
-                {cfg.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Time Control */}
-        <div style={lobby.section}>
-          <div style={lobby.sectionLabel}>Time Control</div>
-          <div style={lobby.timeGrid}>
-            {TIME_OPTIONS.map(t => (
-              <button
-                key={t.value}
-                onClick={() => setSelectedTime(t.value)}
-                style={{
-                  ...lobby.timeBtn,
-                  backgroundColor: selectedTime === t.value ? 'rgba(212,175,55,0.1)' : 'var(--color-bg-elevated)',
-                  borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
-                  color: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
-                }}
-              >
-                <span style={lobby.timeLabel}>{t.label}</span>
-                <span style={lobby.timeType}>{t.type}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div style={lobby.divider} />
-
-        {/* Start Button */}
-        <button onClick={handleStart} style={lobby.startBtn} className="btn-gold">
-          <PlayCircle size={18} />
-          <span>Start Game</span>
-        </button>
       </div>
     </div>
   );
@@ -260,6 +277,7 @@ export default function PlayPage({ username, boardTheme, soundEnabled }) {
         onStart={handleLobbyStart}
         defaultDifficulty={game.difficulty}
         defaultTimeControl={game.timeControl}
+        boardTheme={game.boardTheme}
       />
     );
   }
@@ -367,168 +385,90 @@ export default function PlayPage({ username, boardTheme, soundEnabled }) {
   );
 }
 
-// ── Lobby Styles ──────────────────────────────────────────────────────────────
+// ── Lobby Workstation Styles ──────────────────────────────────────────────────
 const lobby = {
-  overlay: {
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '560px',
-    padding: '32px',
+  configPanel: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0px',
+    height: '100%',
+    boxSizing: 'border-box',
+    padding: '1.25rem',
+    gap: '1.25rem',
+    overflow: 'hidden'
   },
-  header: {
+  configHeader: {
+    paddingBottom: '0.75rem',
+    borderBottom: '1px solid rgba(52, 40, 30, 0.4)'
+  },
+  scrollBody: {
+    flex: 1,
+    overflowY: 'auto',
     display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    marginBottom: '20px',
-  },
-  headerIcon: {
-    fontSize: '48px',
-    lineHeight: 1,
-    color: 'var(--color-brand-primary)',
-    flexShrink: 0,
-  },
-  title: {
-    fontSize: '22px',
-    fontWeight: '800',
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-display)',
-    letterSpacing: '-0.01em',
-  },
-  subtitle: {
-    fontSize: '12px',
-    color: 'var(--color-text-secondary)',
-    marginTop: '4px',
-  },
-  divider: {
-    height: '1px',
-    backgroundColor: 'var(--color-border-subtle)',
-    margin: '16px 0',
+    flexDirection: 'column',
+    gap: '1.25rem',
+    paddingRight: '0.2rem'
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    marginBottom: '20px',
+    gap: '0.5rem'
   },
   sectionLabel: {
-    fontSize: '10px',
-    fontWeight: '800',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    color: 'var(--color-text-dim)',
-  },
-  colorRow: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
-    gap: '10px',
-  },
-  colorBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '16px 8px',
-    borderRadius: '8px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    fontFamily: 'var(--font-sans)',
-  },
-  colorSymbol: {
-    fontSize: '28px',
-    lineHeight: 1,
-  },
-  colorLabel: {
-    fontSize: '12px',
-    fontWeight: '700',
-    color: 'var(--color-text-primary)',
-  },
-  colorDesc: {
-    fontSize: '10px',
-    color: 'var(--color-text-dim)',
-  },
-  difficultyGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
-    gap: '8px',
-  },
-  diffBtn: {
-    padding: '8px 4px',
-    fontSize: '10px',
-    fontWeight: '700',
-    border: '1px solid',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    textAlign: 'center',
-    fontFamily: 'var(--font-sans)',
-    lineHeight: 1.3,
-  },
-  timeGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(6, 1fr)',
-    gap: '8px',
-  },
-  timeBtn: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '2px',
-    padding: '8px 4px',
-    border: '1px solid',
-    borderRadius: '6px',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    fontFamily: 'var(--font-sans)',
-  },
-  timeLabel: {
-    fontSize: '12px',
-    fontWeight: '700',
-    color: 'inherit',
-  },
-  timeType: {
-    fontSize: '9px',
-    color: 'var(--color-text-dim)',
+    fontSize: '0.7rem',
     fontWeight: '600',
+    color: 'var(--color-text-dim)',
+    textTransform: 'capitalize'
   },
-  startBtn: {
+  colorGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '0.5rem'
+  },
+  colorChip: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: '10px',
-    padding: '14px',
-    fontSize: '14px',
-    fontWeight: '800',
-    borderRadius: '8px',
-    letterSpacing: '0.02em',
-    width: '100%',
+    gap: '0.6rem',
+    padding: '0.6rem 0.85rem',
+    borderRadius: '6px',
+    border: '1px solid',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    fontFamily: 'var(--font-display)',
+    transition: 'all 0.15s ease'
   },
+  chipRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.4rem'
+  },
+  chipBtn: {
+    padding: '0.4rem 0.75rem',
+    fontSize: '0.78rem',
+    fontWeight: '600',
+    borderRadius: '4px',
+    border: '1px solid',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+    display: 'inline-flex',
+    alignItems: 'center'
+  },
+  fixedFooter: {
+    paddingTop: '0.75rem',
+    borderTop: '1px solid rgba(52, 40, 30, 0.4)',
+    marginTop: 'auto'
+  }
 };
 
 // ── Game Page Styles ──────────────────────────────────────────────────────────
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '70% 30%',
-    gap: '12px',
+    gridTemplateColumns: '58% 42%',
+    gap: '1.5rem',
     height: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: '12px 16px',
-    boxSizing: 'border-box',
+    padding: '1.25rem 1.5rem',
+    boxSizing: 'border-box'
   },
   boardColumn: {
     display: 'flex',
@@ -536,13 +476,13 @@ const styles = {
     alignItems: 'center',
     height: '100%',
     minWidth: 0,
-    minHeight: 0,
+    minHeight: 0
   },
   sidebarColumn: {
     height: '100%',
     minHeight: 0,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'column'
   },
   sidebarWrapper: {
     flex: 1,
@@ -551,22 +491,22 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
-    boxSizing: 'border-box',
+    boxSizing: 'border-box'
   },
   controlSection: {
-    flexShrink: 0,
+    flexShrink: 0
   },
   historyDivider: {
     height: '1px',
     backgroundColor: 'var(--color-border-subtle)',
     margin: '10px 0',
-    flexShrink: 0,
+    flexShrink: 0
   },
   historySection: {
     flex: 1,
     minHeight: 0,
     overflow: 'hidden',
     display: 'flex',
-    flexDirection: 'column',
-  },
+    flexDirection: 'column'
+  }
 };

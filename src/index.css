@@ -220,9 +220,23 @@ h1, h2, h3, h4, h5, h6 {
    GLOBAL DESIGN SYSTEM UTILITIES (UX/UI POLISH PASS)
    ============================================================ */
 
-/* Layout & Spacing Container */
+/* Layout & Spacing Container System */
+.page-layout-wrapper {
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  padding-inline: clamp(20px, 3vw, 48px);
+  box-sizing: border-box;
+}
+
+.table-scroll-container {
+  overflow-x: auto;
+  max-width: 100%;
+  scrollbar-width: thin;
+}
+
 .app-layout-container {
-  max-width: 1560px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
 }

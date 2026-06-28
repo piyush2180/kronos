@@ -269,7 +269,7 @@ export default function App() {
       {/* MAIN CONTAINER LAYOUT */}
       <main style={styles.mainContent}>
         {activeTab === 'dashboard' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <Dashboard username={currentUser} navigate={navigate} />
           </div>
         )}
@@ -297,7 +297,7 @@ export default function App() {
         )}
 
         {activeTab === 'puzzles' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <Puzzles 
               boardTheme={boardTheme}
               onBack={() => navigate('/')}
@@ -306,7 +306,7 @@ export default function App() {
         )}
 
         {activeTab === 'learn' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <Learn />
           </div>
         )}
@@ -318,13 +318,13 @@ export default function App() {
         )}
 
         {activeTab === 'profile' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <Profile username={currentUser} />
           </div>
         )}
 
         {activeTab === 'editor' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <PositionEditor
               boardTheme={boardTheme}
               onPlayPosition={handlePlayPosition}
@@ -332,7 +332,7 @@ export default function App() {
           </div>
         )}
         {activeTab === 'about' && (
-          <div style={styles.scrollPage}>
+          <div style={styles.scrollPage} className="page-layout-wrapper">
             <AboutPage onBack={() => navigate('/')} />
           </div>
         )}
