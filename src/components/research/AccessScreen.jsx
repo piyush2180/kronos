@@ -54,11 +54,14 @@ export default function AccessScreen({ onEnter }) {
 
 const styles = {
   container: {
-    minHeight: '85vh',
+    flex: 1,
+    width: '100%',
+    height: '100%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '2rem'
+    padding: '2rem',
+    backgroundColor: 'var(--color-bg-base, #120e0a)'
   },
   card: {
     width: '100%',
