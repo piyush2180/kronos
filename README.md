@@ -134,7 +134,7 @@ graph TD
     Controller <--> ChessJS[Chess.js: Rule Validation & Move Gen]
     Controller <--> Storage[(Local Storage: History & Preferences)]
     
-    subgraph Web Worker Threads (Parallel)
+    subgraph Workers["Web Worker Threads (Parallel)"]
         Controller <--> Kronos[Kronos Engine Worker: Minimax/Search]
         Controller <--> Stockfish[Stockfish.js Worker: Deep Evaluation]
     end
