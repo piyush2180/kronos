@@ -5,21 +5,25 @@
    ============================================================ */
 
 :root {
-  --color-bg-base:         #15100c; /* Deep walnut base */
-  --color-bg-surface:      #221a14; /* Medium walnut panels */
-  --color-bg-elevated:     #2d231b; /* Light walnut details */
+  --color-bg-base:         #171311; /* Warm dark base */
+  --color-bg-surface:      #211A15; /* Medium walnut surface */
+  --color-bg-elevated:     #2A211B; /* Light walnut elevated */
   
-  --color-brand-primary:   #d4af37; /* Metallic Gold */
-  --color-brand-hover:     #e5c158; /* Warm yellow-gold */
-  --color-brand-bronze:    #a67c52; /* Soft Bronze */
+  --color-brand-primary:   #C89F3D; /* Gold accent */
+  --color-brand-hover:     #D7B04B; /* Gold hover */
+  --color-brand-bronze:    #a67c52; /* Soft bronze */
   
-  --color-text-primary:    #fffff0; /* Ivory */
-  --color-text-secondary:  #bdaea4; /* Subdued beige */
-  --color-text-dim:        #7a6a5f; /* Muted brown-gray */
+  --color-text-primary:    #F4F1EA; /* Warm off-white */
+  --color-text-secondary:  #B7AEA5; /* Muted warm gray */
+  --color-text-dim:        #8D837A; /* Darker muted gray */
   
-  --color-border-subtle:   #34281e;
-  --color-border-default:  #4c3d31;
-  --color-border-bright:   #8a715a;
+  --color-border-subtle:   #3B2E25;
+  --color-border-default:  #4C3D31;
+  --color-border-bright:   #8A715A;
+
+  --color-success:         #4BAF7A;
+  --color-warning:         #C98A39;
+  --color-danger:          #C45D5D;
   
   --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
