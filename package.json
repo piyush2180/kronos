@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "benchmark": "node benchmark/runner.js tournament",
+    "benchmark:positions": "node benchmark/runner.js position",
+    "benchmark:calibrate": "node benchmark/runner.js calibrate"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

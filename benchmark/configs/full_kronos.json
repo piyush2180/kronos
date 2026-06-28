@@ -1,0 +1,11 @@
+{
+  "name": "Full Kronos Engine",
+  "description": "All search optimizations active: Alpha-Beta, Iterative Deepening, Move Ordering, TT, and Quiescence.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": true,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": true
+}

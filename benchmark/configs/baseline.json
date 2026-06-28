@@ -1,0 +1,11 @@
+{
+  "name": "Baseline Minimax",
+  "description": "Naive minimax search without alpha-beta pruning or any search optimizations.",
+  "useAlphaBeta": false,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": false,
+  "useMVVLVA": false,
+  "useKillerMoves": false,
+  "useTranspositionTable": false,
+  "useQuiescence": false
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Killer Moves",
+  "description": "Alpha-Beta search with Move Ordering and Killer Move heuristic.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": false,
+  "useQuiescence": false
+}

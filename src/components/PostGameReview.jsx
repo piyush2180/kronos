@@ -18,26 +18,6 @@ export default function PostGameReview({
   onToggleHeatmap = () => {}
 }) {
 
-  if (isAnalyzing) {
-    return (
-      <div style={styles.loaderWrapper} className="animate-fade-in">
-        <Award size={36} style={styles.loaderIcon} />
-        <div style={styles.loaderTitle}>Generating Game Review</div>
-        <div style={styles.loaderSubtitle}>
-          Kronos is analyzing move evaluations and detecting blunders...
-        </div>
-        
-        <div style={styles.progressContainer}>
-          <div style={styles.progressBar(analysisProgress)} />
-        </div>
-        
-        <div style={styles.progressText}>
-          {analysisProgress}% Completed
-        </div>
-      </div>
-    );
-  }
-  
   // Calculate accuracy and counts for both sides
   const stats = useMemo(() => {
     const counts = {
@@ -85,6 +65,26 @@ export default function PostGameReview({
       criticalMoments
     };
   }, [gameHistory]);
+
+  if (isAnalyzing) {
+    return (
+      <div style={styles.loaderWrapper} className="animate-fade-in">
+        <Award size={36} style={styles.loaderIcon} />
+        <div style={styles.loaderTitle}>Generating Game Review</div>
+        <div style={styles.loaderSubtitle}>
+          Kronos is analyzing move evaluations and detecting blunders...
+        </div>
+        
+        <div style={styles.progressContainer}>
+          <div style={styles.progressBar(analysisProgress)} />
+        </div>
+        
+        <div style={styles.progressText}>
+          {analysisProgress}% Completed
+        </div>
+      </div>
+    );
+  }
 
   const activeUser = localStorage.getItem('kronos_v2_active_user') || 'Guest';
 

@@ -1,0 +1,11 @@
+{
+  "name": "Transposition Table & Zobrist",
+  "description": "Alpha-Beta search with Move Ordering, Killer Moves, and Transposition Table caching.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": false
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Quiescence Search",
+  "description": "Alpha-Beta search with Move Ordering, TT, and Quiescence Search horizon extensions.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": true
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Alpha-Beta Only",
+  "description": "Minimax search with Alpha-Beta pruning enabled.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": false,
+  "useMVVLVA": false,
+  "useKillerMoves": false,
+  "useTranspositionTable": false,
+  "useQuiescence": false
+}

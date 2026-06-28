@@ -1,0 +1,11 @@
+{
+  "name": "Move Ordering (MVV-LVA)",
+  "description": "Alpha-Beta search with move ordering and MVV-LVA capture sorting enabled.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": false,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": false,
+  "useTranspositionTable": false,
+  "useQuiescence": false
+}
