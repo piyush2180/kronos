@@ -6,12 +6,19 @@ yarn-debug.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
-dist-ssr
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
 *.local
 
-# Editor directories and files
+# Editor files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -25,3 +32,9 @@ dist-ssr
 # Benchmark outputs
 benchmark/output/*
 !benchmark/output/.gitkeep
+
+# Vercel
+.vercel
+
+# Coverage (if you add tests later)
+coverage
