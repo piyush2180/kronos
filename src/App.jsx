@@ -1,7 +1,7 @@
 // Kronos Chess V2 — Main Application Shell
 // Act as a hash-based router shell containing the global header, avatar menu, and command palette.
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import Auth from './components/Auth';
 import Dashboard from './pages/Dashboard';
 import PlayPage from './pages/PlayPage';
@@ -14,6 +14,8 @@ import CommandPalette from './components/CommandPalette';
 import PositionEditor from './components/PositionEditor';
 import AboutPage from './pages/AboutPage';
 import { Volume2, Palette, LogOut, Settings, User, Command, Keyboard, Info, X } from 'lucide-react';
+
+const ResearchLabPage = lazy(() => import('./pages/ResearchLabPage'));
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('kronos_v2_active_user'));
@@ -48,6 +50,7 @@ export default function App() {
     if (hash.startsWith('#/analysis')) return 'analysis';
     if (hash.startsWith('#/puzzles')) return 'puzzles';
     if (hash.startsWith('#/learn')) return 'learn';
+    if (hash.startsWith('#/research')) return 'research';
     if (hash.startsWith('#/profile')) return 'profile';
     if (hash.startsWith('#/editor')) return 'editor';
     if (hash.startsWith('#/about')) return 'about';
@@ -171,6 +174,12 @@ export default function App() {
             style={styles.navLink(activeTab === 'learn')}
           >
             Learn
+          </button>
+          <button 
+            onClick={() => navigate('/research')}
+            style={styles.navLink(activeTab === 'research')}
+          >
+            Research Lab
           </button>
         </nav>
 
@@ -300,6 +309,12 @@ export default function App() {
           <div style={styles.scrollPage}>
             <Learn />
           </div>
+        )}
+
+        {activeTab === 'research' && (
+          <Suspense fallback={<div style={{ color: '#d4af37', padding: '2rem', textAlign: 'center' }}>Loading Research Workstation...</div>}>
+            <ResearchLabPage onBack={() => navigate('/')} />
+          </Suspense>
         )}
 
         {activeTab === 'profile' && (
