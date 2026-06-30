@@ -1,0 +1,79 @@
+﻿======================================================================
+     Phase 2 ΓÇô Empirical Benchmark Execution & Experimental Suite     
+======================================================================
+
+[Task 1/5] Executing Research Smoke Test (20 Games, Depth 2, Seed 42)...
+Starting Tournament: Full Kronos Engine vs Baseline Minimax
+Seed: 42 | Depth: 1 | Mode: Fixed Games (20)
+
+Game 1/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (35 moves, 192 NPS)
+Game 2/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (36 moves, 310 NPS)
+Game 3/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (33 moves, 204 NPS)
+Game 4/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (26 moves, 173 NPS)
+Game 5/20: Full Kronos Engine vs Baseline Minimax -> 0-1 (26 moves, 211 NPS)
+Game 6/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (40 moves, 352 NPS)
+Game 7/20: Full Kronos Engine vs Baseline Minimax -> 1/2-1/2 (65 moves, 302 NPS)
+Game 8/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (22 moves, 341 NPS)
+Game 9/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (23 moves, 240 NPS)
+Game 10/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (54 moves, 383 NPS)
+Game 11/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (35 moves, 165 NPS)
+Game 12/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (36 moves, 323 NPS)
+Game 13/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (33 moves, 232 NPS)
+Game 14/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (26 moves, 190 NPS)
+Game 15/20: Full Kronos Engine vs Baseline Minimax -> 0-1 (26 moves, 189 NPS)
+Game 16/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (40 moves, 264 NPS)
+Game 17/20: Full Kronos Engine vs Baseline Minimax -> 1/2-1/2 (65 moves, 394 NPS)
+Game 18/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (22 moves, 257 NPS)
+Game 19/20: Full Kronos Engine vs Baseline Minimax -> 1-0 (23 moves, 253 NPS)
+Game 20/20: Baseline Minimax vs Full Kronos Engine -> 0-1 (54 moves, 360 NPS)
+
+==================================================
+Research Experiment Artifact Package generated in:
+C:\Users\Piyush\OneDrive\Desktop\chess\benchmark\output\experiment_20260630_013412
+Overall Certification Status: [ NOT VALID FOR PUBLICATION ]
+==================================================
+
+Ordo helper scripts generated in: C:\Users\Piyush\OneDrive\Desktop\chess\benchmark\output\experiment_20260630_013412
+To run Ordo manually, execute: ordo -p "C:\Users\Piyush\OneDrive\Desktop\chess\benchmark\output\experiment_20260630_013412\games.pgn" -o "C:\Users\Piyush\OneDrive\Desktop\chess\benchmark\output\experiment_20260630_013412\ordo_ratings.txt"
+Γ£ö Smoke Test Completed. Output written to: C:\Users\Piyush\OneDrive\Desktop\chess\benchmark\output\experiment_20260630_013412
+
+[Task 2/5] Executing Repeatability Validation (Sequential identical 10-game runs)...
+Starting Tournament: Full Kronos Engine vs Baseline Minimax
+Seed: 42 | Depth: 1 | Mode: Fixed Games (10)
+
+Game 1/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (35 moves, 171 NPS)
+Game 2/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (36 moves, 277 NPS)
+Game 3/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (33 moves, 194 NPS)
+Game 4/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (26 moves, 153 NPS)
+Game 5/10: Full Kronos Engine vs Baseline Minimax -> 0-1 (26 moves, 193 NPS)
+Game 6/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (40 moves, 246 NPS)
+Game 7/10: Full Kronos Engine vs Baseline Minimax -> 1/2-1/2 (65 moves, 313 NPS)
+Game 8/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (22 moves, 255 NPS)
+Game 9/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (23 moves, 237 NPS)
+Game 10/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (54 moves, 334 NPS)
+Starting Tournament: Full Kronos Engine vs Baseline Minimax
+Seed: 42 | Depth: 1 | Mode: Fixed Games (10)
+
+Game 1/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (35 moves, 163 NPS)
+Game 2/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (36 moves, 324 NPS)
+Game 3/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (33 moves, 174 NPS)
+Game 4/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (26 moves, 140 NPS)
+Game 5/10: Full Kronos Engine vs Baseline Minimax -> 0-1 (26 moves, 177 NPS)
+Game 6/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (40 moves, 255 NPS)
+Game 7/10: Full Kronos Engine vs Baseline Minimax -> 1/2-1/2 (65 moves, 268 NPS)
+Game 8/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (22 moves, 184 NPS)
+Game 9/10: Full Kronos Engine vs Baseline Minimax -> 1-0 (23 moves, 207 NPS)
+Game 10/10: Baseline Minimax vs Full Kronos Engine -> 0-1 (54 moves, 262 NPS)
+Γ£ö Repeatability Certified: 100% exact PGN hash and statistical match across sequential runs.
+
+[Task 3/5] Executing Self-Consistency Test (Full Kronos vs Full Kronos, 20 Games)...
+Starting Tournament: Full Kronos Engine vs Full Kronos Engine
+Seed: 42 | Depth: 1 | Mode: Fixed Games (20)
+
+Game 1/20: Full Kronos Engine vs Full Kronos Engine -> 1/2-1/2 (55 moves, 23 NPS)
+Game 2/20: Full Kronos Engine vs Full Kronos Engine -> 1/2-1/2 (93 moves, 14 NPS)
+Game 3/20: Full Kronos Engine vs Full Kronos Engine -> 1/2-1/2 (50 moves, 15 NPS)
+Game 4/20: Full Kronos Engine vs Full Kronos Engine -> 1/2-1/2 (54 moves, 27 NPS)
+Game 5/20: Full Kronos Engine vs Full Kronos Engine -> 0-1 (66 moves, 18 NPS)
+Game 6/20: Full Kronos Engine vs Full Kronos Engine -> 0-1 (38 moves, 14 NPS)
+Game 7/20: Full Kronos Engine vs Full Kronos Engine -> 1-0 (86 moves, 16 NPS)

@@ -247,7 +247,7 @@ export default function Auth({ onAuthSuccess }) {
             </div>
 
             <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
-              {loading ? <Loader style={styles.spinner} /> : 'Send Reset Link'}
+              {loading ? <Loader size={16} className="animate-spin" /> : 'Send Reset Link'}
             </button>
 
             <button
@@ -340,7 +340,7 @@ export default function Auth({ onAuthSuccess }) {
 
             {/* Submit */}
             <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
-              {loading ? <Loader style={styles.spinner} /> : (isSignUp ? 'Create Account' : 'Sign In')}
+              {loading ? <Loader size={16} className="animate-spin" /> : (isSignUp ? 'Create Account' : 'Sign In')}
             </button>
 
             {/* Toggle tabs */}

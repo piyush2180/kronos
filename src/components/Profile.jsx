@@ -105,7 +105,11 @@ export default function Profile({ username }) {
               );
             })
           ) : (
-            <div style={styles.emptyState}>No matches recorded in this profile yet.</div>
+            <div style={styles.emptyContainer}>
+              <Trophy size={20} style={{ color: 'var(--color-text-dim)', marginBottom: '8px' }} />
+              <div style={styles.emptyTitle}>No Matches Recorded</div>
+              <div style={styles.emptyText}>You haven't completed any rated matches in this active profile yet.</div>
+            </div>
           )}
         </div>
       </div>
@@ -269,10 +273,24 @@ const styles = {
     fontSize: '11px',
     letterSpacing: '0.02em',
   },
-  emptyState: {
+  emptyContainer: {
     textAlign: 'center',
-    padding: '30px 20px',
+    padding: '32px 20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
     color: 'var(--color-text-dim)',
-    fontSize: '12px',
+  },
+  emptyTitle: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: 'var(--color-text-primary)',
+    marginBottom: '4px',
+  },
+  emptyText: {
+    fontSize: '11px',
+    color: 'var(--color-text-dim)',
+    lineHeight: '1.4',
+    maxWidth: '220px',
   }
 };

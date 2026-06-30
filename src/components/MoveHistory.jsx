@@ -2,7 +2,7 @@
 // Renders algebraic moves list, classification badges, and Opening details with a detailed strategy card.
 
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, BookOpen, User, Star, Lightbulb, AlertTriangle, AlertOctagon, HelpCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, User, Star, Lightbulb, AlertTriangle, AlertOctagon, HelpCircle, Sliders } from 'lucide-react';
 import { OPENING_DETAILS_DB } from '../utils/openingsData';
 
 // Helper to return icon and color for move classifications
@@ -94,75 +94,79 @@ export default function MoveHistory({
 
       {/* Moves grid list */}
       <div style={styles.scrollWrapper} className="scroll-panel move-history-scroll-panel">
-        <div style={styles.movesGrid}>
-          {groupedMoves.map((pair, idx) => {
-            const wIdx = idx * 2;
-            const bIdx = idx * 2 + 1;
+        {gameHistory.length === 0 ? (
+          <div style={styles.emptyState}>
+            <Sliders size={20} style={{ color: 'var(--color-text-dim)', marginBottom: '8px' }} />
+            <div style={styles.emptyTitle}>Awaiting Moves</div>
+            <div style={styles.emptyText}>Algebraic moves and engine evaluations will display here once the match begins.</div>
+          </div>
+        ) : (
+          <div style={styles.movesGrid}>
+            {groupedMoves.map((pair, idx) => {
+              const wIdx = idx * 2;
+              const bIdx = idx * 2 + 1;
 
-            const isWSelected = previewIndex === wIdx;
-            const isBSelected = previewIndex === bIdx;
+              const isWSelected = previewIndex === wIdx;
+              const isBSelected = previewIndex === bIdx;
 
-            const wClass = pair[0]?.classification || 'Good';
-            const bClass = pair[1]?.classification || 'Good';
+              const wClass = pair[0]?.classification || 'Good';
+              const bClass = pair[1]?.classification || 'Good';
 
-            const wCfg = CLASSIFICATION_CONFIG[wClass] || CLASSIFICATION_CONFIG['Good'];
-            const bCfg = CLASSIFICATION_CONFIG[bClass] || CLASSIFICATION_CONFIG['Good'];
+              const wCfg = CLASSIFICATION_CONFIG[wClass] || CLASSIFICATION_CONFIG['Good'];
+              const bCfg = CLASSIFICATION_CONFIG[bClass] || CLASSIFICATION_CONFIG['Good'];
 
-            return (
-              <div key={idx} style={styles.gridRow}>
-                <span style={styles.moveNum}>{idx + 1}.</span>
-                
-                {/* White Move */}
-                <div 
-                  onClick={() => handleSelect(wIdx)}
-                  style={{
-                    ...styles.moveCell,
-                    backgroundColor: isWSelected ? 'var(--color-bg-elevated)' : 'transparent',
-                    color: isWSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'
-                  }}
-                >
-                  <span style={styles.sanText}>{pair[0].san}</span>
-                  {modeSelected !== 'local' && (
-                    <span 
-                      style={{ ...styles.classBadge, backgroundColor: wCfg.bg, color: wCfg.color }}
-                      title={wClass}
-                    >
-                      {wCfg.icon}
-                    </span>
-                  )}
-                </div>
-
-                {/* Black Move */}
-                {pair[1] ? (
+              return (
+                <div key={idx} style={styles.gridRow}>
+                  <span style={styles.moveNum}>{idx + 1}.</span>
+                  
+                  {/* White Move */}
                   <div 
-                    onClick={() => handleSelect(bIdx)}
+                    onClick={() => handleSelect(wIdx)}
                     style={{
                       ...styles.moveCell,
-                      backgroundColor: isBSelected ? 'var(--color-bg-elevated)' : 'transparent',
-                      color: isBSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'
+                      backgroundColor: isWSelected ? 'var(--color-bg-elevated)' : 'transparent',
+                      color: isWSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'
                     }}
                   >
-                    <span style={styles.sanText}>{pair[1].san}</span>
+                    <span style={styles.sanText}>{pair[0].san}</span>
                     {modeSelected !== 'local' && (
                       <span 
-                        style={{ ...styles.classBadge, backgroundColor: bCfg.bg, color: bCfg.color }}
-                        title={bClass}
+                        style={{ ...styles.classBadge, backgroundColor: wCfg.bg, color: wCfg.color }}
+                        title={wClass}
                       >
-                        {bCfg.icon}
+                        {wCfg.icon}
                       </span>
                     )}
                   </div>
-                ) : (
-                  <div style={styles.moveCellEmpty} />
-                )}
-              </div>
-            );
-          })}
 
-          {gameHistory.length === 0 && (
-            <div style={styles.emptyState}>No moves played yet.</div>
-          )}
-        </div>
+                  {/* Black Move */}
+                  {pair[1] ? (
+                    <div 
+                      onClick={() => handleSelect(bIdx)}
+                      style={{
+                        ...styles.moveCell,
+                        backgroundColor: isBSelected ? 'var(--color-bg-elevated)' : 'transparent',
+                        color: isBSelected ? 'var(--color-brand-primary)' : 'var(--color-text-primary)'
+                      }}
+                    >
+                      <span style={styles.sanText}>{pair[1].san}</span>
+                      {modeSelected !== 'local' && (
+                        <span 
+                          style={{ ...styles.classBadge, backgroundColor: bCfg.bg, color: bCfg.color }}
+                          title={bClass}
+                        >
+                          {bCfg.icon}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div style={styles.moveCellEmpty} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Timeline Controls */}
@@ -488,5 +492,27 @@ const styles = {
   closePopupBtn: {
     padding: '10px',
     fontSize: '12px',
+  },
+  emptyState: {
+    padding: '30px 20px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    height: '100%',
+    color: 'var(--color-text-dim)',
+  },
+  emptyTitle: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: 'var(--color-text-primary)',
+    marginBottom: '4px',
+  },
+  emptyText: {
+    fontSize: '11px',
+    color: 'var(--color-text-dim)',
+    lineHeight: '1.4',
+    maxWidth: '220px',
   }
 };

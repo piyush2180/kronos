@@ -86,6 +86,19 @@ export default function PostGameReview({
     );
   }
 
+  if (gameHistory.length === 0) {
+    return (
+      <div style={styles.emptyReview} className="animate-fade-in">
+        <Award size={32} style={{ color: 'var(--color-text-dim)', marginBottom: '8px' }} />
+        <div style={styles.emptyTitle}>No Analytics Available</div>
+        <div style={styles.emptyText}>Complete a match to unlock move evaluations, accuracy stats, and review diagnostics.</div>
+        <button className="btn-gold" style={{ marginTop: '16px', height: '32px', width: '100%', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }} onClick={onReset}>
+          Start New Match
+        </button>
+      </div>
+    );
+  }
+
   const activeUser = localStorage.getItem('kronos_v2_active_user') || 'Guest';
 
   // Determine label matches
@@ -512,5 +525,28 @@ const styles = {
     fontWeight: '700',
     color: 'var(--color-text-secondary)',
     fontFamily: 'monospace',
+  },
+  emptyReview: {
+    padding: '40px 24px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+    height: '100%',
+    color: 'var(--color-text-dim)',
+    boxSizing: 'border-box'
+  },
+  emptyTitle: {
+    fontSize: '13px',
+    fontWeight: '700',
+    color: 'var(--color-text-primary)',
+    marginBottom: '4px',
+  },
+  emptyText: {
+    fontSize: '11px',
+    color: 'var(--color-text-dim)',
+    lineHeight: '1.4',
+    maxWidth: '220px',
   }
 };

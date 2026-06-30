@@ -2,7 +2,7 @@
 // Manages game state options, timers, action triggers, and engine telemetry display.
 
 import React, { useState } from 'react';
-import { Target, Shuffle, Volume2, RefreshCw, Flag, Award, Eye, Clipboard, ArrowLeft, Cpu, Sliders, FileText, ExternalLink } from 'lucide-react';
+import { Target, Shuffle, Volume2, RefreshCw, Flag, Award, Eye, Clipboard, ArrowLeft, Cpu, Sliders, FileText, ExternalLink, ShieldAlert } from 'lucide-react';
 
 export default function ControlPanel({
   modeSelected,
@@ -39,6 +39,12 @@ export default function ControlPanel({
   const [fenInput, setFenInput] = useState('');
   const [pgnInput, setPgnInput] = useState('');
   const [showImportArea, setShowImportArea] = useState(null); // 'fen' | 'pgn' | null
+  const [errorMsg, setErrorMsg] = useState('');
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    setErrorMsg('');
+  };
 
   // Copy current FEN
   const handleCopyFen = () => {
@@ -49,12 +55,13 @@ export default function ControlPanel({
   const handleImportFenSubmit = (e) => {
     e.preventDefault();
     if (!fenInput) return;
+    setErrorMsg('');
     const success = importFen(fenInput.trim());
     if (success) {
       setFenInput('');
       setShowImportArea(null);
     } else {
-      alert('Invalid FEN position string.');
+      setErrorMsg('Invalid FEN position string. Verify layout.');
     }
   };
 
@@ -72,12 +79,13 @@ export default function ControlPanel({
   const handleImportPgnSubmit = (e) => {
     e.preventDefault();
     if (!pgnInput) return;
+    setErrorMsg('');
     const success = importPgn(pgnInput.trim());
     if (success) {
       setPgnInput('');
       setShowImportArea(null);
     } else {
-      alert('Failed to parse PGN content.');
+      setErrorMsg('Failed to parse PGN content. Verify syntax.');
     }
   };
 
@@ -97,7 +105,7 @@ export default function ControlPanel({
       {/* Tab Navigation */}
       <div style={styles.tabHeader}>
         <button
-          onClick={() => setActiveTab('game')}
+          onClick={() => handleTabChange('game')}
           style={{
             ...styles.tabBtn,
             borderBottom: currentTab === 'game' ? '2px solid var(--color-brand-primary)' : '2px solid transparent',
@@ -109,7 +117,7 @@ export default function ControlPanel({
         </button>
         {showEngineTab && (
           <button
-            onClick={() => setActiveTab('engine')}
+            onClick={() => handleTabChange('engine')}
             style={{
               ...styles.tabBtn,
               borderBottom: currentTab === 'engine' ? '2px solid var(--color-brand-primary)' : '2px solid transparent',
@@ -121,7 +129,7 @@ export default function ControlPanel({
           </button>
         )}
         <button
-          onClick={() => setActiveTab('tools')}
+          onClick={() => handleTabChange('tools')}
           style={{
             ...styles.tabBtn,
             borderBottom: currentTab === 'tools' ? '2px solid var(--color-brand-primary)' : '2px solid transparent',
@@ -133,8 +141,17 @@ export default function ControlPanel({
         </button>
       </div>
 
+      {/* Inline system error message banner */}
+      {errorMsg && (
+        <div style={styles.errorBanner} className="animate-fade-in">
+          <ShieldAlert size={14} style={{ color: 'var(--color-danger)', flexShrink: 0 }} />
+          <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--color-danger)' }}>{errorMsg}</span>
+          <button type="button" onClick={() => setErrorMsg('')} style={styles.errorCloseBtn}>&times;</button>
+        </div>
+      )}
+
       {/* Tab Content Panel */}
-      <div style={styles.tabContent}>
+      <div style={styles.tabContent} className="tab-transition-pane">
         
         {/* GAME TAB */}
         {currentTab === 'game' && (
@@ -282,7 +299,7 @@ export default function ControlPanel({
             <div style={styles.telemetryCard}>
               <div style={styles.telemetryHeader}>
                 <span>Engine Telemetry</span>
-                <span style={styles.searchStatusDot(isSearching)} title={thinkingStatus} />
+                <span style={styles.searchStatusDot(isSearching)} className={isSearching ? 'active-pulse-dot' : ''} title={thinkingStatus} />
               </div>
 
               {modeSelected === 'ai' && (
@@ -698,5 +715,25 @@ const styles = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  errorBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '8px 12px',
+    backgroundColor: 'rgba(196, 93, 93, 0.08)',
+    border: '1px solid rgba(196, 93, 93, 0.3)',
+    borderRadius: '4px',
+    margin: '6px 0',
+  },
+  errorCloseBtn: {
+    background: 'none',
+    border: 'none',
+    color: 'var(--color-text-dim)',
+    cursor: 'pointer',
+    marginLeft: 'auto',
+    fontSize: '14px',
+    fontWeight: '700',
+    padding: '0 4px',
   }
 };

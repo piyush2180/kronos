@@ -2,7 +2,7 @@
 // Desktop-first 3x2 card grid replacing the stacked vertical layout.
 
 import React from 'react';
-import { Target, Shuffle, Eye, Lightbulb, User, Edit, BookOpen, ArrowRight } from 'lucide-react';
+import { Target, Shuffle, Eye, Lightbulb, User, Edit, BookOpen, ArrowRight, Cpu } from 'lucide-react';
 
 const CARDS = [
   {
@@ -52,6 +52,14 @@ const CARDS = [
     route: '/learn',
     accent: '#fc8181',
     badge: 'LEARN',
+  },
+  {
+    title: 'Research Lab',
+    desc: 'Empirical research workstation. Execute tournaments, calibrate weights, and view reports.',
+    icon: Cpu,
+    route: '/research',
+    accent: '#b794f4',
+    badge: 'LAB',
   },
 ];
 
@@ -160,7 +168,7 @@ const styles = {
   },
   cardGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))',
     gap: '18px',
   },
   card: {

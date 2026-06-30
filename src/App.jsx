@@ -123,6 +123,20 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Close avatar dropdown when clicking outside
+  useEffect(() => {
+    if (!showAvatarDropdown) return;
+    const closeDropdown = (e) => {
+      const path = e.composedPath ? e.composedPath() : [];
+      const isAvatarClick = path.some(el => el.id === 'avatar-button-wrapper' || el.className === 'panel-card animate-fade-in');
+      if (!isAvatarClick) {
+        setShowAvatarDropdown(false);
+      }
+    };
+    window.addEventListener('click', closeDropdown);
+    return () => window.removeEventListener('click', closeDropdown);
+  }, [showAvatarDropdown]);
+
   const handleAuthSuccess = (user) => {
     localStorage.setItem('kronos_v2_active_user', user);
     setCurrentUser(user);
@@ -159,42 +173,49 @@ export default function App() {
               <button 
                 onClick={() => navigate('/')}
                 style={styles.navLink(activeTab === 'dashboard')}
+                className="nav-link-hoverable"
               >
                 Dashboard
               </button>
               <button 
                 onClick={() => navigate('/play')}
                 style={styles.navLink(activeTab === 'play')}
+                className="nav-link-hoverable"
               >
                 Play Engine
               </button>
               <button 
                 onClick={() => navigate('/local')}
                 style={styles.navLink(activeTab === 'local')}
+                className="nav-link-hoverable"
               >
                 Pass & Play
               </button>
               <button 
                 onClick={() => navigate('/analysis')}
                 style={styles.navLink(activeTab === 'analysis')}
+                className="nav-link-hoverable"
               >
                 Analysis
               </button>
               <button 
                 onClick={() => navigate('/puzzles')}
                 style={styles.navLink(activeTab === 'puzzles')}
+                className="nav-link-hoverable"
               >
                 Puzzles
               </button>
               <button 
                 onClick={() => navigate('/learn')}
                 style={styles.navLink(activeTab === 'learn')}
+                className="nav-link-hoverable"
               >
                 Learn
               </button>
               <button 
                 onClick={() => navigate('/research')}
                 style={styles.navLink(activeTab === 'research')}
+                className="nav-link-hoverable"
               >
                 Research Lab
               </button>
@@ -206,7 +227,7 @@ export default function App() {
                 <Command size={14} />
               </button>
               
-              <div style={styles.avatarWrapper}>
+              <div style={styles.avatarWrapper} id="avatar-button-wrapper">
                 <button 
                   onClick={() => setShowAvatarDropdown(!showAvatarDropdown)} 
                   style={styles.avatarBtn}
@@ -462,7 +483,16 @@ export default function App() {
         )}
 
         {activeTab === 'research' && (
-          <Suspense fallback={<div style={{ color: '#d4af37', padding: '2rem', textAlign: 'center' }}>Loading Research Workstation...</div>}>
+          <Suspense fallback={
+            <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem', width: '100%', maxWidth: '1200px', margin: '0 auto', boxSizing: 'border-box' }} className="animate-fade-in">
+              <div className="skeleton-loader" style={{ height: '32px', width: '220px' }} />
+              <div className="skeleton-loader" style={{ height: '42px', width: '100%' }} />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1.5rem', width: '100%', height: '320px' }}>
+                <div className="skeleton-loader" style={{ height: '100%', borderRadius: '6px' }} />
+                <div className="skeleton-loader" style={{ height: '100%', borderRadius: '6px' }} />
+              </div>
+            </div>
+          }>
             <ResearchLabPage onBack={() => navigate('/')} />
           </Suspense>
         )}
