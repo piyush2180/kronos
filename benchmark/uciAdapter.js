@@ -12,6 +12,8 @@ export class UCIEngineAdapter {
 
   async init() {
     return new Promise((resolve, reject) => {
+      let isSettled = false;
+
       try {
         this.process = spawn(this.binaryPath, [], { stdio: ['pipe', 'pipe', 'pipe'] });
       } catch (err) {
@@ -19,8 +21,19 @@ export class UCIEngineAdapter {
       }
 
       this.process.on('error', (err) => {
-        reject(new Error(`UCI Process Error (${this.binaryPath}): ${err.message}`));
+        if (!isSettled) {
+          isSettled = true;
+          reject(new Error(`UCI Process Error (${this.binaryPath}): ${err.message}`));
+        }
       });
+
+      if (!this.process.stdout || !this.process.stdin) {
+        if (!isSettled) {
+          isSettled = true;
+          reject(new Error(`UCI Process streams unavailable (${this.binaryPath})`));
+        }
+        return;
+      }
 
       this.rl = readline.createInterface({ input: this.process.stdout });
 
@@ -28,7 +41,6 @@ export class UCIEngineAdapter {
       const onLine = (line) => {
         if (line === 'uciok') {
           uciOK = true;
-          // Set options
           for (const [key, value] of Object.entries(this.options)) {
             this.sendCommand(`setoption name ${key} value ${value}`);
           }
@@ -36,7 +48,10 @@ export class UCIEngineAdapter {
         } else if (line === 'readyok' && uciOK) {
           this.isReady = true;
           this.rl.removeListener('line', onLine);
-          resolve(true);
+          if (!isSettled) {
+            isSettled = true;
+            resolve(true);
+          }
         }
       };
 
@@ -51,65 +66,108 @@ export class UCIEngineAdapter {
     }
   }
 
+  async clearState() {
+    if (this.process && this.isReady) {
+      return new Promise((resolve) => {
+        const onLine = (line) => {
+          if (line === 'readyok') {
+            this.rl.removeListener('line', onLine);
+            resolve(true);
+          }
+        };
+        this.rl.on('line', onLine);
+        this.sendCommand('ucinewgame');
+        this.sendCommand('isready');
+      });
+    }
+  }
+
   async go({ depth = 3, fen = null, timeMs = 0 }) {
     if (!this.isReady) await this.init();
 
     return new Promise((resolve) => {
-      this.sendCommand('ucinewgame');
-      this.sendCommand('isready');
-
-      if (fen) {
-        this.sendCommand(`position fen ${fen}`);
-      } else {
-        this.sendCommand('position startpos');
-      }
-
       let bestMove = null;
       let nodes = 0;
       let nps = 0;
       let depthReached = depth;
+      let scoreCp = null;
+      let scoreMate = null;
       const startTime = Date.now();
 
-      const onLine = (line) => {
-        if (line.startsWith('info') && line.includes('nodes')) {
-          const parts = line.split(' ');
-          const nodesIdx = parts.indexOf('nodes');
-          if (nodesIdx !== -1 && parts[nodesIdx + 1]) {
-            nodes = parseInt(parts[nodesIdx + 1], 10);
-          }
-          const npsIdx = parts.indexOf('nps');
-          if (npsIdx !== -1 && parts[npsIdx + 1]) {
-            nps = parseInt(parts[npsIdx + 1], 10);
-          }
+      const runSearch = () => {
+        if (fen) {
+          this.sendCommand(`position fen ${fen}`);
+        } else {
+          this.sendCommand('position startpos');
         }
 
-        if (line.startsWith('bestmove')) {
-          const parts = line.split(' ');
-          bestMove = parts[1];
-          this.rl.removeListener('line', onLine);
-          const elapsed = Date.now() - startTime;
-          resolve({
-            move: bestMove,
-            timeMs: elapsed,
-            stats: {
-              nodesSearched: nodes,
-              nodesPerSecond: nps || (nodes ? Math.round(nodes / (elapsed / 1000 || 0.001)) : 0),
-              quiescenceNodes: 0,
-              transpositionHits: 0,
-              betaCutoffs: 0
-            },
-            depthReached
-          });
+        const onLine = (line) => {
+          if (line.startsWith('info')) {
+            const parts = line.split(' ');
+            const nodesIdx = parts.indexOf('nodes');
+            if (nodesIdx !== -1 && parts[nodesIdx + 1]) {
+              nodes = parseInt(parts[nodesIdx + 1], 10);
+            }
+            const npsIdx = parts.indexOf('nps');
+            if (npsIdx !== -1 && parts[npsIdx + 1]) {
+              nps = parseInt(parts[npsIdx + 1], 10);
+            }
+            const depthIdx = parts.indexOf('depth');
+            if (depthIdx !== -1 && parts[depthIdx + 1]) {
+              depthReached = parseInt(parts[depthIdx + 1], 10);
+            }
+            const scoreIdx = parts.indexOf('score');
+            if (scoreIdx !== -1) {
+              if (parts[scoreIdx + 1] === 'cp' && parts[scoreIdx + 2]) {
+                scoreCp = parseInt(parts[scoreIdx + 2], 10);
+              } else if (parts[scoreIdx + 1] === 'mate' && parts[scoreIdx + 2]) {
+                scoreMate = parseInt(parts[scoreIdx + 2], 10);
+              }
+            }
+          }
+
+          if (line.startsWith('bestmove')) {
+            const parts = line.split(' ');
+            bestMove = parts[1];
+            this.rl.removeListener('line', onLine);
+            const elapsed = Date.now() - startTime;
+            resolve({
+              move: bestMove,
+              timeMs: elapsed,
+              score: scoreCp !== null ? scoreCp : (scoreMate !== null ? scoreMate * 10000 : 0),
+              scoreCp,
+              scoreMate,
+              stats: {
+                nodesSearched: nodes,
+                nodesPerSecond: nps || (nodes ? Math.round(nodes / (elapsed / 1000 || 0.001)) : 0),
+                quiescenceNodes: 0,
+                transpositionHits: 0,
+                betaCutoffs: 0
+              },
+              depthReached
+            });
+          }
+        };
+
+        this.rl.on('line', onLine);
+
+        if (timeMs > 0) {
+          this.sendCommand(`go movetime ${timeMs}`);
+        } else {
+          this.sendCommand(`go depth ${depth}`);
         }
       };
 
-      this.rl.on('line', onLine);
-
-      if (timeMs > 0) {
-        this.sendCommand(`go movetime ${timeMs}`);
-      } else {
-        this.sendCommand(`go depth ${depth}`);
-      }
+      // Sync ucinewgame and isready before sending search
+      const onReady = (line) => {
+        if (line === 'readyok') {
+          this.rl.removeListener('line', onReady);
+          runSearch();
+        }
+      };
+      this.rl.on('line', onReady);
+      this.sendCommand('ucinewgame');
+      this.sendCommand('isready');
     });
   }
 
@@ -118,6 +176,7 @@ export class UCIEngineAdapter {
       this.sendCommand('quit');
       this.process.kill();
       this.process = null;
+      this.isReady = false;
     }
   }
 }

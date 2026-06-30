@@ -21,15 +21,15 @@ export default function OptimizationTimeline({ experiments = [] }) {
       return {
         ...stg,
         elo: `+${match.stats.eloDiff.toFixed(1)} Elo`,
-        nps: match.telemetryA?.nodesPerSecond?.toLocaleString() || '3,450',
-        bf: match.telemetryA?.branchingFactor?.toFixed(2) || '2.85',
+        nps: match.telemetryA?.nodesPerSecond ? match.telemetryA.nodesPerSecond.toLocaleString() : (match.telemetryA?.nps ? match.telemetryA.nps.toLocaleString() : 'N/A'),
+        bf: match.telemetryA?.branchingFactor ? match.telemetryA.branchingFactor.toFixed(2) : 'N/A',
         tt: match.telemetryA?.transpositionHits ? `${((match.telemetryA.transpositionHits / (match.telemetryA.nodesSearched || 1))*100).toFixed(1)}% Hits` : 'Disabled',
         status: 'VERIFIED'
       };
     }
 
     if (stg.key === 'minimax') {
-      return { ...stg, elo: '+0 (Baseline)', nps: '2,006', bf: '11.80', tt: 'Disabled', status: 'BASELINE' };
+      return { ...stg, elo: '+0 (Baseline)', nps: 'Baseline', bf: 'Baseline', tt: 'Disabled', status: 'BASELINE' };
     }
 
     return {

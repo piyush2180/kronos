@@ -41,7 +41,7 @@ async function main() {
   if (options.mode === 'tournament') {
     const runner = new TournamentRunner(options);
     const results = await runner.run();
-    const { outputDir, certification } = ReportGenerator.generate(results, options);
+    const { outputDir, certification, checks } = ReportGenerator.generate(results, options);
     if (results.pgnContent) {
       OrdoExporter.export(path.join(outputDir, 'games.pgn'), outputDir);
     }
@@ -49,13 +49,11 @@ async function main() {
     console.log(`==================================================`);
     console.log(`              EXPERIMENT INTEGRITY                `);
     console.log(`==================================================`);
-    console.log(`Configuration Isolation: PASS`);
-    console.log(`Tournament Validation: PASS`);
-    console.log(`PGN Validation: PASS`);
-    console.log(`Telemetry Validation: PASS`);
-    console.log(`Statistical Validation: PASS`);
-    console.log(`Calibration Validation: PASS`);
-    console.log(`Reproducibility: PASS\n`);
+    console.log(`Configuration Isolation: ${checks?.configIsolation?.valid ? 'PASS' : 'FAIL'}`);
+    console.log(`Opening Suite Validation: ${checks?.openingSuite?.valid ? 'PASS' : 'FAIL'}`);
+    console.log(`PGN Validation:           ${checks?.pgn?.valid ? 'PASS' : 'FAIL'}`);
+    console.log(`Telemetry Validation:     ${checks?.telemetry?.valid ? 'PASS' : 'FAIL'}`);
+    console.log(`Statistical Validation:   ${checks?.statistics?.valid ? 'PASS' : 'FAIL'}\n`);
     console.log(`Overall Status: [ ${certification} ]`);
     console.log(`==================================================\n`);
   } else if (options.mode === 'position') {

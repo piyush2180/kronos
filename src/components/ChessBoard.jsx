@@ -389,7 +389,7 @@ const styles = {
     flexDirection: 'column',
     gap: '8px',
     width: '100%',
-    maxWidth: '70vh',
+    maxWidth: 'min(70vh, 680px)',
   },
   hudWrapper: {
     display: 'flex',

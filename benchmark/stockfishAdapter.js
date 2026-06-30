@@ -10,6 +10,10 @@ export class StockfishAdapter {
     return await this.uci.init();
   }
 
+  async clearState() {
+    return await this.uci.clearState();
+  }
+
   async go(params) {
     return await this.uci.go(params);
   }

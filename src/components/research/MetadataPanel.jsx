@@ -1,9 +1,40 @@
 import React from 'react';
 import { Cpu, GitBranch, Terminal, HardDrive, ShieldCheck, Database } from 'lucide-react';
 
-export default function MetadataPanel({ experimentCount = 0, latestExperiment = null }) {
+export default function MetadataPanel({ experimentCount = 0, latestExperiment = null, isTablet = false }) {
   const nodeVersion = typeof process !== 'undefined' && process.version ? process.version : 'v20.11.0';
   const platform = typeof process !== 'undefined' && process.platform ? process.platform : 'win32-x64';
+
+  if (isTablet) {
+    return (
+      <div style={styles.tabletPanel} className="card-primary">
+        <div style={styles.header}>
+          <Cpu size={14} color="#d4af37" />
+          <span style={styles.headerTitle}>System Metadata Inspector (Diagnostics)</span>
+        </div>
+        <div style={styles.tabletGrid}>
+          <div style={styles.tabletSection}>
+            <span style={styles.sectionLabel}>Workspace Status</span>
+            <span style={styles.itemValSuccess}>Connected</span>
+          </div>
+          <div style={styles.tabletSection}>
+            <span style={styles.sectionLabel}>Datasets loaded</span>
+            <span style={styles.itemValBold}>{experimentCount} Loaded</span>
+          </div>
+          <div style={styles.tabletSection}>
+            <span style={styles.sectionLabel}>Engine thread status</span>
+            <span style={styles.itemValSuccess}>Stockfish Worker Online</span>
+          </div>
+          <div style={styles.tabletSection}>
+            <span style={styles.sectionLabel}>Latest telemetry run</span>
+            <span style={styles.itemValCode}>
+              {latestExperiment ? latestExperiment.id.slice(0, 16) + '...' : 'None'}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <aside style={styles.panel}>
@@ -152,5 +183,25 @@ const styles = {
     color: '#34D399',
     fontSize: '0.7rem',
     fontWeight: 600
+  },
+  tabletPanel: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    padding: '1rem',
+    backgroundColor: 'var(--color-bg-surface, #1e1712)',
+    border: '1px solid rgba(52, 40, 30, 0.4)',
+    borderRadius: '8px',
+    width: '100%',
+  },
+  tabletGrid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '1rem',
+  },
+  tabletSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.2rem',
   }
 };

@@ -94,9 +94,9 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
     : game.fen;
 
   return (
-    <div style={styles.splitGrid} className="animate-fade-in">
+    <div style={styles.splitGrid} className="animate-fade-in game-split-grid">
       {/* Left: Chessboard */}
-      <div style={styles.boardColumn}>
+      <div style={styles.boardColumn} className="board-column-wrapper">
         <ChessBoard
           fen={boardFen}
           gameHistory={game.gameHistory}
@@ -121,8 +121,8 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
       </div>
 
       {/* Right: Sidebar container */}
-      <div style={styles.sidebarColumn}>
-        <div style={styles.sidebarWrapper} className="panel-card">
+      <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
+        <div style={styles.sidebarWrapper} className="panel-card sidebar-card-wrapper">
           <div style={styles.controlSection}>
             <ControlPanel
               modeSelected={game.modeSelected}

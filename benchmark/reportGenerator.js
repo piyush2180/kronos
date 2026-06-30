@@ -109,7 +109,13 @@ export class ReportGenerator {
     console.log(`Overall Certification Status: [ ${integrityReportObj.overallStatus} ]`);
     console.log(`==================================================\n`);
 
-    return { outputDir, certification: integrityReportObj.overallStatus };
+    return { outputDir, certification: integrityReportObj.overallStatus, checks: {
+      configIsolation: configIsoRes,
+      openingSuite: openingSuiteRes,
+      pgn: pgnRes,
+      telemetry: telemetryRes,
+      statistics: statsRes
+    } };
   }
 
   static createMarkdownReport(data, certificationStatus) {

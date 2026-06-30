@@ -13,7 +13,7 @@ import Profile from './components/Profile';
 import CommandPalette from './components/CommandPalette';
 import PositionEditor from './components/PositionEditor';
 import AboutPage from './pages/AboutPage';
-import { Volume2, Palette, LogOut, Settings, User, Command, Keyboard, Info, X } from 'lucide-react';
+import { Volume2, Palette, LogOut, Settings, User, Command, Keyboard, Info, X, Menu } from 'lucide-react';
 
 const ResearchLabPage = lazy(() => import('./pages/ResearchLabPage'));
 
@@ -36,6 +36,21 @@ export default function App() {
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Responsive state listeners
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
+  const [isTablet, setIsTablet] = useState(() => window.innerWidth >= 640 && window.innerWidth <= 1024);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const w = window.innerWidth;
+      setIsMobile(w < 640);
+      setIsTablet(w >= 640 && w <= 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const navigate = (path) => {
@@ -137,134 +152,269 @@ export default function App() {
           <div style={styles.logoText}>KRONOS CHESS</div>
         </div>
 
-        {/* Tab links */}
-        <nav style={styles.nav}>
-          <button 
-            onClick={() => navigate('/')}
-            style={styles.navLink(activeTab === 'dashboard')}
-          >
-            Dashboard
-          </button>
-          <button 
-            onClick={() => navigate('/play')}
-            style={styles.navLink(activeTab === 'play')}
-          >
-            Play Engine
-          </button>
-          <button 
-            onClick={() => navigate('/local')}
-            style={styles.navLink(activeTab === 'local')}
-          >
-            Pass & Play
-          </button>
-          <button 
-            onClick={() => navigate('/analysis')}
-            style={styles.navLink(activeTab === 'analysis')}
-          >
-            Analysis
-          </button>
-          <button 
-            onClick={() => navigate('/puzzles')}
-            style={styles.navLink(activeTab === 'puzzles')}
-          >
-            Puzzles
-          </button>
-          <button 
-            onClick={() => navigate('/learn')}
-            style={styles.navLink(activeTab === 'learn')}
-          >
-            Learn
-          </button>
-          <button 
-            onClick={() => navigate('/research')}
-            style={styles.navLink(activeTab === 'research')}
-          >
-            Research Lab
-          </button>
-        </nav>
+        {!(isMobile || isTablet) ? (
+          <>
+            {/* Tab links */}
+            <nav style={styles.nav}>
+              <button 
+                onClick={() => navigate('/')}
+                style={styles.navLink(activeTab === 'dashboard')}
+              >
+                Dashboard
+              </button>
+              <button 
+                onClick={() => navigate('/play')}
+                style={styles.navLink(activeTab === 'play')}
+              >
+                Play Engine
+              </button>
+              <button 
+                onClick={() => navigate('/local')}
+                style={styles.navLink(activeTab === 'local')}
+              >
+                Pass & Play
+              </button>
+              <button 
+                onClick={() => navigate('/analysis')}
+                style={styles.navLink(activeTab === 'analysis')}
+              >
+                Analysis
+              </button>
+              <button 
+                onClick={() => navigate('/puzzles')}
+                style={styles.navLink(activeTab === 'puzzles')}
+              >
+                Puzzles
+              </button>
+              <button 
+                onClick={() => navigate('/learn')}
+                style={styles.navLink(activeTab === 'learn')}
+              >
+                Learn
+              </button>
+              <button 
+                onClick={() => navigate('/research')}
+                style={styles.navLink(activeTab === 'research')}
+              >
+                Research Lab
+              </button>
+            </nav>
 
-        {/* User control buttons */}
-        <div style={styles.headerControls}>
-          <button onClick={() => setShowCmdPalette(true)} style={styles.cmdPaletteBtn} title="Command Palette (Ctrl+K)">
-            <Command size={14} />
-          </button>
-          
-          <div style={styles.avatarWrapper}>
-            <button 
-              onClick={() => setShowAvatarDropdown(!showAvatarDropdown)} 
-              style={styles.avatarBtn}
-            >
-              {currentUser[0].toUpperCase()}
+            {/* User control buttons */}
+            <div style={styles.headerControls}>
+              <button onClick={() => setShowCmdPalette(true)} style={styles.cmdPaletteBtn} title="Command Palette (Ctrl+K)">
+                <Command size={14} />
+              </button>
+              
+              <div style={styles.avatarWrapper}>
+                <button 
+                  onClick={() => setShowAvatarDropdown(!showAvatarDropdown)} 
+                  style={styles.avatarBtn}
+                >
+                  {currentUser[0].toUpperCase()}
+                </button>
+
+                {/* Avatar Dropdown Settings */}
+                {showAvatarDropdown && (
+                  <div style={styles.dropdown} className="panel-card animate-fade-in">
+                    <div style={styles.dropdownHeader}>
+                      <div style={styles.dropUserRow}>
+                        <div style={styles.dropAvatarMini}>{currentUser[0].toUpperCase()}</div>
+                        <div>
+                          <div style={styles.userLabel}>{currentUser}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={styles.dropdownList}>
+                      <button
+                        onClick={() => { navigate('/profile'); setShowAvatarDropdown(false); }}
+                        style={styles.dropItem}
+                      >
+                        <User size={13} />
+                        <span>Profile</span>
+                      </button>
+
+                      <div style={styles.dropdownDivider} />
+
+                      {/* Board Theme */}
+                      <div style={styles.nestedMenu}>
+                        <div style={styles.nestedTitle}><Palette size={11} /> Board Theme</div>
+                        <div style={styles.themeRow}>
+                          <button onClick={() => updateTheme('walnut')} style={styles.themeBadge('walnut', boardTheme)}>Walnut</button>
+                          <button onClick={() => updateTheme('green')} style={styles.themeBadge('green', boardTheme)}>Green</button>
+                          <button onClick={() => updateTheme('slate')} style={styles.themeBadge('slate', boardTheme)}>Slate</button>
+                        </div>
+                      </div>
+
+                      {/* Sound toggle */}
+                      <button onClick={() => setSoundEnabled(!soundEnabled)} style={styles.dropItem}>
+                        <Volume2 size={13} />
+                        <span>Sounds</span>
+                        <span style={styles.dropBadge(soundEnabled)}>{soundEnabled ? 'ON' : 'OFF'}</span>
+                      </button>
+
+                      {/* Keyboard shortcuts info */}
+                      <button style={{ ...styles.dropItem, cursor: 'default' }} disabled>
+                        <Keyboard size={13} />
+                        <span style={{ flex: 1 }}>Shortcuts</span>
+                        <span style={styles.shortcutHint}>N · F · E · ←→</span>
+                      </button>
+
+                      {/* About */}
+                      <button 
+                        onClick={() => { navigate('/about'); setShowAvatarDropdown(false); }} 
+                        style={styles.dropItem}
+                      >
+                        <Info size={13} />
+                        <span style={{ flex: 1 }}>About Kronos</span>
+                      </button>
+
+                      <div style={styles.dropdownDivider} />
+
+                      <button onClick={handleLogout} style={{ ...styles.dropItem, color: '#f56565' }}>
+                        <LogOut size={13} />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div style={styles.headerControls}>
+            <button onClick={() => setShowCmdPalette(true)} style={styles.cmdPaletteBtn} title="Command Palette (Ctrl+K)">
+              <Command size={14} />
             </button>
+            <button onClick={() => setIsDrawerOpen(true)} style={styles.hamburgerBtn} title="Menu">
+              <Menu size={16} />
+            </button>
+          </div>
+        )}
+      </header>
 
-            {/* Avatar Dropdown Settings */}
-            {showAvatarDropdown && (
-              <div style={styles.dropdown} className="panel-card animate-fade-in">
-                <div style={styles.dropdownHeader}>
-                  <div style={styles.dropUserRow}>
-                    <div style={styles.dropAvatarMini}>{currentUser[0].toUpperCase()}</div>
-                    <div>
-                      <div style={styles.userLabel}>{currentUser}</div>
-                    </div>
-                  </div>
-                </div>
+      {/* MOBILE DRAWER */}
+      {(isMobile || isTablet) && (
+        <>
+          <div 
+            className={`mobile-drawer-overlay ${isDrawerOpen ? 'open' : ''}`} 
+            onClick={() => setIsDrawerOpen(false)} 
+          />
+          <div className={`mobile-drawer ${isDrawerOpen ? 'open' : ''}`}>
+            <div style={styles.drawerHeader}>
+              <div style={styles.logoText}>KRONOS CHESS</div>
+              <button onClick={() => setIsDrawerOpen(false)} style={styles.drawerCloseBtn}>
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div style={styles.dropdownDivider} />
 
-                <div style={styles.dropdownList}>
-                  <button
-                    onClick={() => { navigate('/profile'); setShowAvatarDropdown(false); }}
-                    style={styles.dropItem}
-                  >
-                    <User size={13} />
-                    <span>Profile</span>
-                  </button>
+            <div style={styles.drawerSection}>
+              <div style={styles.drawerSectionTitle}>Navigation</div>
+              <div style={styles.drawerList}>
+                <button 
+                  onClick={() => { navigate('/'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'dashboard')}
+                >
+                  Dashboard
+                </button>
+                <button 
+                  onClick={() => { navigate('/play'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'play')}
+                >
+                  Play Engine
+                </button>
+                <button 
+                  onClick={() => { navigate('/local'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'local')}
+                >
+                  Pass & Play
+                </button>
+                <button 
+                  onClick={() => { navigate('/analysis'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'analysis')}
+                >
+                  Analysis
+                </button>
+                <button 
+                  onClick={() => { navigate('/puzzles'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'puzzles')}
+                >
+                  Puzzles
+                </button>
+                <button 
+                  onClick={() => { navigate('/learn'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'learn')}
+                >
+                  Learn
+                </button>
+                <button 
+                  onClick={() => { navigate('/research'); setIsDrawerOpen(false); }}
+                  style={styles.drawerItem(activeTab === 'research')}
+                >
+                  Research Lab
+                </button>
+              </div>
+            </div>
 
-                  <div style={styles.dropdownDivider} />
+            <div style={styles.dropdownDivider} />
 
-                  {/* Board Theme */}
-                  <div style={styles.nestedMenu}>
-                    <div style={styles.nestedTitle}><Palette size={11} /> Board Theme</div>
-                    <div style={styles.themeRow}>
-                      <button onClick={() => updateTheme('walnut')} style={styles.themeBadge('walnut', boardTheme)}>Walnut</button>
-                      <button onClick={() => updateTheme('green')} style={styles.themeBadge('green', boardTheme)}>Green</button>
-                      <button onClick={() => updateTheme('slate')} style={styles.themeBadge('slate', boardTheme)}>Slate</button>
-                    </div>
-                  </div>
+            <div style={styles.drawerSection}>
+              <div style={styles.drawerSectionTitle}>Profile & settings</div>
+              
+              <button 
+                onClick={() => { navigate('/profile'); setIsDrawerOpen(false); }}
+                style={styles.drawerActionBtn}
+              >
+                <User size={14} />
+                <span>View Profile ({currentUser})</span>
+              </button>
 
-                  {/* Sound toggle */}
-                  <button onClick={() => setSoundEnabled(!soundEnabled)} style={styles.dropItem}>
-                    <Volume2 size={13} />
-                    <span>Sounds</span>
-                    <span style={styles.dropBadge(soundEnabled)}>{soundEnabled ? 'ON' : 'OFF'}</span>
-                  </button>
+              <div style={styles.drawerDivider} />
 
-                  {/* Keyboard shortcuts info */}
-                  <button style={{ ...styles.dropItem, cursor: 'default' }} disabled>
-                    <Keyboard size={13} />
-                    <span style={{ flex: 1 }}>Shortcuts</span>
-                    <span style={styles.shortcutHint}>N · F · E · ←→</span>
-                  </button>
-
-                  {/* About */}
-                  <button 
-                    onClick={() => { navigate('/about'); setShowAvatarDropdown(false); }} 
-                    style={styles.dropItem}
-                  >
-                    <Info size={13} />
-                    <span style={{ flex: 1 }}>About Kronos</span>
-                  </button>
-
-                  <div style={styles.dropdownDivider} />
-
-                  <button onClick={handleLogout} style={{ ...styles.dropItem, color: '#f56565' }}>
-                    <LogOut size={13} />
-                    <span>Log Out</span>
-                  </button>
+              <div style={styles.nestedMenu}>
+                <div style={styles.nestedTitle}><Palette size={11} /> Board Theme</div>
+                <div style={styles.themeRow}>
+                  <button onClick={() => updateTheme('walnut')} style={styles.themeBadge('walnut', boardTheme)}>Walnut</button>
+                  <button onClick={() => updateTheme('green')} style={styles.themeBadge('green', boardTheme)}>Green</button>
+                  <button onClick={() => updateTheme('slate')} style={styles.themeBadge('slate', boardTheme)}>Slate</button>
                 </div>
               </div>
-            )}
+
+              <div style={styles.drawerDivider} />
+
+              <button onClick={() => setSoundEnabled(!soundEnabled)} style={styles.drawerActionBtn}>
+                <Volume2 size={14} />
+                <span>Sounds</span>
+                <span style={styles.dropBadge(soundEnabled)}>{soundEnabled ? 'ON' : 'OFF'}</span>
+              </button>
+
+              <div style={{ ...styles.drawerActionBtn, cursor: 'default', opacity: 0.6 }} disabled>
+                <Keyboard size={14} />
+                <span>Shortcuts</span>
+                <span style={styles.shortcutHint}>N · F · E · ←→</span>
+              </div>
+
+              <button 
+                onClick={() => { navigate('/about'); setIsDrawerOpen(false); }} 
+                style={styles.drawerActionBtn}
+              >
+                <Info size={14} />
+                <span>About Kronos</span>
+              </button>
+
+              <div style={styles.dropdownDivider} />
+
+              <button onClick={() => { handleLogout(); setIsDrawerOpen(false); }} style={{ ...styles.drawerActionBtn, color: '#f56565' }}>
+                <LogOut size={14} />
+                <span>Log Out</span>
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </>
+      )}
 
       {/* MAIN CONTAINER LAYOUT */}
       <main style={styles.mainContent}>
@@ -420,6 +570,91 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
+  },
+  hamburgerBtn: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '4px',
+    backgroundColor: 'var(--color-bg-elevated)',
+    border: '1px solid var(--color-border-default)',
+    color: 'var(--color-text-secondary)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.2s ease',
+  },
+  drawerHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: '12px',
+  },
+  drawerCloseBtn: {
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--color-text-dim)',
+    cursor: 'pointer',
+    padding: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  drawerSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+    padding: '10px 0',
+    width: '100%',
+  },
+  drawerSectionTitle: {
+    fontSize: '9px',
+    color: 'var(--color-text-dim)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.06em',
+    fontWeight: '700',
+    marginBottom: '4px',
+    textAlign: 'left',
+  },
+  drawerList: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    width: '100%',
+  },
+  drawerItem: (active) => ({
+    padding: '10px 14px',
+    fontSize: '13px',
+    fontWeight: '700',
+    textAlign: 'left',
+    color: active ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+    backgroundColor: active ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
+    border: 'none',
+    borderLeft: active ? '3px solid var(--color-brand-primary)' : '3px solid transparent',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    width: '100%',
+    transition: 'all 0.2s ease',
+  }),
+  drawerActionBtn: {
+    padding: '8px 12px',
+    fontSize: '12px',
+    fontWeight: '600',
+    color: 'var(--color-text-secondary)',
+    backgroundColor: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    textAlign: 'left',
+    transition: 'all 0.15s ease',
+    width: '100%',
+  },
+  drawerDivider: {
+    height: '1px',
+    backgroundColor: 'rgba(76, 61, 49, 0.2)',
+    margin: '4px 0',
   },
   cmdPaletteBtn: {
     width: '28px',

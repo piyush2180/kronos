@@ -4,54 +4,20 @@
 const STORAGE_KEY_EXPERIMENTS = 'kronos_research_experiments_v2';
 const STORAGE_KEY_CALIBRATIONS = 'kronos_research_calibrations_v2';
 
-// Seed initial empirical experiment dataset if storage is empty
-const INITIAL_EMPIRICAL_DATASETS = [
-  {
-    id: 'experiment_20260628_145211',
-    timestamp: '2026-06-28T14:52:11.162Z',
-    gitCommitHash: 'a0bdf019cdf0b2bea0cf7a0d3da6c9eea7e59093',
-    repositoryBranch: 'main',
-    name: 'Alpha-Beta Optimization Study',
-    engineA: 'Alpha-Beta Only',
-    engineB: 'Baseline Minimax',
-    games: 20,
-    depth: 3,
-    seed: 42,
-    certification: 'RESEARCH READY',
-    stats: { wins: 14, losses: 2, draws: 4, scorePct: 80.0, eloDiff: 240.8, ciLower: 150.2, ciUpper: 331.4 },
-    telemetryA: { nodesSearched: 48290, nps: 2619, branchingFactor: 3.42, ttHits: 0, quiescencePct: 0, memoryMb: 42.1 },
-    telemetryB: { nodesSearched: 924100, nps: 2006, branchingFactor: 11.8, ttHits: 0, quiescencePct: 0, memoryMb: 48.5 }
-  },
-  {
-    id: 'experiment_20260628_142000',
-    timestamp: '2026-06-28T14:20:00.000Z',
-    gitCommitHash: 'a0bdf019cdf0b2bea0cf7a0d3da6c9eea7e59093',
-    repositoryBranch: 'main',
-    name: 'Transposition Table Contribution',
-    engineA: 'Transposition Table & Zobrist',
-    engineB: 'Killer Moves',
-    games: 40,
-    depth: 4,
-    seed: 101,
-    certification: 'RESEARCH READY',
-    stats: { wins: 26, losses: 8, draws: 6, scorePct: 72.5, eloDiff: 172.4, ciLower: 94.1, ciUpper: 250.7 },
-    telemetryA: { nodesSearched: 124000, nps: 3450, branchingFactor: 2.85, ttHits: 38400, quiescencePct: 0, memoryMb: 54.2 },
-    telemetryB: { nodesSearched: 410000, nps: 3100, branchingFactor: 4.12, ttHits: 0, quiescencePct: 0, memoryMb: 44.0 }
-  }
-];
-
 export const BenchmarkDataService = {
   // Retrieve all stored experiment datasets
   getExperiments() {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_EXPERIMENTS);
-      if (saved) {
-        return JSON.parse(saved);
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem(STORAGE_KEY_EXPERIMENTS);
+        if (saved) {
+          return JSON.parse(saved);
+        }
       }
     } catch (e) {
       console.error('Failed to load stored benchmark experiments:', e);
     }
-    return INITIAL_EMPIRICAL_DATASETS;
+    return [];
   },
 
   // Save a new benchmark dataset record

@@ -221,10 +221,10 @@ export default function PositionEditor({ onPlayPosition, boardTheme }) {
         </div>
       </div>
 
-      <div style={styles.mainGrid}>
+      <div style={styles.mainGrid} className="editor-main-grid">
         
         {/* Board column */}
-        <div style={styles.boardCol}>
+        <div style={styles.boardCol} className="editor-board-col">
           <div style={styles.boardCard} className="panel-card">
             <Chessboard
               options={{
@@ -244,7 +244,7 @@ export default function PositionEditor({ onPlayPosition, boardTheme }) {
         </div>
 
         {/* Configuration Column */}
-        <div style={styles.configCol}>
+        <div style={styles.configCol} className="editor-config-col">
           
           {/* Piece Grid */}
           <div style={styles.configSection}>

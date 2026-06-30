@@ -59,7 +59,7 @@ export default function Dashboard({ username, navigate }) {
   return (
     <div style={styles.page} className="animate-fade-in">
       {/* Welcome Banner */}
-      <div style={styles.welcomeBanner}>
+      <div style={styles.welcomeBanner} className="dashboard-welcome-banner">
         <div>
           <h1 style={styles.welcomeTitle}>Welcome back, {username || 'Grandmaster'}</h1>
           <p style={styles.welcomeSubtitle}>Select a mode below — your previous sessions are auto-saved.</p>
@@ -71,7 +71,7 @@ export default function Dashboard({ username, navigate }) {
       </div>
 
       {/* 3x2 Card Grid */}
-      <div style={styles.cardGrid}>
+      <div style={styles.cardGrid} className="dashboard-card-grid">
         {CARDS.map((card, idx) => (
           <button
             key={idx}

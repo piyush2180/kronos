@@ -71,6 +71,12 @@ export class ConfigurableKronosEngine {
     };
   }
 
+  clearState() {
+    this.resetStats();
+    this.clearKillerMoves();
+    this.tt.clear();
+  }
+
   resetStats() {
     this.stats = {
       nodesSearched: 0,
@@ -129,10 +135,12 @@ export class ConfigurableKronosEngine {
     return moves.sort((a, b) => this.scoreMove(b, ttMove, depth) - this.scoreMove(a, ttMove, depth));
   }
 
-  quiescence(chess, alpha, beta) {
+  quiescence(chess, alpha, beta, qdepth = 0) {
     this.stats.quiescenceNodes++;
     const isWhite = chess.turn() === 'w';
     const standPat = evaluateBoard(chess) * (isWhite ? 1 : -1);
+
+    if (qdepth > 10) return standPat;
 
     if (this.config.useAlphaBeta) {
       if (standPat >= beta) return beta;
@@ -144,18 +152,21 @@ export class ConfigurableKronosEngine {
     if (captures.length === 0) return standPat;
 
     this.orderMoves(captures, null, 0);
+    let bestScore = standPat;
 
     for (const move of captures) {
       chess.move(move);
-      const score = -this.quiescence(chess, -beta, -alpha);
+      const score = -this.quiescence(chess, -beta, -alpha, qdepth + 1);
       chess.undo();
 
       if (this.config.useAlphaBeta) {
         if (score >= beta) return beta;
         if (score > alpha) alpha = score;
+      } else {
+        if (score > bestScore) bestScore = score;
       }
     }
-    return alpha;
+    return this.config.useAlphaBeta ? alpha : bestScore;
   }
 
   searchRecursive(chess, depth, ply, alpha, beta) {
@@ -267,13 +278,15 @@ export class ConfigurableKronosEngine {
 
         for (const m of moves) {
           chess.move(m);
-          const score = -this.searchRecursive(chess, d - 1, 1, -beta, -alpha);
+          const score = this.config.useAlphaBeta
+            ? -this.searchRecursive(chess, d - 1, 1, -beta, -alpha)
+            : -this.searchRecursive(chess, d - 1, 1, -INFINITY, INFINITY);
           chess.undo();
           if (score > currentBestScore) {
             currentBestScore = score;
             currentBestMove = m;
           }
-          if (score > alpha) alpha = score;
+          if (this.config.useAlphaBeta && score > alpha) alpha = score;
         }
         bestMove = currentBestMove;
         bestScore = currentBestScore;
@@ -287,7 +300,9 @@ export class ConfigurableKronosEngine {
         bestMove = moves[0];
         for (const m of moves) {
           chess.move(m);
-          const score = -this.searchRecursive(chess, depth - 1, 1, -beta, -alpha);
+          const score = this.config.useAlphaBeta
+            ? -this.searchRecursive(chess, depth - 1, 1, -beta, -alpha)
+            : -this.searchRecursive(chess, depth - 1, 1, -INFINITY, INFINITY);
           chess.undo();
           if (score > bestScore) {
             bestScore = score;

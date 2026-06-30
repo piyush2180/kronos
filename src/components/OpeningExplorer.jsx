@@ -40,7 +40,7 @@ export default function OpeningExplorer({ openingName, ecoCode, onClose }) {
   const wikiUrl = `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(details.name || openingName)}`;
 
   return (
-    <div style={styles.explorerWrapper} className="animate-slide-in panel-card">
+    <div style={styles.explorerWrapper} className="animate-slide-in panel-card opening-explorer-panel">
       
       {/* Header */}
       <div style={styles.header}>

@@ -40,7 +40,7 @@ export default function Profile({ username }) {
       </div>
 
       {/* Metrics Row */}
-      <div style={styles.metricsGrid}>
+      <div style={styles.metricsGrid} className="profile-metrics-grid">
         
         <div style={styles.metricCard} className="panel-card">
           <Trophy size={20} color="var(--color-brand-primary)" />
@@ -84,7 +84,7 @@ export default function Profile({ username }) {
               else if (isDraw) resultColor = '#ecc94b';
 
               return (
-                <div key={idx} style={styles.historyRow}>
+                <div key={idx} style={styles.historyRow} className="profile-history-row">
                   <div style={styles.historyLeft}>
                     <Calendar size={13} style={styles.rowIcon} />
                     <span style={styles.rowDate}>{game.date}</span>

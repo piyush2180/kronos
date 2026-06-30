@@ -417,7 +417,7 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', height: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} className="puzzle-sidebar-column">
           
           {/* Rating Selection Grid */}
           <div className="panel-card" style={{ padding: '12px' }}>

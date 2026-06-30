@@ -15,6 +15,7 @@ export class TournamentRunner {
     this.depth = options.depth || 3;
     this.seed = options.seed || 42;
     this.useSprt = options.sprt || false;
+    this.maxPlies = options.maxPlies || 30;
 
     this.prng = new PRNG(this.seed);
     this.telemetryA = new TelemetryCollector();
@@ -60,10 +61,14 @@ export class TournamentRunner {
       // Color alternation: Odd games EngineA is White, Even games EngineA is Black
       const isAWhite = g % 2 !== 0;
 
+      // Fresh state initialization per game to prevent state leakage
+      if (engineA.clearState) engineA.clearState();
+      if (engineB.clearState) engineB.clearState();
+
       const whiteEngine = isAWhite ? engineA : engineB;
       const blackEngine = isAWhite ? engineB : engineA;
       const whiteName = isAWhite ? nameA : nameB;
-      const blackName = isAWhite ? nameA : nameB;
+      const blackName = isAWhite ? nameB : nameA;
 
       const chess = new Chess(opening.fen);
       const gameMoves = [];
@@ -71,7 +76,8 @@ export class TournamentRunner {
       let totalTimeThisGame = 0;
 
       let moveCount = 0;
-      const maxPlies = 100; // Cap to prevent infinite games in baseline tests
+      const maxPlies = this.maxPlies || 30; // Cap to prevent ultra-long draw games in benchmark tests
+      let terminationReason = 'normal';
 
       while (!chess.isGameOver() && moveCount < maxPlies) {
         const currentTurn = chess.turn();
@@ -79,15 +85,16 @@ export class TournamentRunner {
         const currentTelemetry = (currentEngine === engineA) ? this.telemetryA : this.telemetryB;
 
         const result = await currentEngine.go({ depth: this.depth, fen: chess.fen() });
-        if (!result.move) break;
+        if (!result.move) {
+          terminationReason = 'no_move';
+          break;
+        }
 
         try {
           chess.move(result.move);
         } catch (e) {
-          // Fallback if LAN parse fails
-          const legal = chess.moves();
-          if (legal.length > 0) chess.move(legal[0]);
-          else break;
+          // Strict legal move verification: throw explicit error rather than silent fallback
+          throw new Error(`Engine ${currentEngine === engineA ? nameA : nameB} made illegal move "${result.move}" in game ${g} at FEN ${chess.fen()}`);
         }
 
         gameMoves.push(result.move);
@@ -117,6 +124,14 @@ export class TournamentRunner {
         }
       } else {
         draws++;
+        if (chess.isDraw()) {
+          if (chess.isStalemate()) terminationReason = 'stalemate';
+          else if (chess.isThreefoldRepetition()) terminationReason = 'threefold_repetition';
+          else if (chess.isInsufficientMaterial()) terminationReason = 'insufficient_material';
+          else terminationReason = '50_move_rule';
+        } else if (moveCount >= maxPlies) {
+          terminationReason = 'max_plies_reached';
+        }
       }
 
       // Format PGN string
@@ -128,6 +143,7 @@ export class TournamentRunner {
         `[White "${whiteName}"]`,
         `[Black "${blackName}"]`,
         `[Result "${resultHeader}"]`,
+        `[Termination "${terminationReason}"]`,
         `[FEN "${opening.fen}"]`,
         `[SetUp "1"]`,
         `\n${chess.pgn()}\n`

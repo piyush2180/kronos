@@ -93,7 +93,7 @@ export default function MoveHistory({
       )}
 
       {/* Moves grid list */}
-      <div style={styles.scrollWrapper} className="scroll-panel">
+      <div style={styles.scrollWrapper} className="scroll-panel move-history-scroll-panel">
         <div style={styles.movesGrid}>
           {groupedMoves.map((pair, idx) => {
             const wIdx = idx * 2;

@@ -56,8 +56,8 @@ export default function EvaluationBar({ score, orientation }) {
   const labelColor = whiteAhead ? '#1c1410' : '#e8dcc8';
 
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.barContainer}>
+    <div style={styles.wrapper} className="evaluation-bar-wrapper">
+      <div style={styles.barContainer} className="evaluation-bar-container">
         {/* Black section (top) */}
         <div style={{
           ...styles.section,
@@ -79,7 +79,7 @@ export default function EvaluationBar({ score, orientation }) {
           transform: 'translateY(-50%)',
           backgroundColor: labelBg,
           color: labelColor,
-        }}>
+        }} className="evaluation-bar-score">
           {displayScore}
         </div>
       </div>

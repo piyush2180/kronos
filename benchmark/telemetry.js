@@ -18,12 +18,15 @@ export class TelemetryCollector {
     this.totalMovesSearched = 0;
     this.searchTimeMs = 0;
     this.maxDepthReached = 0;
+    this.totalDepthReached = 0;
     this.searchCalls = 0;
+    this.branchingFactorSum = 0;
   }
 
   addSearchStats(stats, timeMs, maxDepth) {
     this.searchCalls++;
-    this.nodesSearched += stats.nodesSearched || 0;
+    const nodesThisCall = stats.nodesSearched || 0;
+    this.nodesSearched += nodesThisCall;
     this.quiescenceNodes += stats.quiescenceNodes || 0;
     this.transpositionHits += stats.transpositionHits || 0;
     this.transpositionStores += stats.transpositionStores || 0;
@@ -32,8 +35,13 @@ export class TelemetryCollector {
     this.firstMoveCutoffs += stats.firstMoveCutoffs || 0;
     this.totalMovesSearched += stats.totalMovesSearched || 0;
     this.searchTimeMs += timeMs;
+    this.totalDepthReached += maxDepth;
     if (maxDepth > this.maxDepthReached) {
       this.maxDepthReached = maxDepth;
+    }
+
+    if (nodesThisCall > 0 && maxDepth > 0) {
+      this.branchingFactorSum += Math.pow(nodesThisCall, 1 / maxDepth);
     }
   }
 
@@ -44,10 +52,16 @@ export class TelemetryCollector {
       ? Number(((this.quiescenceNodes / this.nodesSearched) * 100).toFixed(2)) 
       : 0;
     
-    // Branching factor estimation: b = N ^ (1 / d)
-    const avgDepth = this.maxDepthReached || 1;
-    const branchingFactor = this.nodesSearched > 0 && avgDepth > 0
-      ? Number(Math.pow(this.nodesSearched, 1 / avgDepth).toFixed(2))
+    const avgDepth = this.searchCalls > 0 
+      ? Number((this.totalDepthReached / this.searchCalls).toFixed(2))
+      : 0;
+    
+    const branchingFactor = this.searchCalls > 0
+      ? Number((this.branchingFactorSum / this.searchCalls).toFixed(2))
+      : 0;
+
+    const avgMoveTimeMs = this.searchCalls > 0
+      ? Number((this.searchTimeMs / this.searchCalls).toFixed(2))
       : 0;
 
     const moveOrderingEfficiency = this.betaCutoffs > 0
@@ -67,8 +81,10 @@ export class TelemetryCollector {
       firstMoveCutoffs: this.firstMoveCutoffs,
       moveOrderingEfficiency: moveOrderingEfficiency,
       searchTimeMs: this.searchTimeMs,
+      avgMoveTimeMs: avgMoveTimeMs,
       nodesPerSecond: nps,
       maxDepthReached: this.maxDepthReached,
+      avgDepthReached: avgDepth,
       branchingFactor: branchingFactor,
       memoryUsageMb: {
         rss: Number((mem.rss / 1024 / 1024).toFixed(2)),

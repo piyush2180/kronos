@@ -8,36 +8,43 @@ export class BenchmarkStats {
     if (totalGames === 0) {
       return {
         wins: 0, losses: 0, draws: 0, totalGames: 0,
-        scorePct: 0, eloDiff: 0, ciLower: 0, ciUpper: 0, eloCiLower: 0, eloCiUpper: 0
+        winPct: 0, drawPct: 0, lossPct: 0, scorePct: 0,
+        eloDiff: 0, ciLowerPct: 0, ciUpperPct: 0, eloCiLower: 0, eloCiUpper: 0
       };
     }
 
-    const score = wins + 0.5 * draws;
-    const scorePct = score / totalGames;
+    const w = wins / totalGames;
+    const l = losses / totalGames;
+    const d = draws / totalGames;
+    const scorePctVal = w + 0.5 * d;
 
     // Clip score percentage slightly to avoid log(0) or log(infinity)
-    const clippedPct = Math.min(Math.max(scorePct, 0.001), 0.999);
+    const clippedPct = Math.min(Math.max(scorePctVal, 0.001), 0.999);
     const eloDiff = -400 * Math.log10(1 / clippedPct - 1);
 
-    // Standard Error of proportion
-    const se = Math.sqrt((clippedPct * (1 - clippedPct)) / totalGames);
+    // True empirical variance for trinomial chess game outcomes
+    const variance = w * Math.pow(1 - clippedPct, 2) + l * Math.pow(0 - clippedPct, 2) + d * Math.pow(0.5 - clippedPct, 2);
+    const se = Math.sqrt(variance / totalGames);
     const ciRadius = 1.96 * se;
 
-    const ciLowerPct = Math.max(0, clippedPct - ciRadius);
-    const ciUpperPct = Math.min(1, clippedPct + ciRadius);
+    const ciLowerPctVal = Math.max(0, clippedPct - ciRadius);
+    const ciUpperPctVal = Math.min(1, clippedPct + ciRadius);
 
-    const eloCiLower = -400 * Math.log10(1 / Math.min(Math.max(ciLowerPct, 0.001), 0.999) - 1);
-    const eloCiUpper = -400 * Math.log10(1 / Math.min(Math.max(ciUpperPct, 0.001), 0.999) - 1);
+    const eloCiLower = -400 * Math.log10(1 / Math.min(Math.max(ciLowerPctVal, 0.001), 0.999) - 1);
+    const eloCiUpper = -400 * Math.log10(1 / Math.min(Math.max(ciUpperPctVal, 0.001), 0.999) - 1);
 
     return {
       wins,
       losses,
       draws,
       totalGames,
-      scorePct: Number((scorePct * 100).toFixed(2)),
+      winPct: Number((w * 100).toFixed(2)),
+      drawPct: Number((d * 100).toFixed(2)),
+      lossPct: Number((l * 100).toFixed(2)),
+      scorePct: Number((scorePctVal * 100).toFixed(2)),
       eloDiff: Number(eloDiff.toFixed(1)),
-      ciLowerPct: Number((ciLowerPct * 100).toFixed(2)),
-      ciUpperPct: Number((ciUpperPct * 100).toFixed(2)),
+      ciLowerPct: Number((ciLowerPctVal * 100).toFixed(2)),
+      ciUpperPct: Number((ciUpperPctVal * 100).toFixed(2)),
       eloCiLower: Number(eloCiLower.toFixed(1)),
       eloCiUpper: Number(eloCiUpper.toFixed(1))
     };

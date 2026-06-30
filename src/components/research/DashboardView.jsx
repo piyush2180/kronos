@@ -3,24 +3,14 @@ import { ShieldCheck, Plus } from 'lucide-react';
 import EmptyState from './EmptyState';
 
 export default function DashboardView({ experiments = [], onNavigate, onInspect }) {
-  const [nodes, setNodes] = useState(3214812);
-  const [nps, setNps] = useState(31210);
-  const [cpuUsage, setCpuUsage] = useState(64);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNodes((prev) => prev + Math.floor(Math.random() * 4500) + 1200);
-      setNps(30000 + Math.floor(Math.random() * 2500));
-      setCpuUsage(60 + Math.floor(Math.random() * 15));
-    }, 1200);
-    return () => clearInterval(interval);
-  }, []);
-
   if (experiments.length === 0) {
     return <EmptyState />;
   }
 
   const latest = experiments[0];
+  const nodes = latest.telemetryA?.nodesSearched || 0;
+  const nps = latest.telemetryA?.nps || latest.telemetryA?.nodesPerSecond || 0;
+  const branchingFactor = latest.telemetryA?.branchingFactor || 0;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="animate-fade-in">
@@ -41,12 +31,12 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', backgroundColor: 'var(--color-bg-surface)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.78rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ color: 'var(--color-text-dim)' }}>Branch</span>
-          <span style={{ fontWeight: '600' }}>main</span>
+          <span style={{ fontWeight: '600' }}>{latest.repositoryBranch || 'main'}</span>
         </div>
         <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <span style={{ color: 'var(--color-text-dim)' }}>Revision</span>
-          <span style={{ fontWeight: '600' }}>v1.0.0</span>
+          <span style={{ color: 'var(--color-text-dim)' }}>Commit</span>
+          <span style={{ fontWeight: '600' }}>{latest.gitCommitHash ? latest.gitCommitHash.substring(0, 7) : 'HEAD'}</span>
         </div>
         <span style={{ color: 'rgba(255,255,255,0.1)' }}>|</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -57,7 +47,7 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
           <span style={{ color: 'var(--color-text-dim)' }}>Integrity</span>
           <span style={{ color: '#34D399', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <ShieldCheck size={13} /> Verified
+            <ShieldCheck size={13} /> {latest.certification || 'Verified'}
           </span>
         </div>
       </div>
@@ -67,20 +57,15 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#34D399', boxShadow: '0 0 8px #34D399' }} />
-            <span style={{ fontSize: '0.78rem', fontWeight: '600', color: 'var(--color-text-primary)' }}>Live engine telemetry monitor</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: '600', color: 'var(--color-text-primary)' }}>Empirical engine telemetry monitor</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-dim)' }}>Real-time analysis stream • Stockfish Worker #1</span>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-dim)' }}>Latest dataset: {latest.name}</span>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>CPU utilization</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span style={{ fontSize: '1.15rem', fontWeight: '700' }}>{cpuUsage}%</span>
-              <div style={{ flex: 1, height: '5px', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ height: '100%', backgroundColor: '#d4af37', width: `${cpuUsage}%`, transition: 'width 0.5s ease' }} />
-              </div>
-            </div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>Branching factor</span>
+            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: '#60A5FA' }}>{branchingFactor}</span>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
