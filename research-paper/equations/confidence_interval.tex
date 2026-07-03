@@ -1,0 +1,12 @@
+% Statistical Confidence Intervals for Elo ratings
+\begin{equation}
+    \sigma_{score} = \sqrt{\frac{p_{win} + p_{loss} - (p_{win} - p_{loss})^2}{N}}
+\end{equation}
+\begin{equation}
+    CI_{95\%} = \hat{S} \pm 1.96 \cdot \frac{\sigma_{score}}{\sqrt{N}}
+\end{equation}
+% Where:
+% p_{win}, p_{loss} are the sample probabilities of winning and losing.
+% N is the total number of games played.
+% \hat{S} is the average score (S = p_{win} + 0.5 * p_{draw}).
+% CI_{95\%} represents the 95% confidence interval boundaries.

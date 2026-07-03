@@ -1,0 +1,20 @@
+\begin{algorithm2e}[tp]
+\caption{History Heuristic Score Update and Retrieval}
+\label{alg:history_heuristic}
+\DontPrintSemicolon
+\BlankLine
+\textbf{Procedure} UpdateHistory(move $m$, depth $d$, isBetaCutoff) \\
+\Begin{
+    \If{isBetaCutoff}{
+        $\text{HistoryTable}[m.player][m.from][m.to] \leftarrow \text{HistoryTable}[m.player][m.from][m.to] + d^2$\;
+    }
+    \Else{
+        $\text{HistoryTable}[m.player][m.from][m.to] \leftarrow \text{HistoryTable}[m.player][m.from][m.to] - d^2$\;
+    }
+}
+\BlankLine
+\textbf{Function} GetHistoryScore(move $m$) \\
+\Begin{
+    \Return{$\text{HistoryTable}[m.player][m.from][m.to]$}\;
+}
+\end{algorithm2e}

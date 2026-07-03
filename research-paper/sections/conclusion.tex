@@ -1,0 +1,34 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+We have presented Kronos, a modular chess engine and automated benchmarking suite implemented in Node.js and JavaScript. Under V8 runtime constraints, we systematically evaluated search heuristics to measure their contribution to search space compression and playing strength. The results suggest that managed runtimes can execute classical search loops stably and efficiently when heap allocations are eliminated on the hot path.
+
+Our empirical findings establish a clear hierarchy of heuristic impact. Late Move Reduction is the most significant search reduction optimization, contributing a 66.3\% node reduction. Quiescence search is critical, as its deactivation results in a 417 Elo rating regression—the largest performance drop in our ablation study. Move ordering serves as the foundation on which both LMR and PVS depend; without it, pruning heuristics lose their efficiency. Together, the full heuristic stack compresses the search space by 62.0\% at depth 4, while reaching a peak calibrated playing strength of 1,485 Elo at depth 6.
+
+The depth-7 regression to 1,450 Elo highlights a latency ceiling imposed by single-threaded execution. When the search latency exceeds the tournament time limit, the engine falls back to depth-6 evaluations in tactically sharp positions. Overcoming this ceiling requires parallel search, which remains a primary avenue for future work.
+
+\section{Kronos as a Reproducible Research Framework}
+Beyond the immediate experimental outcomes, the primary contribution of Kronos is the framework itself. Any researcher with a Node.js environment can clone the repository, run the benchmarking pipeline, and reproduce the complete tournament workflow—from opening shuffle through SPRT verification to report generation—with a single command. All seeds, configuration flags, and opening libraries are version-controlled.
+
+This accessibility distinguishes Kronos from prior JavaScript chess implementations, which were primarily interactive games without benchmarking infrastructure. Kronos provides a platform for investigating questions beyond this report, including the execution behavior of neural network evaluation functions on managed runtimes, or parallel search scaling via SharedArrayBuffer.
+
+\section{Reproducibility Reference}
+The Kronos source code, benchmark scripts, opening libraries, and result datasets are organized as follows:
+\begin{itemize}
+    \item \texttt{src/engine/} — Search core, evaluation, transposition table, and move ordering.
+    \item \texttt{benchmark/pipeline/} — Tournament runner, SPRT evaluator, and report generator.
+    \item \texttt{benchmark/openings/} — Version-controlled opening FEN library.
+    \item \texttt{benchmark/seeds/} — Fixed LCG seed values for each experiment.
+    \item \texttt{benchmark/output/} — Raw PGN game files and report artifacts.
+    \item \texttt{research-paper/} — This \LaTeX{} manuscript, figures, and tables.
+\end{itemize}
+
+To reproduce the experimental suite, execute \texttt{npm run benchmark} from the project root. Individual experiments can be executed by specifying a configuration file:
+\begin{verbatim}
+node benchmark/pipeline/pipelineManager.js --config configs/exp-lmr.json
+\end{verbatim}
+Figure generation from PGN output is automated via \texttt{benchmark/reports/exportOrdo.js}. All results reported in this paper are linked to specific seed values in the \texttt{benchmark/seeds/} directory and can be reproduced on any platform running Node.js $\geq$ 18.
+
+
+This combination of a reproducible pipeline, statistically validated results, and open-source architecture establishes Kronos as an accessible research platform.
+

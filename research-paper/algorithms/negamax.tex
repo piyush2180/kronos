@@ -1,0 +1,24 @@
+\begin{algorithm2e}[tp]
+\caption{Negamax Alpha-Beta Search}
+\label{alg:negamax}
+\DontPrintSemicolon
+\Input{Position $p$, Depth $d$, $\alpha$, $\beta$}
+\Output{Evaluation score of the position}
+\BlankLine
+\If{$d == 0$ \Or $p$ is terminal}{
+    \Return{QuiescenceSearch($p$, $\alpha$, $\beta$)}\;
+}
+$moves \leftarrow \text{OrderMoves}(\text{GenerateMoves}(p))$\;
+$value \leftarrow -\infty$\;
+\ForEach{move $m$ in $moves$}{
+    $\text{MakeMove}(p, m)$\;
+    $score \leftarrow -\text{Negamax}(p, d - 1, -\beta, -\alpha)$\;
+    $\text{UnmakeMove}(p, m)$\;
+    $value \leftarrow \max(value, score)$\;
+    $\alpha \leftarrow \max(\alpha, value)$\;
+    \If{$\alpha \ge \beta$}{
+        \Break \tcp*{Beta cutoff}
+    }
+}
+\Return{$value$}\;
+\end{algorithm2e}

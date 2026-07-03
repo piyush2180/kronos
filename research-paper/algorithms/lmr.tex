@@ -1,0 +1,19 @@
+\begin{algorithm2e}[tp]
+\caption{Late Move Reduction (LMR)}
+\label{alg:lmr}
+\DontPrintSemicolon
+\Input{Position $p$, Move $m$, Move Index $i$, Depth $d$, $\alpha$, $\beta$}
+\Output{Search score}
+\BlankLine
+\If{$d \ge 3$ \And $i > 3$ \And \Not $\text{IsCapture}(m)$ \And \Not $\text{IsCheck}(m)$ \And \Not $\text{InCheck}(p)$}{
+    $R \leftarrow 1 + \lfloor \ln(d)\ln(i)/2.5 \rfloor$ \tcp*{Calculate reduction}
+    $score \leftarrow -\text{Search}(p, d - 1 - R, -\alpha - 1, -\alpha)$\;
+    \If{$score > \alpha$}{
+        $score \leftarrow -\text{Search}(p, d - 1, -\alpha - 1, -\alpha)$ \tcp*{Re-search without reduction}
+    }
+}
+\Else{
+    $score \leftarrow -\text{Search}(p, d - 1, -\alpha - 1, -\alpha)$ \tcp*{Normal search}
+}
+\Return{$score$}\;
+\end{algorithm2e}

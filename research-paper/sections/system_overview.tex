@@ -1,0 +1,81 @@
+\chapter{System Overview}
+\label{ch:system_overview}
+
+Kronos is not only a chess engine—it is a complete research platform. This chapter describes both the software architecture that makes high-performance search possible in JavaScript, and the user-facing application that makes the research accessible and reproducible. The engineering decisions described here are themselves the primary contribution of this work.
+
+\section{User-Facing Application Platform}
+The Kronos application is a React-based single-page application running in the browser. It exposes six distinct interaction modes, each serving a different research or gameplay purpose. Figure~\ref{fig:app_screenshots} shows the four most research-relevant pages.
+
+\begin{figure}[htbp]
+\centering
+\begin{tabular}{cc}
+\includegraphics[width=0.47\textwidth]{figures/app_dashboard.png} &
+\includegraphics[width=0.47\textwidth]{figures/app_play_engine.png} \\[4pt]
+\small (a) Dashboard & \small (b) Play Engine \\[10pt]
+\includegraphics[width=0.47\textwidth]{figures/app_analysis.png} &
+\includegraphics[width=0.47\textwidth]{figures/app_research_lab.png} \\[4pt]
+\small (c) Analysis Board & \small (d) Research Lab \\
+\end{tabular}
+\caption{The four primary Kronos application pages. The Dashboard (a) presents a unified entry point with live engine statistics. The Play Engine page (b) lets users select depth configurations from D2 to D7, with NPS estimates displayed per variant. The Analysis Board (c) integrates Stockfish for post-game position review. The Research Lab (d) is a restricted-access workspace for benchmark execution, SPRT verification, and raw telemetry inspection.}
+\label{fig:app_screenshots}
+\end{figure}
+
+The \textbf{Dashboard} (Figure~\ref{fig:app_screenshots}a) provides a unified entry point. It displays the active engine configuration, flagship search depth (D6), peak estimated Elo (1{,}485), and quick-access buttons for each mode. Notably, it surfaces live statistics from the engine, reinforcing Kronos's identity as a research tool rather than just a game client.
+
+The \textbf{Play Engine} page (Figure~\ref{fig:app_screenshots}b) exposes the depth-configuration selector from D2 to D7, each with NPS estimates printed directly in the UI. This transparency—showing users approximately how many nodes per second the engine processes at each depth—was a deliberate design choice to make the research context visible during play.
+
+The \textbf{Analysis Board} (Figure~\ref{fig:app_screenshots}c) integrates Stockfish for reference evaluation. After a game, users can replay moves, inspect the detected opening, and compare Kronos's principal variation against Stockfish's recommendation. This page supports the calibration experiments in Chapter~\ref{ch:experimental_results}.
+
+The \textbf{Research Lab} (Figure~\ref{fig:app_screenshots}d) is a restricted-access engineering workstation. It surfaces SPRT verification routines, benchmark pipeline status, and raw empirical dataset inspection tools. Access is gated by authorization status, enforcing a clear boundary between the research and public-facing layers of the application.
+
+\section{Asynchronous Worker Architecture}
+The architectural challenge of running chess search in a browser is that JavaScript's main thread is also responsible for rendering the UI. Blocking it with a synchronous search loop causes the interface to freeze. Kronos solves this with a decoupled Web Worker architecture.
+
+The React UI instantiates a background \texttt{CustomChessWorker} thread at startup. All search computation executes on this worker. Communication between the main thread and the worker uses structured message passing: the host sends a serialized control command containing the board state (as a FEN string), the configured search depth, and a time limit. The worker parses the payload, initializes search variables, and begins Negamax recursion. During search, the worker emits periodic \texttt{ITERATION\_COMPLETE} telemetry messages—containing current depth, nodes searched, NPS, and principal variation—which update the evaluation bar and move list in real time. On completion, a final \texttt{SEARCH\_COMPLETE} message returns the best move.
+
+The overall system topology is shown in Figure~\ref{fig:overall_architecture}, and the tournament scheduling model is illustrated in Figure~\ref{fig:tournament_scheduler}.
+
+\input{figures/overall_architecture}
+\input{figures/tournament_scheduler}
+
+This design has a measurable consequence: the main UI thread remains at 60\,FPS even while the engine is searching at depth 6, because the 11-second search at D7 runs entirely in the worker thread without blocking any UI events.
+
+\subsection{Software Subsystem Decomposition}
+The engine code is divided into modular classes. Table~\ref{tab:subsystems_summary} details each subsystem, its source files, and its primary responsibility.
+
+\input{tables/subsystems_summary}
+
+The modularity of this design is what enables the ablation study in Chapter~\ref{ch:experimental_results}: each search heuristic is implemented as a flag-gated code path, allowing any combination to be toggled without rebuilding the engine.
+
+\section{Engine Design and Memory Optimization}
+The search core is engineered to minimize heap allocations on every hot path. This section describes the three key techniques.
+
+\subsection{GC-Neutral Board Mutation}
+Kronos delegates board representation to the third-party \texttt{chess.js} library, which normally clones the entire board state on every move validation. For a depth-6 search expanding hundreds of thousands of nodes, this would allocate millions of temporary objects, triggering frequent GC sweeps.
+
+To prevent this, Kronos wraps the library in a custom class, \texttt{ChessInstanceClone}, that bypasses the public API and directly calls the library's private methods: \texttt{\_moves()} to enumerate legal moves, \texttt{\_makeMove()} to mutate the board in-place, and \texttt{\_undoMove()} to revert changes using an internal history stack. This eliminates all heap allocations from the move-make/unmake loop—the hottest path in the entire engine.
+
+\subsection{Static Position Evaluation}
+The evaluation function assigns a centipawn score to each leaf node using a layered approach: base material values (pawn = 100, knight = 320, bishop = 330, rook = 500, queen = 900), Piece-Square Tables (PSTs) that reward central piece placement, tapered evaluation that interpolates between middle-game and endgame tables based on remaining non-pawn material, and structural bonuses including doubled pawn penalties ($-$15\,cp), isolated pawn penalties ($-$10\,cp), passed pawn bonuses ($+$20\,cp), bishop pair bonuses ($+$30\,cp), and a tempo bonus ($+$10\,cp) for the side to move.
+
+\subsection{Transposition Table and Memory Bounding}
+The transposition table indexes search results by 64-bit Zobrist hash keys. Keys are updated incrementally on each move and undo using XOR operations. The critical design decision for the V8 environment was choosing the eviction policy: a size cap of 500,000 entries with FIFO eviction. When the table reaches capacity, the oldest entry is deleted:
+\begin{verbatim}
+this.table.delete(this.table.keys().next().value);
+\end{verbatim}
+This simple policy keeps the table footprint bounded under 30\,MB and achieves a peak hit rate of 85.2\%, preventing the cache from competing with the search core for heap space.
+
+\subsection{Engine Evolution Mapping}
+Table~\ref{tab:engine_feature_matrix} documents which search optimizations are active in each engine version, from the baseline Minimax (v1.0) to the full Kronos engine (v2.0). This table serves as the ground truth for the ablation study.
+
+\input{tables/engine_feature_matrix}
+
+\section{Benchmarking and Calibration Pipelines}
+Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run benchmark} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to anchor the internal Elo ratings to an absolute reference scale.
+
+These pipelines are the experimental foundation for Chapter~\ref{ch:experimental_results}. All results reported in this paper are produced by these pipelines with fixed seeds and are fully reproducible from the repository.
+
+\section{Engine Development Progression}
+Figure~\ref{fig:kronos_evolution} provides a comprehensive view of how the engine evolved from Phase 1 through Phase 4, documenting the features added, node count reductions, and Elo improvements at each stage.
+
+\input{figures/kronos_evolution}

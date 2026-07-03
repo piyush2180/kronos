@@ -1,0 +1,29 @@
+\begin{algorithm2e}[tp]
+\caption{Minimax Search Algorithm}
+\label{alg:minimax}
+\DontPrintSemicolon
+\Input{Position $p$, Depth $d$, Player color $pl$}
+\Output{Evaluation score of the position}
+\BlankLine
+\If{$d == 0$ \Or $p$ is terminal}{
+    \Return{Evaluate($p$)}\;
+}
+\If{$pl == \text{MAX}$}{
+    $maxEval \leftarrow -\infty$\;
+    \ForEach{legal move $m$ from $p$}{
+        $child \leftarrow \text{MakeMove}(p, m)$\;
+        $eval \leftarrow \text{Minimax}(child, d - 1, \text{MIN})$\;
+        $maxEval \leftarrow \max(maxEval, eval)$\;
+    }
+    \Return{$maxEval$}\;
+}
+\Else{
+    $minEval \leftarrow +\infty$\;
+    \ForEach{legal move $m$ from $p$}{
+        $child \leftarrow \text{MakeMove}(p, m)$\;
+        $eval \leftarrow \text{Minimax}(child, d - 1, \text{MAX})$\;
+        $minEval \leftarrow \min(minEval, eval)$\;
+    }
+    \Return{$minEval$}\;
+}
+\end{algorithm2e}

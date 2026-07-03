@@ -1,0 +1,22 @@
+\section*{Executive Summary}
+\addcontentsline{toc}{chapter}{Executive Summary}
+
+This report presents the engineering design and empirical findings of Kronos, a modular chess engine and benchmarking framework implemented in Node.js/JavaScript. Kronos serves as a reproducible systems testbed for game-tree search heuristics in managed, garbage-collected runtimes.
+
+\subsection*{V8 Engineering Solutions}
+Historically, dynamic runtimes were considered unsuitable for latency-sensitive search systems due to event loop freezing and garbage collection (GC) sweeps. Kronos resolves these issues through three implementations:
+\begin{enumerate}
+    \item \textbf{Asynchronous Worker Decoupling:} Decoupled background Web Workers communicate with the React UI via serialized JSON messages, preventing interface freezes.
+    \item \textbf{GC-Neutral Search Path:} Direct in-place board state mutations bypass object allocations, and a size-bounded transposition table limits dynamic heap growth.
+    \item \textbf{JIT Compiler Warming:} Benchmarks run pre-heat iterations to trigger V8 JIT compilation and optimize execution paths prior to recording search telemetry.
+\end{enumerate}
+
+\subsection*{Key Experimental Outcomes}
+*   \textbf{Heap Bounded Memory:} Heap usage remains stable between 14.8\,MB and 28.4\,MB during continuous search, eliminating major GC sweeps.
+*   \textbf{Search Reduction:} Late Move Reductions (LMR) is the dominant pruning heuristic, yielding a 66.3\% node reduction at depth 4.
+*   \textbf{Calibrated Strengths:} Stockfish 18 matchups calibrate the peak playing strength at $1485 \pm 86$ Elo (at depth 6), after which single-threaded latency constraints cause search timeouts.
+*   \textbf{Statistical Validation:} All core search heuristics (PVS, LMR, and combined ordering) are statistically validated under Wald Sequential Probability Ratio Tests (SPRT).
+
+This work establishes that managed runtime environments can execute complex game-tree searches efficiently and stably, providing a highly accessible web-deployable systems research framework.
+
+

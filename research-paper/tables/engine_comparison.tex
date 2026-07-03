@@ -1,0 +1,21 @@
+\begin{table}[htbp]
+\centering
+\caption[Comparative Analysis with Existing JavaScript Chess Engines]{Comparative Analysis: Kronos vs. Existing JavaScript Chess Engines.}
+\label{tab:engine_comparison}
+\begin{tabularx}{\textwidth}{lXXXX}
+\toprule
+\textbf{Attribute} & \textbf{Kronos} & \textbf{Lozza} & \textbf{GarboChess (JS)} & \textbf{Stockfish.js} \\
+\midrule
+Type & Native JS (ES6) & Native JS & Native JS & Compiled C++ (Wasm) \\
+Search Core & Negamax AB & Negamax AB & Alpha-Beta & Alpha-Beta (NNUE) \\
+Extensions & PVS, LMR, NMP & PVS, LMR, NMP & Q-Search & Standard SF Search \\
+Trans. Table & 500k FIFO Capped & Uncapped Map & Uncapped Array & Capped Cluster Hash \\
+Concurrency & Multi-thread Worker & Single UCI Worker & Single-thread & Multi-thread Wasm \\
+Benchmarking & Deterministic CLI & None & None & Command CLI \\
+Memory Mgt. & In-place Mutations & Object Pooling & Standard Alloc. & Wasm Linear Memory \\
+Validation & Built-in SPRT \& BT & None & None & External Fishtest \\
+Reproduce & PRNG Seeds & None & None & Fixed Threads \\
+\bottomrule
+\end{tabularx}
+\end{table}
+

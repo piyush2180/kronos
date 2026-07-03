@@ -1,0 +1,28 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 0.6cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=2.4em, minimum width=13em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    subblock/.style={draw=gray!60!black, rectangle, minimum height=2.4em, minimum width=10em, align=center, rounded corners=3pt, fill=gray!15, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    % Nodes
+    \node [block] (ui) {React UI};
+    \node [block, below=of ui] (worker) {Worker Manager};
+    
+    \node [subblock, below left=of worker, xshift=0.5cm] (search) {Search Core};
+    \node [subblock, below right=of worker, xshift=-0.5cm] (eval) {Evaluation};
+    
+    \node [block, below=of {$(search.south)!0.5!(eval.south)$}, yshift=-0.5cm] (tt) {Transposition Table};
+
+    % Arrows
+    \draw [arrow] (ui) -- (worker);
+    \draw [arrow] (worker.south) -| (search.north);
+    \draw [arrow] (worker.south) -| (eval.north);
+    \draw [arrow] (search.south) |- (tt.north);
+    \draw [arrow] (eval.south) |- (tt.north);
+\end{tikzpicture}
+\caption[Overall System Architecture]{Overall System Architecture. Shows the visual control UI plane decoupled from background engine threads (Web Workers) and core search components.}
+\label{fig:overall_architecture}
+\end{figure}
+

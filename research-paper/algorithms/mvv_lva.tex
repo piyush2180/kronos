@@ -1,0 +1,14 @@
+\begin{algorithm2e}[tp]
+\caption{MVV-LVA Capture Scoring}
+\label{alg:mvv_lva}
+\DontPrintSemicolon
+\Input{Capture move $m$}
+\Output{Priority value score}
+\BlankLine
+$victimValue \leftarrow \text{GetPieceValue}(m.victim)$\;
+$attackerValue \leftarrow \text{GetPieceValue}(m.attacker)$\;
+\BlankLine
+% Higher score means higher sorting priority
+$score \leftarrow 100 \cdot victimValue - attackerValue$\;
+\Return{$score$}\;
+\end{algorithm2e}

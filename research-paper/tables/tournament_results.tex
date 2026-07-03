@@ -1,0 +1,19 @@
+\begin{table}[htbp]
+\centering
+\caption[Tournament Results Summary at Depth 3]{Tournament Results Summary at Depth 3.}
+\label{tab:tournament_results}
+\begin{tabularx}{\textwidth}{Xrrrrrr}
+\toprule
+\textbf{Engine Variant} & \textbf{Played} & \textbf{Wins} & \textbf{Draws} & \textbf{Losses} & \textbf{Score (\%)} & \textbf{Elo Rating} \\
+\midrule
+Baseline Minimax          & 223 & 0 & 223 & 0 & 50.0\% & 978 \\
+Alpha-Beta Only           & 223 & 0 & 223 & 0 & 50.0\% & 977 \\
+Move Ordering (MVV-LVA)   & 185 & 10 & 172 & 3 & 51.9\% & 991 \\
+Killer Moves Heuristic    & 400 & 11 & 385 & 4 & 50.9\% & 984 \\
+Transposition Table       & 400 & 3 & 389 & 8 & 49.4\% & 974 \\
+Full Kronos (No Quiescence)& 400 & 0 & 383 & 17 & 47.9\% & 963 \\
+Full Kronos Engine        & 400 & 328 & 72 & 0 & 91.0\% & 1,380 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+

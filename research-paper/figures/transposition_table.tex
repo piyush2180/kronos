@@ -1,0 +1,18 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm,
+    block/.style={draw, rectangle, minimum height=2.5em, align=center, fill=orange!5, scale=0.85}
+]
+    % Node layout
+    \node [block, minimum width=6em] (hash) {Zobrist Hash \\ (64-bit)};
+    \node [block, right=of hash, xshift=-0.9cm, minimum width=3em] (depth) {Depth \\ (8-bit)};
+    \node [block, right=of depth, xshift=-0.9cm, minimum width=3em] (flag) {Flag \\ (2-bit)};
+    \node [block, right=of flag, xshift=-0.9cm, minimum width=4em] (score) {Value \\ (16-bit)};
+    \node [block, right=of score, xshift=-0.9cm, minimum width=5em] (move) {Best Move \\ (16-bit)};
+    
+\end{tikzpicture}
+\caption{Transposition Table Entry Data Structure Layout.}
+\label{fig:transposition_table}
+\end{figure}
+% Source Material: Summarized from MEMORY_PROFILE.md and src/engine/transposition.js

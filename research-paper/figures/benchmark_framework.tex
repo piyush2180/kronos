@@ -1,0 +1,22 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 2.0cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=2.8em, minimum width=10em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    \node [block] (source) {Position Suite};
+    \node [block, right=of source] (runner) {Pipeline Manager};
+    \node [block, right=of runner] (ordo) {Rating Evaluator};
+    \node [block, below=of runner, yshift=-0.2cm] (output) {Report Generator};
+
+    \draw [arrow] (source) -- (runner);
+    \draw [arrow] (runner) -- (ordo);
+    \draw [arrow] (ordo.south) |- (output.east);
+    \draw [arrow] (runner) -- (output);
+\end{tikzpicture}
+\caption[Kronos Benchmarking Framework Data Flow]{Kronos Benchmarking Framework Data Flow.}
+\label{fig:benchmark_framework}
+\end{figure}
+
+% Source Material: Summarized from benchmark/docs/README.md

@@ -1,0 +1,61 @@
+\chapter{Experimental Methodology}
+\label{ch:experimental_methodology}
+
+This chapter details the experimental design, benchmarking framework, and statistical methods used to evaluate the search performance and playing strength of Kronos.
+
+\section{Automated Tournament Scheduler}
+The benchmarking suite runs tournaments using a Node.js script managed by our \texttt{TournamentRunner}. The scheduler supports paired opening match execution. For each match, the engine variants play two games using a shared opening FEN: once with Engine A playing White, and once with Engine A playing Black. This paired arrangement isolates playing strength evaluations from opening book advantages (such as the standard first-move advantage of White). This constraint represents a systems-level trade-off. While the hardware can support up to 8 threads, V8 engine processes are memory-intensive. Running more than 3 instances of the search core concurrently results in V8 heap paging, causing RSS to exceed physical memory bounds and introducing GC cycles that distort speedup measurements. Cap 3 ensures that all workers run entirely in active physical memory, preserving CPU cache locality.
+
+
+\input{algorithms/tournament_scheduler}
+
+The scheduler shuffles the opening FEN library (\texttt{openings.json}) using a custom Linear Congruential Generator (LCG) Pseudo-Random Number Generator (PRNG) initialized with a fixed seed. This ensures that different tournament runs can be reproduced under identical game configurations. The execution pipeline runs from raw configuration specs to final web-based dashboards, as detailed in Figure~\ref{fig:benchmark_framework}.
+
+\input{figures/benchmark_framework}
+
+\section{Execution Integrity and Verification}
+To ensure that engine matches reflect correct chess logic, the runner monitors game play. We verified execution integrity by ensuring 100\% legal moves under FIDE rules, strict color alternation (W $\to$ B $\to$ W), and correct draw trigger validation for stalemates, threefold repetitions, and the 50-move rule. The framework logs game records to standard PGN files, and we confirmed that all exported PGNs parse and replay cleanly in standard chess readers. The data flow of the validation pipeline is illustrated in Figure~\ref{fig:validation_pipeline}.
+
+\input{figures/validation_pipeline}
+
+\section{Statistical Heuristics and Formulas}
+We compute tournament ratings and confidence intervals using the Bradley-Terry logistic model. The probability $P_A$ that player A defeats player B is defined in terms of their respective ratings $R_A$ and $R_B$:
+
+\input{equations/win_probability}
+
+The expected score $E_A$ and rating updates are computed using standard formulas:
+
+\input{equations/elo_computation}
+
+To evaluate rating differences and confidence intervals from match scores, we compute the trinomial sample variance and standard error:
+
+\input{equations/confidence_interval}
+
+We apply Wald's Sequential Probability Ratio Test (SPRT) to determine whether a search enhancement provides a statistically significant playing strength increase.
+
+The SPRT routine evaluates the log-likelihood ratio (LLR) of match outcomes against a null hypothesis $H_0$ ($\text{Elo} \le 0$) and an alternative hypothesis $H_1$ ($\text{Elo} \ge 10$). The runner computes the LLR after each game pair. If the LLR exceeds the upper boundary ($\eta_1 = \log \frac{1-\beta}{\alpha}$), the tournament terminates and accepts $H_1$. Conversely, if the LLR falls below the lower boundary ($\eta_0 = \log \frac{\beta}{1-\alpha}$), the scheduler terminates and accepts $H_0$. Under target error rates of $\alpha = 0.05$ and $\beta = 0.05$, these boundary thresholds correspond to $[-2.944, 2.944]$. Unlike classical null-hypothesis significance testing, this sequential approach does not calculate frequentist $p$-values, but rather provides a binary decision boundary at specified error limits.
+
+When running fixed-length calibration tournaments rather than SPRT matchups, the scheduler evaluates Elo boundaries using trinomial distribution updates. In this mode, execution halts early if the 95\% confidence radius drops below $\pm 60$ Elo or stabilizes within a range of $5$ Elo over a 10-game window.
+
+
+To quantify the search space compression achieved by each search heuristic, we define the \textbf{Node Reduction (\%)} metric:
+\begin{equation}
+    \text{Node Reduction (\%)} = \frac{N_{\text{disabled}} - N_{\text{baseline}}}{N_{\text{disabled}}} \times 100\%
+\end{equation}
+where $N_{\text{disabled}}$ is the number of visited nodes with the heuristic deactivated, and $N_{\text{baseline}}$ is the number of visited nodes with the heuristic active (Baseline engine). This represents the percentage of the search tree pruned specifically by activating that heuristic.
+
+Finally, the Effective Branching Factor (EBF) measures search tree expansion:
+
+\input{equations/ebf}
+
+
+\section{Checkpointing and Memory Profiling}
+Tournaments run for hundreds of games, taking hours to execute. The framework implements two mechanisms to ensure robustness:
+\begin{itemize}
+    \item \textbf{JSON Checkpointing:} The tournament state is saved to a checkpoint JSON file every 10 games. The checkpoint records the game index, win/loss/draw counts, active PRNG seed index, color-flip flags, and telemetry logs. If a crash or interruption occurs, the runner reads the JSON file and resumes execution from the last saved state without loss of progress.
+    \item \textbf{Memory Profiler:} The scheduler monitors V8 heap allocations and transposition table footprints every 5 games. The profiler logs system memory usage (RSS, heap total, heap used) to \texttt{MEMORY\_PROFILE.md} during execution. This tracking monitors memory leaks that could degrade search performance during long runs.
+\end{itemize}
+
+To specify the configurations tested, Table~\ref{tab:experimental_configs} shows the parameter flags defined in the engine config files.
+
+\input{tables/experimental_configs}

@@ -1,0 +1,16 @@
+\begin{table}[htbp]
+\caption{Tournament Integrity Verification Matrix}
+\label{tab:integrity_verification}
+\centering
+\begin{tabular}{lp{3.5cm}cc}
+\toprule
+\textbf{Integrity Check} & \textbf{Target Standard} & \textbf{Status} & \textbf{Summary} \\
+\midrule
+PGN Replay       & PGN exports parse and replay cleanly in standard engines & Pass & Verified \\
+Legal Moves      & No illegal moves executed; strict FIDE rules check & Pass & Verified \\
+Unique Sequences & Move patterns do not duplicate across different seeds & Pass & Verified \\
+Color Alternation& Strict alternation of player turns (W $\to$ B $\to$ W) & Pass & Verified \\
+Draw Rule Sanity & stalemates, threefold rep., and 50-move draws trigger & Pass & Verified \\
+\bottomrule
+\end{tabular}
+\end{table}

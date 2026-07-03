@@ -1,0 +1,20 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.8cm,
+    block/.style={draw, rectangle, minimum height=2em, minimum width=12em, align=center, fill=violet!5, scale=0.85},
+    arrow/.style={draw, -latex', thick}
+]
+    \node [block] (input) {Piece placed on Square $[p][s]$};
+    \node [block, below=of input] (xor) {$\text{Hash} \leftarrow \text{Hash} \oplus \text{Table}[p][s]$};
+    \node [block, below=of xor] (side) {Side to Move $\oplus$ \text{BlackToMoveHash}};
+    \node [block, below=of side] (output) {Final 64-bit Hash Index};
+    
+    \draw [arrow] (input) -- (xor);
+    \draw [arrow] (xor) -- (side);
+    \draw [arrow] (side) -- (output);
+\end{tikzpicture}
+\caption{Zobrist Hash calculation and update process.}
+\label{fig:zobrist_hashing}
+\end{figure}
+% Source Material: Summarized from src/engine/zobrist.js

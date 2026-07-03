@@ -1,0 +1,24 @@
+\begin{table}[htbp]
+\centering
+\caption[Memory Telemetry Profile across Configurations]{Memory Telemetry Profile across Configurations.}
+\label{tab:memory_profile}
+\begin{tabularx}{\textwidth}{Xrrrr}
+\toprule
+\textbf{Experimental Run} & \textbf{RSS (MB)} & \textbf{Heap Total (MB)} & \textbf{Heap Used (MB)} & \textbf{Max TT Size} \\
+\midrule
+\multicolumn{5}{l}{\textit{Unoptimized / Early Configurations}} \\
+test\_det\_run         & 73.86  & 44.26  & 19.48   & -- \\
+EXP-3-Killer           & 119.66 & 61.76  & 31.06   & -- \\
+EXP-5-TT               & 2,739.87 & 1,410.77 & 1,354.82 & 199,999 \\
+EXP-6-Iterative        & 3,403.27 & 3,344.53 & 3,261.80 & 199,999 \\
+\midrule
+\multicolumn{5}{l}{\textit{Optimized / Final Configurations}} \\
+\textbf{FINAL-D5-D4}   & \textbf{282.76}  & \textbf{160.39}  & \textbf{123.10}  & \textbf{19,084} \\
+\textbf{FINAL-D6-D5}   & \textbf{1,713.82} & \textbf{487.77}  & \textbf{445.66}  & \textbf{72,288} \\
+\textbf{CALIB-D6-SF3}  & \textbf{124.20}  & \textbf{65.51}   & \textbf{32.85}   & \textbf{5,611} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+

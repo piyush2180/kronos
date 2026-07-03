@@ -1,0 +1,29 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm and 1.8cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=3em, minimum width=10em,
+                  text width=9.5em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    \node [block, fill=gray!15, draw=gray!60!black] (p1) {Phase 1\\Minimax / Alpha-Beta};
+    \node [block, fill=blue!10, draw=blue!60!black, right=of p1] (p2) {Phase 2\\Move Ordering \& PSTs};
+    \node [block, fill=blue!10, draw=blue!60!black, right=of p2] (p3) {Phase 3\\LMR, NMP \& Memory};
+    \node [block, fill=blue!10, draw=blue!60!black, below=1.2cm of p3] (p4) {Phase 4\\SPRT Validation};
+
+    \draw [arrow] (p1) -- (p2);
+    \draw [arrow] (p2) -- (p3);
+    \draw [arrow] (p3) -- (p4);
+
+    % Elo labels below each phase
+    \node[font=\scriptsize\sffamily, text=gray!80!black, below=0.1cm of p1] {$\sim$900 Elo};
+    \node[font=\scriptsize\sffamily, text=gray!80!black, below=0.1cm of p2] {$\sim$1{,}380 Elo};
+    \node[font=\scriptsize\sffamily, text=gray!80!black, below=0.1cm of p3] {$\sim$1{,}468 Elo};
+    \node[font=\scriptsize\sffamily, text=blue!80!black, below=0.1cm of p4] {\textbf{1{,}485 Elo}};
+
+\end{tikzpicture}
+\caption[Development Timeline and Optimization Phases]{Chronological Development Timeline and Optimization Phases of the Kronos Engine Project.}
+\label{fig:engine_timeline}
+\end{figure}
+
+% Source Material: ROADMAP_NEXT.md and README.md

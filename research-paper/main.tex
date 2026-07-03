@@ -1,0 +1,113 @@
+\documentclass[11pt,titlepage,onecolumn]{report}
+
+% --- Core Packages ---
+\usepackage[margin=1in]{geometry}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{tabularx}
+
+
+% --- Diagrams and Plotting ---
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{shapes,arrows,positioning,calc}
+
+% --- Algorithms ---
+\usepackage[ruled,linesnumbered,algo2e]{algorithm2e}
+
+% --- Navigation and Referencing ---
+% hyperref should be loaded before cleveref
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage{cleveref}
+
+% --- Table Formatting ---
+\renewcommand{\arraystretch}{1.25}
+
+
+% --- Todo Note Macro ---
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+% --- Algorithm helper macros ---
+\SetKwInput{Input}{Input}
+\SetKwInput{Output}{Output}
+\SetKw{Break}{break}
+\SetKw{To}{to}
+\renewcommand{\And}{\textbf{ and }}
+\newcommand{\Or}{\textbf{ or }}
+\newcommand{\Not}{\textbf{not }}
+
+\begin{document}
+
+% --- Title Page ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\huge \bfseries Kronos: A Reproducible Research Platform for Empirically Evaluating Classical Chess Search Heuristics on Managed JavaScript Runtimes \par}
+    \vspace{2cm}
+    {\Large \textbf{Piyush Sinha} \par}
+    \vspace{1cm}
+    {\large Department of Computer Science \par}
+    \textit{Kronos Research Project} \par
+    Email: \texttt{piyush218sinha@gmail.com} \par
+    \vspace{6cm}
+    {\large July 2026 \par}
+\end{titlepage}
+
+
+\pagenumbering{roman}
+
+% --- Abstract ---
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\clearpage
+
+% --- Executive Summary ---
+\input{sections/executive_summary}
+
+\clearpage
+
+% --- Table of Contents and Lists ---
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+\listoftables
+\clearpage
+
+% --- Switch to Arabic Page Numbering ---
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% --- Chapters ---
+\input{sections/introduction}          % Chapter 1
+\input{sections/contributions}         % Chapter 2
+\input{sections/related_work}          % Chapter 3 (Theoretical Foundations)
+\input{sections/system_overview}       % Chapter 4 (System & Engine Architecture)
+\input{sections/experimental_methodology}% Chapter 5 (Methodology & Scheduling)
+\input{sections/experimental_results}   % Chapter 6 (Empirical Results)
+\input{sections/discussion}            % Chapter 7 (Observations & Analysis)
+\input{sections/limitations}           % Chapter 8 (Validity & Limitations)
+\input{sections/future_work}           % Chapter 9 (Future Improvements)
+\input{sections/conclusion}            % Chapter 10 (Conclusion)
+
+% --- Bibliography ---
+\clearpage
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+% --- Appendices ---
+\clearpage
+\appendix
+\input{sections/appendices}
+
+\end{document}

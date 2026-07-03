@@ -1,0 +1,35 @@
+\begin{algorithm2e}[tp]
+\caption{Alpha-Beta Pruning Algorithm}
+\label{alg:alpha_beta}
+\DontPrintSemicolon
+\Input{Position $p$, Depth $d$, $\alpha$, $\beta$, Player color $pl$}
+\Output{Evaluation score of the position}
+\BlankLine
+\If{$d == 0$ \Or $p$ is terminal}{
+    \Return{Evaluate($p$)}\;
+}
+\If{$pl == \text{MAX}$}{
+    $value \leftarrow -\infty$\;
+    \ForEach{legal move $m$ from $p$}{
+        $child \leftarrow \text{MakeMove}(p, m)$\;
+        $value \leftarrow \max(value, \text{AlphaBeta}(child, d - 1, \alpha, \beta, \text{MIN}))$\;
+        $\alpha \leftarrow \max(\alpha, value)$\;
+        \If{$\alpha \ge \beta$}{
+            \Break \tcp*{Beta cut-off}
+        }
+    }
+    \Return{$value$}\;
+}
+\Else{
+    $value \leftarrow +\infty$\;
+    \ForEach{legal move $m$ from $p$}{
+        $child \leftarrow \text{MakeMove}(p, m)$\;
+        $value \leftarrow \min(value, \text{AlphaBeta}(child, d - 1, \alpha, \beta, \text{MAX}))$\;
+        $\beta \leftarrow \min(\beta, value)$\;
+        \If{$\alpha \ge \beta$}{
+            \Break \tcp*{Alpha cut-off}
+        }
+    }
+    \Return{$value$}\;
+}
+\end{algorithm2e}

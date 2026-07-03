@@ -1,0 +1,38 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=0.45cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=1.8em, minimum width=15em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    % Nodes
+    \node [block] (start) {Start Search};
+    \node [block, below=of start] (tt) {TT Probe};
+    \node [block, below=of tt] (term) {Terminal?};
+    \node [block, below=of term] (gen) {Generate Moves};
+    \node [block, below=of gen] (order) {Move Ordering};
+    \node [block, below=of order] (pvs) {PVS Loop};
+    \node [block, below=of pvs] (lmr) {Late Move Reduction (LMR)};
+    \node [block, below=of lmr] (nmp) {Null Move Pruning (NMP)};
+    \node [block, below=of nmp] (qsearch) {Quiescence Search};
+    \node [block, below=of qsearch] (eval) {Evaluation};
+    \node [block, below=of eval] (store) {Store TT};
+    \node [block, below=of store] (ret) {Return Score};
+
+    % Connections
+    \draw [arrow] (start) -- (tt);
+    \draw [arrow] (tt) -- (term);
+    \draw [arrow] (term) -- (gen);
+    \draw [arrow] (gen) -- (order);
+    \draw [arrow] (order) -- (pvs);
+    \draw [arrow] (pvs) -- (lmr);
+    \draw [arrow] (lmr) -- (nmp);
+    \draw [arrow] (nmp) -- (qsearch);
+    \draw [arrow] (qsearch) -- (eval);
+    \draw [arrow] (eval) -- (store);
+    \draw [arrow] (store) -- (ret);
+\end{tikzpicture}
+\caption[Kronos Search Execution Pipeline]{Kronos Search Execution Pipeline. Sequentially shows the operations executed during game-tree search for a single ply.}
+\label{fig:search_pipeline}
+\end{figure}
+

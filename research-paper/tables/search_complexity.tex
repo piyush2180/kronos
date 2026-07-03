@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption[Algorithmic Enhancements and Complexity Mappings]{Algorithmic Enhancements and Complexity Mappings.}
+\label{tab:search_complexity}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{Technique} & \textbf{Time Complexity Effect} & \textbf{Space Complexity Effect} \\
+\midrule
+Alpha-Beta & Reduces $O(b^d)$ to $O(b^{d/2})$ (best-case) & $O(d)$ call stack \\
+PVS & Minimizes zero-width node traversals & $O(d)$ call stack \\
+NMP & Prunes dominant branches early & $O(d)$ call stack \\
+LMR & Reduces search depth for late quiet moves & $O(d)$ call stack \\
+TT & Eliminates duplicate node evaluations & Bounded $O(M)$ memory \\
+PST & Constant time $O(1)$ leaf evaluation & Static tables \\
+\bottomrule
+\end{tabularx}
+\end{table}
+

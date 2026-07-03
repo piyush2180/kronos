@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    block/.style={draw, rectangle, minimum height=2.2em, minimum width=8em, align=center, rounded corners, fill=violet!5, scale=0.85},
+    arrow/.style={draw, -latex', thick}
+]
+    \node [block] (json) {Config Spec \\ (JSON File)};
+    \node [block, right=of json, xshift=1cm] (factory) {Engine Factory};
+    \node [block, right=of factory, xshift=1cm] (engine) {Configurable Engine};
+    \node [block, below=of engine] (options) {Optimization Flags \\ (PVS, TT, NMP, LMR)};
+
+    \draw [arrow] (json) -- (factory);
+    \draw [arrow] (factory) -- (engine);
+    \draw [arrow] (engine) -- (options);
+\end{tikzpicture}
+\caption{Parameter-injected configuration system and engine factory architecture.}
+\label{fig:configuration_system}
+\end{figure}

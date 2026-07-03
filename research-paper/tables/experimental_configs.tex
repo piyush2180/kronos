@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption[Kronos Experimental Configuration Parameters]{Kronos Experimental Configuration Parameters.}
+\label{tab:experimental_configs}
+\begin{tabularx}{\textwidth}{lXc}
+\toprule
+\textbf{Parameter Flag} & \textbf{Search Module Influence} & \textbf{Default} \\
+\midrule
+\texttt{useAlphaBeta} & Toggles baseline minimax vs.\ alpha-beta pruning & True \\
+\texttt{useIterativeDeepening} & Controls incremental deepening search loops & True \\
+\texttt{useMoveOrdering} & Enables MVV-LVA, killer moves, and history heuristics & True \\
+\texttt{useTranspositionTable} & Toggles Zobrist-keyed transposition cache & True \\
+\texttt{useQuiescence} & Restricts leaf search to quiet positions & True \\
+\texttt{usePieceSquareTables} & Controls positional evaluation mapping & True \\
+\bottomrule
+\end{tabularx}
+\end{table}

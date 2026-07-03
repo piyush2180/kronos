@@ -1,0 +1,33 @@
+\chapter{Research Objectives and Contributions}
+\label{ch:contributions}
+
+Our primary objective is to empirically evaluate the execution limits and scaling behavior of classical game-tree search heuristics implemented within managed, garbage-collected runtimes. Rather than seeking to compete with native C/C++ engines, we design Kronos as a controlled research platform to isolate and quantify the systems-level cost and benefit of individual search optimizations. This chapter details our core research questions, outlines the classical algorithms adopted from computer chess literature, and summarizes our main engineering contributions.
+
+\section{Research Questions}
+We formulate three core research questions:
+\begin{enumerate}
+    \item Can a chess search engine written in Node.js/JavaScript execute classical algorithms efficiently under V8's single-threaded and memory-managed runtime constraints?
+    \item What is the relative search space reduction and playing strength contribution of individual heuristics (LMR, NMP, PVS, move ordering, and quiescence search) under controlled tournament conditions?
+    \item What memory layout and object-allocation strategies are necessary and sufficient to prevent garbage-collection latency spikes during continuous execution?
+\end{enumerate}
+
+\section{Classical Techniques Adopted}
+To isolate dynamic runtime effects, we adopt several standard search and evaluation heuristics from computer chess literature, claiming no algorithmic novelty for these components:
+\begin{itemize}
+    \item \textbf{Search Core:} Negamax formulation of Alpha-Beta pruning~\cite{knuth1975analysis} and Principal Variation Search (PVS)~\cite{marsland1982parallel}.
+    \item \textbf{Search Reductions:} Null Move Pruning (NMP)~\cite{donninger1993null} and Late Move Reductions (LMR).
+    \item \textbf{Move Ordering:} Most Valuable Victim -- Least Valuable Attacker (MVV-LVA), Killer Move cache, and History Heuristic~\cite{schaeffer1989history}.
+    \item \textbf{Transposition Caching:} Zobrist Hashing~\cite{zobrist1970new} for state identification.
+    \item \textbf{Positional Evaluation:} Piece-Square Tables (PSTs) with tapered interpolation.
+\end{itemize}
+
+\section{Engineering Contributions}
+The contributions of this work lie in the runtime engineering, memory optimization, and deterministic benchmarking infrastructure designed to evaluate these heuristics:
+\begin{itemize}
+    \item \textbf{GC-Neutral Search Architecture:} An implementation that stabilizes V8 heap usage between 14.8\,MB and 28.4\,MB under continuous search by avoiding hot-path heap allocations via direct in-place board state mutations, flat TypedArray move buffers, and size-capped transposition table eviction.
+    \item \textbf{Web Worker Concurrency Model:} An asynchronous coordination architecture separating the React user interface thread from concurrent background search threads (Web Workers) to prevent UI thread starvation.
+    \item \textbf{Deterministic Benchmarking Pipeline:} A CLI-driven tournament suite executing paired, color-flipped matches using LCG-based opening book shuffles, ensuring identical game sequences across different host hardware configurations.
+    \item \textbf{SPRT and Bradley-Terry Integration:} An automated verification framework utilizing Sequential Probability Ratio Testing (SPRT) bounds and Bradley-Terry rating regression to validate playing strength variations.
+    \item \textbf{Incremental Checkpoint Scheduler:} A stateful scheduling architecture that logs tournament telemetry and matches incrementally to disk, enabling long-running evaluations to survive execution interrupts.
+\end{itemize}
+

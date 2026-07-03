@@ -1,0 +1,18 @@
+\begin{table}[htbp]
+\centering
+\caption[Kronos Subsystem Mappings and Responsibilities]{Kronos Subsystem Mappings and Component Responsibilities.}
+\label{tab:subsystems_summary}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Subsystem} & \textbf{Main Files} & \textbf{Responsibility} \\
+\midrule
+UI & App.jsx, pages & Interface layout, telemetry rendering \\
+Engine Core & worker.js & Search orchestration, UCI communications \\
+Search Heuristics & search.js, moveOrdering.js & Game-tree pruning, move sorting \\
+Evaluation & evaluation.js, pst.js & Position scoring, tapered interpolation \\
+Transposition Table & transpositionTable.js & State hashing, cache pruning \\
+Benchmarking Suite & pipelineManager.js & Match orchestration, data aggregation \\
+Verification Suite & testDeterminism.js & Execution logging, rule validation \\
+\bottomrule
+\end{tabularx}
+\end{table}

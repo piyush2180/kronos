@@ -1,0 +1,41 @@
+\chapter{Related Work and Background}
+\label{ch:related_work}
+
+This chapter briefly reviews the established algorithms that Kronos builds upon, emphasizing why each was chosen and what role it plays in the system rather than explaining the algorithms from first principles.
+
+\section{Game-Tree Search Foundations}
+Computer chess search originates from Claude Shannon's 1950 framework~\cite{shannon1950xxii}, which proposed exhaustive game-tree traversal as a decision procedure. Shannon's minimax algorithm—formalized as Negamax in modern implementations—evaluates all positions to a fixed depth and selects the move leading to the best outcome under optimal opponent play. Kronos uses a Negamax formulation because it simplifies the recursive structure: both sides maximize the same score from the current player's perspective, halving the amount of branching logic in the search core.
+
+\input{algorithms/negamax}
+
+Alpha-beta pruning~\cite{knuth1975analysis} extends minimax by maintaining a search window $(\alpha, \beta)$ and abandoning branches that cannot improve the current best result. Kronos depends critically on alpha-beta: without it, the branching factor of $\sim$35 in typical middle-game positions makes depth-6 search computationally infeasible on a JavaScript runtime. As the ablation results in Chapter~\ref{ch:experimental_results} confirm, alpha-beta remains the single most important structural element—all subsequent heuristics are refinements on top of it.
+
+\section{Search Reduction and Move Ordering Heuristics}
+Several well-established techniques reduce the number of nodes alpha-beta must examine.
+
+\textbf{Principal Variation Search (PVS)}~\cite{marsland1982parallel} assumes the first sorted move is the best. It searches this move with a full window, then verifies remaining moves with a cheap zero-width probe. If a probe fails, a re-search with the full window is triggered. Kronos includes PVS because move ordering quality is high enough that most subsequent moves fail low, and the zero-width probes are substantially cheaper than full searches. In practice, enabling PVS achieves a 5.2\% node reduction compared to the variant with PVS deactivated.
+
+\textbf{Null Move Pruning (NMP)}~\cite{donninger1993null} prunes nodes where the position is so dominant that passing the turn still exceeds $\beta$. Kronos applies NMP at depths $\geq 3$ with a reduction factor $R = 2$. At shallow plies it offers modest savings (0.9\% node reduction at depth 4), but becomes increasingly effective at depths 6 and above, where the branching factor amplifies every pruning decision.
+
+\textbf{Late Move Reduction (LMR)} reduces the search depth for moves that rank late in the sorted move list, exploiting the statistical observation that a well-sorted list places the best moves early. If a reduced-depth probe returns a score above $\alpha$, the engine re-searches at full depth. LMR is the dominant optimization in Kronos, responsible for a 66.3\% node reduction when enabled.
+
+\input{algorithms/lmr}
+
+Move ordering determines how effectively alpha-beta and its extensions prune the tree. Kronos uses three complementary strategies: \textbf{MVV-LVA} (captures sorted by victim value minus attacker value), \textbf{Killer Moves} (quiet moves that caused beta cutoffs in sibling nodes), and the \textbf{History Heuristic}~\cite{schaeffer1989history} (a global table recording quiet moves that triggered cutoffs anywhere in the tree, weighted by $\text{depth}^2$). Together these strategies reduce the searched node count at depth 4 from 21,784 (raw alpha-beta) to 8,286—a 62.0\% node reduction achieved before any search extension is applied.
+
+\input{tables/search_complexity}
+
+
+\section{Transposition Caching and Managed Runtime Constraints}
+To avoid re-evaluating board positions reached via alternative move paths, Kronos implements a transposition cache indexed by 64-bit Zobrist signatures~\cite{zobrist1970new}. These keys are updated incrementally via XOR operations during move execution and retraction, bypassing the overhead of full board re-hashing. The transposition table is capped at 500,000 entries with a FIFO eviction policy, a configuration found to limit memory growth under V8.
+
+Performing latency-sensitive search on dynamic runtimes introduces performance challenges absent in native compiled systems, notably garbage collection pauses and JIT compiler warm-up latency. Unlike C++ engines that manage physical memory layouts directly, JavaScript programs rely on automatic collection sweeps. Kronos mitigates collection pauses through direct in-place board state mutations, flat TypedArray move buffers, and the size-bounded cache described above. This design prevents V8 heap inflation, facilitating continuous search throughput without latency sweeps.
+
+\section{Comparison with Existing JavaScript Chess Engines}
+We contrast Kronos with other JavaScript-based engines to locate it within the dynamic runtime ecosystem. Table~\ref{tab:engine_comparison} summarizes the structural attributes of Kronos alongside Lozza (a native JavaScript engine), GarboChess (a native port), and Stockfish.js (an Emscripten-transpiled C++ engine).
+
+\input{tables/engine_comparison}
+
+Native engines such as Lozza and GarboChess do not implement strict heap-allocation constraints, leaving them susceptible to garbage collection pauses during sustained search. Stockfish.js bypasses V8 memory management by operating within WebAssembly's linear memory space, but it relies on modern browser support for SharedArrayBuffer to run parallel searches. Kronos, by contrast, executes natively within the JavaScript runtime, using target memory engineering to control collection pauses while providing a built-in benchmarking and statistical validation suite.
+
+

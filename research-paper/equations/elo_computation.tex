@@ -1,0 +1,13 @@
+% Elo rating update formula and expected score formula
+\begin{equation}
+    E_A = \frac{1}{1 + 10^{(R_B - R_A)/400}}
+\end{equation}
+\begin{equation}
+    R'_A = R_A + K(S_A - E_A)
+\end{equation}
+% Where:
+% R_A, R_B are current ratings of player A and B.
+% E_A is the expected score of player A.
+% R'_A is the updated rating of player A.
+% S_A is the actual score (1 for win, 0.5 for draw, 0 for loss).
+% K is the rating development factor.

@@ -1,0 +1,24 @@
+\begin{algorithm2e}[tp]
+\caption{Killer Moves Store and Retrieve}
+\label{alg:killer_moves}
+\DontPrintSemicolon
+\BlankLine
+\textbf{Procedure} RecordKillerMove(ply $p$, move $m$) \\
+\Begin{
+    \If{$\text{KillerTable}[p][0] \ne m$}{
+        $\text{KillerTable}[p][1] \leftarrow \text{KillerTable}[p][0]$\;
+        $\text{KillerTable}[p][0] \leftarrow m$\;
+    }
+}
+\BlankLine
+\textbf{Function} IsKillerMove(ply $p$, move $m$) \\
+\Begin{
+    \If{$m == \text{KillerTable}[p][0]$}{
+        \Return{true (High Priority)}\;
+    }
+    \If{$m == \text{KillerTable}[p][1]$}{
+        \Return{true (Medium Priority)}\;
+    }
+    \Return{false}\;
+}
+\end{algorithm2e}

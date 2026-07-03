@@ -1,0 +1,113 @@
+\chapter{Engine Configuration Parameters}
+\label{app:configs}
+
+This appendix contains sample configuration schemas, opening FEN libraries, Stockfish calibration models, and raw runtime logs.
+
+
+\section{Search Engine Configuration Schema}
+The engine variant behaviors are defined using a JSON configuration file. Below is the configuration spec utilized by the tournament runner to initialize each engine instance:
+\begin{verbatim}
+{
+  "search": {
+    "useAlphaBeta": true,
+    "useIterativeDeepening": true,
+    "useMoveOrdering": true,
+    "useTranspositionTable": true,
+    "useQuiescence": true,
+    "usePVS": true,
+    "useLMR": true,
+    "useNMP": true
+  },
+  "evaluation": {
+    "usePieceSquareTables": true,
+    "weights": {
+      "pawn": 100,
+      "knight": 320,
+      "bishop": 330,
+      "rook": 500,
+      "queen": 900,
+      "king": 20000
+    },
+    "taperedEndgameThreshold": 1600
+  },
+  "cache": {
+    "maxTranspositionTableSize": 500000
+  }
+}
+\end{verbatim}
+
+\section{Opening Book Sample FEN Seeds}
+To evaluate playing strength without bias, games are seeded with positions from a randomized opening library. Below is a selection of the baseline opening FENs used:
+\begin{enumerate}
+    \item \texttt{rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1} (King's Pawn Opening)
+    \item \texttt{rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPP/RNBQKBNR b KQkq d3 0 1} (Queen's Pawn Opening)
+    \item \texttt{rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2} (Open Game)
+    \item \texttt{r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3} (King's Knight Opening)
+    \item \texttt{r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3} (Ruy Lopez)
+\end{enumerate}
+
+\chapter{Stockfish Playing Strength Projections}
+\label{app:sf_projections}
+
+To contextualize the playing strength of the final Kronos engine (Depth 6) relative to Stockfish 18, we provide rating projections for deeper Stockfish configurations. These ratings are extrapolated by applying the observed per-depth Elo scaling increment to the base measured anchors. Because direct head-to-head matches were not executed at these higher depths, these values are theoretical estimates and should not be treated as measured empirical data.
+
+\begin{table}[htbp]
+\centering
+\caption[Stockfish Playing Strength Projections]{Stockfish Playing Strength Projections.}
+\label{tab:sf_projections_speculative}
+\begin{tabularx}{\textwidth}{Xrrrc}
+\toprule
+\textbf{Opponent} & \textbf{Games} & \textbf{Kronos Score (\%)} & \textbf{Elo Diff.} & \textbf{Source} \\
+\midrule
+vs.\ Stockfish Depth 4 & --  & --      & $\approx-180$ & Projected \\
+vs.\ Stockfish Depth 5 & --  & --      & $\approx-290$ & Projected \\
+vs.\ Stockfish Depth 6 & --  & --      & $\approx-390$ & Projected \\
+vs.\ Stockfish Depth 7 & --  & --      & $\approx-480$ & Projected \\
+vs.\ Stockfish Depth 8 & --  & --      & $\approx-570$ & Projected \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\chapter{Raw Telemetry Logs}
+\label{app:telemetry}
+We provide a sample telemetry trace recorded during calibration matches to document V8 runtime memory behavior:
+
+\begin{verbatim}
+[Kronos Profiler] Game 5 Complete.
+[Memory Profile] RSS: 75.26 MB | Heap Total: 45.26 MB | Heap Used: 26.60 MB
+[Cache Telemetry] Transposition Table Size: 48 entries | Purging.
+[Kronos Profiler] Game 10 Complete.
+[Memory Profile] RSS: 77.31 MB | Heap Total: 46.76 MB | Heap Used: 24.98 MB
+[Cache Telemetry] Transposition Table Size: 43 entries | Purging.
+\end{verbatim}
+
+\chapter{Reproducibility Checklist}
+\label{app:checklist}
+
+To ensure complete empirical transparency and support future verification studies, we provide a systems reproducibility checklist for the Kronos benchmarking suite.
+
+\begin{table}[htbp]
+\centering
+\caption[Reproducibility Configuration Checklist]{Reproducibility Configuration Checklist.}
+\label{tab:reproducibility_checklist}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Item} & \textbf{Value / Source} \\
+\midrule
+Code Repository & \url{https://github.com/piyush2180/kronos} \\
+Commit Hash & \texttt{53389c710f974b8e} \\
+Runtime Environment & Node.js v20.11.0 (Google V8 Engine) \\
+Operating System & Microsoft Windows 11 (23H2) \\
+Host Hardware (CPU) & AMD Ryzen 7 5800H (8 Cores, 16 Threads) \\
+Host Hardware (RAM) & 16.0\,GB DDR4 Physical Memory \\
+PRNG Determinism Seed & \texttt{42} (fixed inside LCG shuffle) \\
+Opening Book Library & 50 balanced positions (\texttt{openings.json}) \\
+SPRT Error Bounds & $\alpha = 0.05$, $\beta = 0.05$ \\
+Fitted Bradley-Terry & Anchored to Stockfish 18 reference targets \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+

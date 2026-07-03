@@ -1,0 +1,23 @@
+\begin{table}[htbp]
+\caption[Engine Feature Matrix Across Iterations]{Engine Feature Matrix Across Iterations.}
+
+
+\label{tab:engine_feature_matrix}
+\centering
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Feature / Enhancement} & \textbf{v1.0 (Base)} & \textbf{v1.1} & \textbf{v1.2} & \textbf{v1.3} & \textbf{v2.0 (Kronos)} \\
+\midrule
+Minimax Search               & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+Alpha-Beta Pruning           & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+Basic Move Ordering (MVV-LVA) & --         & \checkmark & \checkmark & \checkmark & \checkmark \\
+Transposition Table          & --         & --         & \checkmark & \checkmark & \checkmark \\
+Principal Variation Search   & --         & --         & \checkmark & \checkmark & \checkmark \\
+Null Move Pruning            & --         & --         & --         & \checkmark & \checkmark \\
+Late Move Reductions         & --         & --         & --         & \checkmark & \checkmark \\
+History Heuristic            & --         & --         & --         & --         & \checkmark \\
+Killer Move Heuristic        & --         & --         & --         & --         & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+% Source Material: Summarized from ENGINE_FEATURE_MATRIX.md

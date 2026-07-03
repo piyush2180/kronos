@@ -1,0 +1,14 @@
+% Late Move Reduction (LMR) and Null Move Pruning (NMP) depth reduction formulas
+\begin{equation}
+    \label{eq:nmp_reduction}
+    R_{NMP}(d) = \beta + \lfloor d / \alpha \rfloor
+\end{equation}
+\begin{equation}
+    \label{eq:lmr_reduction}
+    R_{LMR}(d, m) = c_1 + \frac{\ln(d) \cdot \ln(m)}{c_2}
+\end{equation}
+% Where:
+% d is the remaining depth, m is the move index in move ordering.
+% R_{NMP} is the depth reduction for Null Move Pruning.
+% R_{LMR} is the depth reduction for Late Move Reduction.
+% \alpha, \beta, c_1, c_2 are tuning constants.

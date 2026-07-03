@@ -1,0 +1,20 @@
+\begin{algorithm2e}[tp]
+\caption{Iterative Deepening Search}
+\label{alg:iterative_deepening}
+\DontPrintSemicolon
+\Input{Position $p$, MaxDepth $D$}
+\Output{Best move selected}
+\BlankLine
+$bestMove \leftarrow \text{None}$\;
+$\alpha \leftarrow -\infty$\;
+$\beta \leftarrow +\infty$\;
+\For{$d \leftarrow 1$ \To $D$}{
+    $score \leftarrow \text{Search}(p, d, \alpha, \beta)$\;
+    $bestMove \leftarrow \text{GetPVMove}(p)$\;
+    % If time limit is reached, break and return previous depth's best move
+    \If{\text{TimeLimitExpired}()}{
+        \Break\;
+    }
+}
+\Return{$bestMove$}\;
+\end{algorithm2e}

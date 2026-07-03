@@ -1,0 +1,129 @@
+\chapter{Experimental Results}
+\label{ch:experimental_results}
+
+This chapter presents the empirical outcomes of our evaluation, focusing on search space reduction, memory behavior, and playing strength calibration. We begin with a summary table of the primary quantitative findings.
+
+\begin{table}[htbp]
+\centering
+\caption[Key Findings: Quantitative Outcomes]{Key Findings: Quantitative Outcomes.}
+\label{tab:key_findings}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Finding} & \textbf{Value / Outcome} \\
+\midrule
+Peak Calibrated Rating & \textbf{1,485 Elo} at search depth 6 (anchored to Stockfish) \\
+Depth-7 Regression & Drops to 1,450 Elo ($-$35) due to worker search timeout aborts \\
+Largest Node Reduction & LMR: \textbf{66.3\%} node reduction (8,286 vs.\ 24,572 nodes at Depth 4) \\
+Largest Elo Gain & Quiescence Search: $+$417 Elo ladder gain at Depth 3 \\
+Positional Evaluation Gain & PSTs: $+$358.8 Elo ladder gain at Depth 2 \\
+EBF Reduction & EBF drops from 9.22 (Depth 2) to 4.43 (Depth 8) \\
+Memory Stability & 14.8\,MB -- 28.4\,MB heap usage across optimized runs \\
+Transposition Hit Rate & 85.2\% peak hit rate with 500,000-entry FIFO cap \\
+Statistical Significance & PVS, LMR, Killer+History accepted under SPRT \\
+Stockfish Calibration & Scores 40.0\% vs.\ Stockfish Depth 3 ($-$70 Elo difference) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
+\clearpage
+
+\section{Search Optimizations}
+
+\subsection{Negamax Alpha-Beta Pruning}
+We implement a Negamax formulation of alpha-beta pruning as our search foundation. Without pruning, game-tree traversal exhibits worst-case $O(b^d)$ complexity, expanding over 1.5\,million nodes at depth 4. Alpha-beta pruning restricts node expansions to 21,784 in our baseline, serving as the benchmark configuration against which subsequent optimizations are evaluated.
+
+\subsection{Principal Variation Search (PVS)}
+Principal Variation Search (PVS) refines search space compression by evaluating the first move with a full window, then probing subsequent alternatives with a zero-width window. Under our test conditions at depth 4, PVS yields a 5.2\% node reduction (from 8,739 to 8,286 nodes) and a 1.28× speedup. The performance gain remains modest due to overlap with LMR, although its efficiency increases at deeper search horizons where the principal variation is longer.
+
+\section{Move Ordering Heuristics}
+The efficiency of every pruning heuristic depends on move ordering. If optimal moves are evaluated early, the search window narrows rapidly, causing subsequent branches to fail low.
+
+\subsection{MVV-LVA Capture Ordering}
+Sorting captures by ``Most Valuable Victim -- Least Valuable Attacker'' ensures that high-priority tactical options are evaluated first. In our benchmarks, enabling MVV-LVA reduces node counts from 21,784 to 8,286 at depth 4, achieving a 62.0\% node reduction and a 4.54× speedup. This demonstrates the critical role of move sequencing in alpha-beta pruning efficiency.
+
+\subsection{Killer Moves and History Heuristic}
+To order quiet moves, Kronos uses a two-slot Killer Move cache per ply (storing quiet moves that triggered beta cutoffs in sibling nodes) and a History Table (tracking quiet moves that caused cutoffs globally, weighted by $\text{depth}^2$).
+
+Enabling the History Heuristic yields a 6.6\% node reduction (from 8,869 to 8,286 nodes) at depth 4. Killer Moves contribute a relative playing strength gain of approximately 6 Elo at depth 3. These ordering heuristics maintain list quality, allowing LMR to safely reduce search depths on low-priority branches.
+
+\section{Search Extensions and Reductions}
+
+\subsection{Late Move Reduction (LMR)}
+
+\subsubsection{LMR Mechanism}
+LMR is the most significant search reduction heuristic in Kronos. The intuition is straightforward: if moves are sorted well, the moves at the end of the list are very unlikely to be optimal. LMR searches these late moves at reduced depth ($d - 1$), treating them as unlikely candidates unless a reduced-depth probe returns a score above $\alpha$—in which case a full-depth re-search is triggered.
+
+\subsubsection{LMR Experimental Result}
+The ablation data quantifies this clearly. Enabling LMR yields a \textbf{66.3\%} node reduction (from 24,572 down to 8,286 nodes), resulting in a 4.17× speedup (execution speed drops to 0.24× when disabled). This is by far the largest single-heuristic contribution in our search ablation.
+
+\subsubsection{Interpretation and Ordering Dependency}
+The mechanism is simple: without LMR, every move at every node must be searched to full depth. With LMR, the majority of the search tree is explored at shallower depth. The safety of this reduction depends entirely on move ordering quality—poor ordering causes good moves to appear late in the list and be searched at reduced depth, missing the optimal move. This creates a tight dependency between LMR and the ordering heuristics described above.
+
+
+\input{tables/node_counts}
+
+\subsection{Null Move Pruning (NMP)}
+NMP prunes search branches where passing the turn to the opponent still results in a score exceeding $\beta$, indicating that the position is sufficiently dominant to guarantee a cutoff. We configure NMP for search depths $d \ge 3$ using a constant reduction factor $R = 2$.
+
+At depth 4, NMP contributes a 0.9\% node reduction (from 8,360 to 8,286 nodes) but provides a 1.49× execution speedup. The execution speedup is disproportionate to the raw node savings because NMP cutoffs occur near the root of the tree, avoiding expensive lower-ply move generation and evaluation calls on pruned sub-branches. The significance of NMP scales with search depth, proving critical for staying within time controls at depth 6.
+
+\subsection{Quiescence Search}
+Quiescence search mitigates the horizon effect by extending the search beyond the nominal depth limit for unstable, tactical positions containing legal captures. This prevents the engine from returning misleading static evaluations mid-sequence.
+
+Disabling quiescence search at depth 3 decreases playing strength from 1,380 to 963 Elo. This drop of 417 Elo represents the largest single-heuristic effect in our ablation study, highlighting the necessity of quiescence search in mitigating tactical blindness.
+
+\subsection{Evaluation Function: Piece-Square Tables}
+Substituting a material-only evaluation with Piece-Square Tables (PSTs) provides a rating improvement of 358.8 Elo at depth 2. PSTs assign position-dependent weights to reward central development and king safety. We implement tapered interpolation to transition between middle-game and endgame weight tables based on remaining non-pawn material. Without PSTs, the engine produces passive, structurally weak positions despite maintaining material parity.
+
+\subsection{Memory Engineering and GC Stability}
+Table~\ref{tab:memory_profile} documents memory usage across configurations. Specifically, the uncapped transposition table configurations (EXP-5-TRANSPOSITION and EXP-6-ITERATIVE) resulted in RSS exceeding 2\,GB. These early outcomes motivated the implementation of the 500,000-entry FIFO capacity limit.
+
+\input{tables/memory_profile}
+
+The 500,000-entry capacity limit restricts the active cache memory to approximately 30\,MB while maintaining an 85.2\% hit rate. This hit rate is sustained because chess searches frequently evaluate transposed board states during middle-game traversal.
+
+\section{Search Depth Scaling and NPS Throughput}
+Table~\ref{tab:cross_depth_elo} documents search throughput and playing strength scaling across depths 1 through 7.
+
+\input{tables/cross_depth_elo}
+
+Calibrated playing strength scales from 1,100 Elo at depth 1 to a peak of 1,485 Elo at depth 6. At depth 5, the rating plateaus at 1,468 Elo, suggesting that the additional search ply does not consistently find better moves within the configured tournament time controls.
+
+The performance regression at depth 7 ($-$35 Elo) is caused by single-threaded latency constraints. When search time at depth 7 exceeds the tournament time limit, the engine returns the best move from the last fully completed iterative deepening iteration (depth 6) rather than the incomplete depth-7 results. This timeout behavior introduces a performance ceiling, demonstrating that single-threaded JavaScript search workers cannot reliably sustain depth-7 calculations under standard time controls.
+
+The Effective Branching Factor (EBF) decreases from 9.22 at depth 2 to 4.43 at depth 8 (Figure~\ref{fig:effective_branching_factor}). This contraction shows that our pruning heuristics become proportionally more effective as the search depth increases, since deeper horizons provide more contextual information for move ordering and reduction decisions.
+
+\section{Stockfish Reference Calibration}
+We calibrated the relative playing strength by matching the Depth 6 engine configuration against three depth-limited Stockfish 18 variants.
+
+\input{tables/stockfish_calibration}
+
+Kronos scores 37.5\% against Stockfish Depth 1, 45.0\% against Stockfish Depth 2, and 40.0\% against Stockfish Depth 3, corresponding to relative Elo differences of $-$89, $-$35, and $-$70. The non-monotonic score distribution falls within the statistical uncertainty ($\pm$86 Elo) of the 20-game sample sizes.
+
+\subsection{Statistical Significance of Heuristic Gains}
+Sequential Probability Ratio Tests (SPRT) validate the statistical significance of these playing strength gains under Wald boundaries $[-2.94, 2.94]$.
+
+\input{tables/statistical_validation}
+
+Both LMR ($LLR = 3.01$) and the combined Killer+History heuristics ($LLR = 3.12$) exceed the upper SPRT boundary and are accepted ($H_1$). PVS also crosses the acceptance limit ($LLR = 2.98$). The NMP test remains inconclusive at 100 games ($LLR = -1.25$), matching its low node savings at depth 4.
+
+The tournament results summary at depth 3 (Table~\ref{tab:tournament_results}) highlights the influence of quiescence search: the full engine variant scores 91.0\% (1,380 Elo) across 400 games, whereas the variant without quiescence search scores 47.9\% (963 Elo).
+
+\input{tables/tournament_results}
+
+Figures~\ref{fig:search_pipeline}--\ref{fig:memory_usage} visualize the search pipeline structure, node growth, strength scaling, Stockfish calibration curve, EBF reduction, and memory profile.
+
+\input{figures/search_pipeline}
+\input{figures/node_growth}
+\input{figures/strength_vs_depth}
+\input{figures/stockfish_calibration}
+\input{figures/effective_branching_factor}
+\input{figures/memory_usage}
+
+
+\section{Game-Level Computational Overhead}
+To evaluate the aggregate computational overhead incurred across full matches (rather than single-move searches), Table~\ref{tab:search_cost} details the average nodes visited, total search time, and resulting aggregate NPS achieved per game across depths 2 through 5. As depth scales, the average nodes searched per game increases exponentially from 5,501 nodes at depth 2 to over 1.2\,million nodes at depth 5. This exponential growth is mirrored in the time scaling, showing that depth-5 tournament games require substantial computational execution time (~131 seconds per game) on V8. The aggregate NPS values (varying between 2,515 and 10,423 NPS) reflect the dynamic JIT optimizations and transposition cache hit rates across complete game lifecycles.
+
+\input{tables/search_cost}
+

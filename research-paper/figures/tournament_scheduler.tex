@@ -1,0 +1,21 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 2.0cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=2.8em, minimum width=10em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    \node [block] (sched) {Tournament Scheduler};
+    \node [block, right=of sched, yshift=1.2cm] (w1) {Worker 1 (Match)};
+    \node [block, right=of sched, yshift=0.0cm] (w2) {Worker 2 (Match)};
+    \node [block, right=of sched, yshift=-1.2cm] (w3) {Worker N (Match)};
+
+    \draw [arrow] (sched.east) -- (w1.west);
+    \draw [arrow] (sched.east) -- (w2.west);
+    \draw [arrow] (sched.east) -- (w3.west);
+\end{tikzpicture}
+\caption[Parallel Worker Tournament Scheduler]{Parallel Worker Tournament Scheduler.}
+\label{fig:tournament_scheduler}
+\end{figure}
+
+% Source Material: Summarized from TOURNAMENT_FAIRNESS_REPORT.md and TOURNAMENT_INTEGRITY_REPORT.md

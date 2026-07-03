@@ -1,0 +1,8 @@
+% Bradley-Terry model for pairwise chess engine comparison
+\begin{equation}
+    P(i \succ j) = \frac{\gamma_i}{\gamma_i + \gamma_j} = \frac{e^{\theta_i}}{e^{\theta_i} + e^{\theta_j}}
+\end{equation}
+% Where:
+% P(i \succ j) is the probability that engine i defeats engine j.
+% \gamma_i, \gamma_j represent the strength parameters of engines i and j.
+% \theta_i, \theta_j are the log-strength ratings (directly proportional to Elo).

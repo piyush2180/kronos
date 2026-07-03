@@ -1,0 +1,46 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+This chapter interprets our experimental findings, framing them as systems engineering insights for building latency-sensitive search components on managed runtimes.
+
+\section{GC-Neutral Memory Engineering}
+Dynamic runtimes are historically considered unsuitable for performance-critical systems because automatic garbage collection (GC) sweeps introduce unpredictable latency spikes. Kronos shows that these pauses are avoidable by eliminating dynamic object allocations on the hot path.
+
+As documented in Table~\ref{tab:memory_profile}, early configurations utilizing uncapped transposition tables (EXP-5-TRANSPOSITION and EXP-6-ITERATIVE) suffered from heap inflation, which triggered frequent collection cycles. Restricting transposition table growth to 500,000 entries and wrapping board mutations in the allocation-free \texttt{ChessInstanceClone} class bounded V8 heap memory between 14.8\,MB and 28.4\,MB during standard tournament matches. Within this footprint, V8's minor collections run in under 1\,ms, preventing search loop interruptions.
+
+This memory discipline enables a sustained search throughput of 4,500--5,600\,NPS at depths 4 through 6. Although this throughput is lower than native C++ engines, it is sufficient to evaluate depth-6 horizons within standard time controls. For systems developers working on managed runtimes, the core takeaway is that memory allocation patterns, rather than language choice, govern real-time search efficiency.
+
+\section{Synergy between Move Ordering and Search Reductions}
+Our ablation data (Table~\ref{tab:node_counts}) indicates a multiplicative synergy between ordering heuristics and tree reductions. Move ordering alone compresses the search space by 62.0\% at depth 4. LMR builds upon this sorting to reduce the evaluation depth of late-ranked moves. Disabling LMR increases the search space to 24,572 nodes even with ordering active.
+
+This interaction is highly non-linear. The safety of LMR is conditioned on move ordering quality; if the best move is ranked late in the list, LMR searches it at reduced depth, potentially overlooking a tactical variation. Conversely, poor ordering under an active LMR configuration is more hazardous than poor ordering in a standard alpha-beta search. Thus, investment in move ordering quality (MVV-LVA, Killer Moves, and History Heuristics) directly enhances the safety of aggressive pruning heuristics.
+
+\section{Latency Constraints and the Search Ceiling}
+Depth-scaling metrics (Table~\ref{tab:cross_depth_elo}) exhibit consistent strength gains up to depth 6, followed by regression at depth 7. This is a latency-induced limitation of the single-threaded execution model.
+
+At depth 7, the average search latency per position reaches 11.7 seconds, which frequently exceeds the tournament time limit. When the search is aborted mid-ply, the engine reverts to the best move from the last completed iterative deepening step (depth 6). In positions where depth-6 and depth-7 evaluations differ, the engine plays sub-optimally. This establishes a hard throughput ceiling, indicating that single-threaded JavaScript workers cannot reliably sustain depth-7 search under standard time controls. Pushing past this limit would require shared-memory parallel search strategies, such as Lazy SMP, operating over browser \texttt{SharedArrayBuffer} allocations.
+
+\section{Deterministic Seeding and SPRT Validation}
+To ensure reproducibility in playing strength evaluation, Kronos incorporates deterministic seeding and sequential testing.
+
+First, the tournament runner shuffles the opening library using a custom LCG PRNG initialized with a fixed seed. This ensures that independent benchmark runs execute identical game sequences. Second, paired, color-flipped matches isolate playing strength from opening advantages. Each opening FEN is played twice, swapping color assignments between variants, which mitigates White's first-move advantage.
+
+Third, Sequential Probability Ratio Testing (SPRT) provides a mathematically grounded termination criterion. Rather than evaluating a fixed game count, SPRT tracks the LLR against Wald boundaries, terminating as soon as the outcomes statistically confirm or reject a rating hypothesis. In practice, this sequential approach reduces the required game sample size by up to 40\% compared to fixed-sample testing, making laptop-based systems evaluations viable.
+
+\section{Draw-Rate Analysis in Self-Play Pools}
+During self-play matchups between variants of similar strength, draw rates reached 92.4\% to 97.5\% (Table~\ref{tab:tournament_results}). We identify four contributing factors to this high draw rate:
+\begin{enumerate}
+    \item \textbf{Shallow Search Depth:} At depths 3 and 4, the engines cannot formulate long-term positional plans to create structural imbalances, resulting in defensive simplifications.
+    \item \textbf{Search Determinism:} Root move selection is entirely deterministic without randomization. In a closed self-play pool, this lacks variation, leading games into identical drawn lines.
+    \item \textbf{Move Limit Termination:} Even matchups frequently simplify into drawish endgames that are terminated by the runner's 200-ply limit.
+    \item \textbf{Repetition Detection Limitations:} The transposition table does not penalize move repetitions during search traversal. Consequently, the search core is prone to repeating moves when it evaluates the position as equal.
+\end{enumerate}
+This high draw rate reduces the statistical information generated per game, expanding standard error margins and requiring larger game sample sizes to resolve minor Elo differences.
+
+\section{Managed Runtime Engineering Lessons}
+Three design guidelines emerge from our study:
+\begin{enumerate}
+    \item \textbf{Prioritize Allocation Elimination:} Replacing object allocations with in-place board state mutations yields a greater practical speedup than algorithmic modifications by removing GC spikes.
+    \item \textbf{Warm the JIT Compiler:} V8 JIT optimizations require several warm-up iterations to stabilize. Benchmarking timings recorded during the first few matches will result in distorted, high-latency metrics.
+    \item \textbf{Isolate Concurrent Tasks:} Without background Web Worker isolation, search execution blocks the browser main thread, freezing the user interface. Decoupling the search plane is a functional requirement for interactive dynamic runtimes.
+\end{enumerate}

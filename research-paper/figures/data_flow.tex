@@ -1,0 +1,28 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    block/.style={draw, rectangle, minimum height=2.5em, minimum width=7em, align=center, rounded corners, fill=orange!5, scale=0.85},
+    arrow/.style={draw, -latex', thick}
+]
+    % Nodes
+    \node [block] (game) {Game Play \\ (Board State)};
+    \node [block, right=of game, xshift=0.8cm] (engine) {Engine Core \\ (Search/Eval)};
+    \node [block, below=of engine] (telemetry) {Telemetry Collector \\ (Raw Metrics)};
+    \node [block, below=of game] (results) {Results Persistence \\ (CSV/PGN Logs)};
+    \node [block, left=of results, xshift=-0.8cm] (analysis) {Statistical Analysis \\ (SPRT / Ordo)};
+    \node [block, above=of analysis] (reports) {Report Generation \\ (Markdown/JSON)};
+    \node [block, above=of game] (frontend) {React Dashboard \\ (Visualization)};
+
+    % Connections
+    \draw [arrow] (game) -- (engine);
+    \draw [arrow] (engine) -- (telemetry);
+    \draw [arrow] (telemetry) -- (results);
+    \draw [arrow] (results) -- (analysis);
+    \draw [arrow] (analysis) -- (reports);
+    \draw [arrow] (reports) -- (frontend);
+    \draw [arrow] (frontend) -- (game);
+\end{tikzpicture}
+\caption{Data flow model within the Kronos research engine system.}
+\label{fig:data_flow}
+\end{figure}

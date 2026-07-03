@@ -1,0 +1,19 @@
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.0cm and 2.0cm,
+    block/.style={draw=blue!60!black, rectangle, minimum height=2.8em, minimum width=10em, align=center, rounded corners=3pt, fill=blue!10, font=\small\sffamily},
+    arrow/.style={draw, -latex, thick, gray!80!black}
+]
+    \node [block] (games) {Game Results (W/D/L)};
+    \node [block, right=of games] (stats) {SPRT Calculator};
+    \node [block, right=of stats] (val) {Validation Report};
+
+    \draw [arrow] (games) -- (stats);
+    \draw [arrow] (stats) -- (val);
+\end{tikzpicture}
+\caption[Kronos Validation Pipeline]{Kronos Validation Pipeline.}
+\label{fig:validation_pipeline}
+\end{figure}
+
+% Source Material: Summarized from STATISTICAL_VALIDATION_REPORT.md

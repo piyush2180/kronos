@@ -1,0 +1,34 @@
+\begin{algorithm2e}[tp]
+\caption{Tournament Scheduler with SPRT}
+\label{alg:tournament_scheduler}
+\DontPrintSemicolon
+\Input{Engine Config A, Engine Config B, Opening FENs list $F$, SPRT bounds $[\eta_0, \eta_1]$, Max Games $M$}
+\Output{Trinomial Elo rating delta, SPRT Decision}
+\BlankLine
+$wins \leftarrow 0$, $losses \leftarrow 0$, $draws \leftarrow 0$, $N \leftarrow 0$\;
+$checkpoint \leftarrow \text{LoadCheckpoint()}$\;
+\If{$checkpoint$ exists}{
+    $wins, losses, draws, N \leftarrow \text{RestoreState}(checkpoint)$\;
+}
+\While{$N < M$}{
+    $fen \leftarrow F[N / 2]$\;
+    \If{$N \pmod 2 == 0$}{
+        $result \leftarrow \text{PlayGame}(\text{Config A as White}, \text{Config B as Black}, fen)$\;
+    }
+    \Else{
+        $result \leftarrow \text{PlayGame}(\text{Config B as White}, \text{Config A as Black}, fen)$\;
+        $result \leftarrow \text{Flip}(result)$ \tcp*{Invert outcome for Config A perspective}
+    }
+    $wins, losses, draws \leftarrow \text{UpdateCounts}(wins, losses, draws, result)$\;
+    $N \leftarrow N + 1$\;
+    $\text{SaveCheckpoint}(wins, losses, draws, N)$\;
+    $LLR \leftarrow \text{CalculateLLR}(wins, losses, draws)$\;
+    \If{$LLR \ge \eta_1$}{
+        \Return{\text{ComputeElo}(wins, losses, draws), $\text{Accepted } (H_1)$}\;
+    }
+    \If{$LLR \le \eta_0$}{
+        \Return{\text{ComputeElo}(wins, losses, draws), $\text{Rejected } (H_1)$}\;
+    }
+}
+\Return{\text{ComputeElo}(wins, losses, draws), \text{Inconclusive}}\;
+\end{algorithm2e}

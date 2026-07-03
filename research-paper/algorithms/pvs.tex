@@ -1,0 +1,32 @@
+\begin{algorithm2e}[tp]
+\caption{Principal Variation Search (PVS)}
+\label{alg:pvs}
+\DontPrintSemicolon
+\Input{Position $p$, Depth $d$, $\alpha$, $\beta$}
+\Output{Evaluation score}
+\BlankLine
+\If{$d == 0$ \Or $p$ is terminal}{
+    \Return{QuiescenceSearch($p$, $\alpha$, $\beta$)}\;
+}
+$moves \leftarrow \text{OrderMoves}(\text{GenerateMoves}(p))$\;
+$firstMove \leftarrow \text{true}$\;
+\ForEach{move $m$ in $moves$}{
+    $\text{MakeMove}(p, m)$\;
+    \If{$firstMove$}{
+        $score \leftarrow -\text{PVS}(p, d - 1, -\beta, -\alpha)$\;
+        $firstMove \leftarrow \text{false}$\;
+    }
+    \Else{
+        $score \leftarrow -\text{PVS}(p, d - 1, -\alpha - 1, -\alpha)$ \tcp*{Null-window search}
+        \If{$score > \alpha$ \And $score < \beta$}{
+            $score \leftarrow -\text{PVS}(p, d - 1, -\beta, -\alpha)$ \tcp*{Research with full window}
+        }
+    }
+    $\text{UnmakeMove}(p, m)$\;
+    $\alpha \leftarrow \max(\alpha, score)$\;
+    \If{$\alpha \ge \beta$}{
+        \Return{$\beta$}\;
+    }
+}
+\Return{$\alpha$}\;
+\end{algorithm2e}
