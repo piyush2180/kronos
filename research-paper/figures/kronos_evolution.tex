@@ -19,39 +19,39 @@
 
 % ===== Phase 1 =====
 \node[phaseA] (p1) at (0,0) {%
-    \textbf{Phase 1 — Baseline Minimax (v1.0)} \hfill \textcolor{gray!80!black}{$\sim$Elo 800--900}\\
-    \textit{Features:} Negamax Alpha-Beta with material evaluation. Single-threaded execution.\\
-    \textit{Nodes at D4:} $\sim$300{,}000 \quad \textit{NPS:} $\sim$800 \quad \textit{GC behavior:} Unstable heap cloning.
+    \textbf{Phase 1 — Baseline Minimax (v1.0)} \hfill \textcolor{gray!80!black}{Initial Alpha-Beta Target}\\
+    \textit{Added Features:} Negamax Alpha-Beta with simple material evaluation. Single-threaded search execution.\\
+    \textit{Systems Focus:} Verifying game-tree traversal correctness and measuring baseline search performance bounds.
 };
 
 \draw[arrow] (0,-1.35) -- (0,-1.85);
 
 % ===== Phase 2 =====
 \node[phaseB] (p2) at (0,-3.1) {%
-    \textbf{Phase 2 — Move Ordering + Evaluation (v1.1--v1.2)} \hfill \textcolor{blue!80!black}{$\sim$Elo 1{,}100--1{,}380}\\
-    \textit{Added:} MVV-LVA capture sorting, Zobrist Transposition Table, PST evaluation, PVS.\\
-    \textit{Nodes at D4:} $\sim$21{,}784 ($-$93\% vs Phase 1) \quad \textit{Elo gain:} $+$358.8 Elo from PST.
+    \textbf{Phase 2 — Move Ordering \& Evaluation (v1.1--v1.2)} \hfill \textcolor{blue!80!black}{Pruning Optimization Target}\\
+    \textit{Added Features:} MVV-LVA capture sorting, Piece-Square Tables (PST) with tapered interpolation, PVS.\\
+    \textit{Systems Focus:} Maximizing alpha-beta pruning density through heuristic move selection.
 };
 
 \draw[arrow] (0,-4.45) -- (0,-4.95);
 
 % ===== Phase 3 =====
 \node[phaseC] (p3) at (0,-6.2) {%
-    \textbf{Phase 3 — Search Extensions + Memory (v1.3)} \hfill \textcolor{blue!80!black}{$\sim$Elo 1{,}380--1{,}468}\\
-    \textit{Added:} Null Move Pruning ($R=2$), Late Move Reduction (LMR), in-place state mutations.\\
-    \textit{Nodes at D4:} $\sim$8{,}286 ($-$62\% vs Phase 2) \quad \textit{Heap:} Bounded at 14.8--28.4\,MB.
+    \textbf{Phase 3 — Search Reductions \& Memory (v1.3)} \hfill \textcolor{blue!80!black}{Allocation Elimination Target}\\
+    \textit{Added Features:} Null Move Pruning, Late Move Reductions (LMR), in-place board state mutations.\\
+    \textit{Systems Focus:} Eliminating garbage collection pauses on search hot paths and compressing the active tree.
 };
 
 \draw[arrow] (0,-7.55) -- (0,-8.05);
 
 % ===== Phase 4 =====
 \node[phaseD] (p4) at (0,-9.3) {%
-    \textbf{Phase 4 — Final Kronos v2.0 + SPRT Validation} \hfill \textcolor{blue!80!black}{\textbf{1{,}485 Elo} (Depth 6)}\\
-    \textit{Added:} Killer Move cache, History Heuristic, SPRT validation, Stockfish calibration.\\
-    \textit{Nodes at D4:} 8{,}286 \quad \textit{TT hit rate:} 85.2\% \quad \textit{Calibration:} $-$70 Elo vs.\ Stockfish D3.
+    \textbf{Phase 4 — Final Kronos v2.0 + Threading} \hfill \textcolor{blue!80!black}{Web Worker Concurrency Target}\\
+    \textit{Added Features:} Killer Move cache, History Heuristic, concurrent background Web Workers, automated CLI validation.\\
+    \textit{Systems Focus:} Separating search threads from the React user interface and conducting calibration tournaments.
 };
 
-% Right-side metric labels
+% Right-side version labels
 \node[label, fill=gray!60!black]   at (7.2, 0)    {v1.0};
 \node[label, fill=blue!60!black]   at (7.2, -3.1) {v1.1--1.2};
 \node[label, fill=blue!60!black]   at (7.2, -6.2) {v1.3};

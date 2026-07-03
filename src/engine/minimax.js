@@ -12,7 +12,9 @@ export const SEARCH_OPTIONS = {
   history: true,
   lmr: true,
   nmp: true,
-  aspiration: true
+  aspiration: true,
+  moveOrdering: true,
+  tt: true
 };
 
 const INFINITY = 1000000;
@@ -232,7 +234,7 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
   }
 
   // 4. Transposition Table lookup (no board clones or FEN generation!)
-  const ttEntry = tt.get(zobristKey);
+  const ttEntry = SEARCH_OPTIONS.tt ? tt.get(zobristKey) : null;
   let ttMove = null;
 
   if (ttEntry) {
@@ -284,7 +286,9 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
     return 0;
   }
 
-  orderMoves(moves, ttMove, depth);
+  if (SEARCH_OPTIONS.moveOrdering) {
+    orderMoves(moves, ttMove, depth);
+  }
 
   let bestMoveThisNode = null;
   let oldAlpha = alpha;
@@ -346,7 +350,9 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
           storeHistoryScore(move, depth);
         }
       }
-      tt.set(zobristKey, beta, depth, TT_FLAGS.BETA, move);
+      if (SEARCH_OPTIONS.tt) {
+        tt.set(zobristKey, beta, depth, TT_FLAGS.BETA, move);
+      }
       return beta;
     }
   }
@@ -357,7 +363,9 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
   if (scoreToStore > MATE_SCORE - 100) scoreToStore += ply;
   else if (scoreToStore < -MATE_SCORE + 100) scoreToStore -= ply;
 
-  tt.set(zobristKey, scoreToStore, depth, flag, bestMoveThisNode);
+  if (SEARCH_OPTIONS.tt) {
+    tt.set(zobristKey, scoreToStore, depth, flag, bestMoveThisNode);
+  }
 
   return alpha;
 }

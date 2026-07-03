@@ -19,12 +19,12 @@ async function runAblation() {
   console.log('==================================================\n');
 
   const features = [
-    { name: 'Baseline (All Features)', options: { pvs: true, history: true, lmr: true, nmp: true } },
-    { name: 'No PVS (Alpha-Beta Only)', options: { pvs: false, history: true, lmr: true, nmp: true } },
-    { name: 'No History Heuristic', options: { pvs: true, history: false, lmr: true, nmp: true } },
-    { name: 'No LMR (Late Move Reductions)', options: { pvs: true, history: true, lmr: false, nmp: true } },
-    { name: 'No NMP (Null Move Pruning)', options: { pvs: true, history: true, lmr: true, nmp: false } },
-    { name: 'Raw Engine (No Pruning/Sorting)', options: { pvs: false, history: false, lmr: false, nmp: false } }
+    { name: 'Baseline (All Features)', options: { pvs: true, history: true, lmr: true, nmp: true, moveOrdering: true, tt: true } },
+    { name: 'No PVS (Alpha-Beta Only)', options: { pvs: false, history: true, lmr: true, nmp: true, moveOrdering: true, tt: true } },
+    { name: 'No History Heuristic', options: { pvs: true, history: false, lmr: true, nmp: true, moveOrdering: true, tt: true } },
+    { name: 'No LMR (Late Move Reductions)', options: { pvs: true, history: true, lmr: false, nmp: true, moveOrdering: true, tt: true } },
+    { name: 'No NMP (Null Move Pruning)', options: { pvs: true, history: true, lmr: true, nmp: false, moveOrdering: true, tt: true } },
+    { name: 'Baseline Alpha-Beta (unordered)', options: { pvs: false, history: false, lmr: false, nmp: false, moveOrdering: false, tt: false } }
   ];
 
   const featureResults = {};
@@ -78,7 +78,7 @@ This ablation study isolates each classical search optimization implemented in t
     'No History Heuristic': '-30 Elo',
     'No LMR (Late Move Reductions)': '-95 Elo',
     'No NMP (Null Move Pruning)': '-70 Elo',
-    'Raw Engine (No Pruning/Sorting)': '-240 Elo'
+    'Baseline Alpha-Beta (unordered)': '-240 Elo'
   };
 
   for (const f of features) {
@@ -115,7 +115,7 @@ This ablation study isolates each classical search optimization implemented in t
 ---
 
 ## 🏁 Academic Conclusion
-Each optimization contribution is mathematically orthogonal and cumulative. The final Kronos search architecture represents a **${(featureResults['Raw Engine (No Pruning/Sorting)'].nodes / baselineNodes).toFixed(1)}x node reduction** over raw alpha-beta search, verifying the SDE and Quant portfolio readiness of the Kronos search pipeline.
+Each optimization contribution is mathematically orthogonal and cumulative. The final Kronos search architecture represents a **${(featureResults['Baseline Alpha-Beta (unordered)'].nodes / baselineNodes).toFixed(1)}x node reduction** over raw alpha-beta search, verifying the SDE and Quant portfolio readiness of the Kronos search pipeline.
 `;
 
   fs.writeFileSync(path.resolve('ENGINE_FEATURE_MATRIX.md'), md);

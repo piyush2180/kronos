@@ -22,35 +22,35 @@ function main() {
 
   // Anchoring Stockfish Depth 1 at 1500 Elo.
   // Based on calibration:
-  // Kronos Final D6 vs Stockfish D1: -89 Elo => Kronos D6 = 1411 Elo
-  // Kronos Final D6 vs Stockfish D2: -35 Elo => Kronos D6 = 1515 Elo (Stockfish D2 = 1550)
-  // Kronos Final D6 vs Stockfish D3: -70 Elo => Kronos D6 = 1530 Elo (Stockfish D3 = 1600)
-  // Average anchored Elo of Kronos D6 = 1485 Elo.
+  // Kronos Final D6 vs Stockfish D1: -127 Elo => Kronos D6 = 1373 Elo (Stockfish D1 = 1500)
+  // Kronos Final D6 vs Stockfish D2: -108 Elo => Kronos D6 = 1442 Elo (Stockfish D2 = 1550)
+  // Kronos Final D6 vs Stockfish D3: -215 Elo => Kronos D6 = 1385 Elo (Stockfish D3 = 1600)
+  // Average anchored Elo of Kronos D6 = 1400 Elo.
   
-  const kronosD6Elo = 1485;
-  const kronosD7Elo = 1450; // -35 Elo relative to D6 (measured)
-  const kronosD5Elo = 1468; // -17 Elo relative to D6 (measured)
-  const kronosD4Elo = 1468; // +0 Elo relative to D5 (measured)
-  const kronosD3Elo = 1380; // -88 Elo relative to D4 (extrapolated via search scaling)
+  const kronosD6Elo = 1400;
+  const kronosD7Elo = 1365; // -35 Elo relative to D6 (measured)
+  const kronosD5Elo = 1383; // -17 Elo relative to D6 (measured)
+  const kronosD4Elo = 1383; // +0 Elo relative to D5 (measured)
+  const kronosD3Elo = 1295; // -88 Elo relative to D4 (extrapolated via search scaling)
 
-  // Map historical ablation configurations relative to Full Kronos Depth 3 (1380 Elo)
+  // Map historical ablation configurations relative to Baseline Minimax (1000 Elo)
   // Using relative offsets derived from Bradley-Terry network:
-  // - Full Kronos Engine: 1380 Elo
-  // - Full Kronos (No Quiescence): 1380 - 417 = 963 Elo
-  // - Transposition Table: 1380 - 406 = 974 Elo
-  // - Killer Moves: 1380 - 396 = 984 Elo
-  // - Move Ordering: 1380 - 389 = 991 Elo
-  // - Alpha-Beta: 1380 - 403 = 977 Elo
-  // - Baseline Minimax: 1380 - 402 = 978 Elo
+  // - Baseline Minimax: 1000 Elo
+  // - Alpha-Beta Only: 1000 Elo
+  // - Move Ordering: 1005 Elo
+  // - Killer Moves: 1005 Elo
+  // - Transposition Table: 1005 Elo
+  // - Full Kronos (No Quiescence): 1016 Elo
+  // - Full Kronos Engine: 1387 Elo
   
   const absoluteRatings = {
-    "Baseline Minimax": 978,
-    "Alpha-Beta Only": 977,
-    "Move Ordering (MVV-LVA)": 991,
-    "Killer Moves": 984,
-    "Transposition Table & Zobrist": 974,
-    "Full Kronos (No Quiescence)": 963,
-    "Full Kronos Engine": 1380,
+    "Baseline Minimax": 1000,
+    "Alpha-Beta Only": 1000,
+    "Move Ordering (MVV-LVA)": 1005,
+    "Killer Moves": 1005,
+    "Transposition Table & Zobrist": 1005,
+    "Full Kronos (No Quiescence)": 1016,
+    "Full Kronos Engine": 1387,
     "Kronos Final (Depth 6)": kronosD6Elo
   };
 

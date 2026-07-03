@@ -21,7 +21,7 @@ The Kronos application is a React-based single-page application running in the b
 \label{fig:app_screenshots}
 \end{figure}
 
-The \textbf{Dashboard} (Figure~\ref{fig:app_screenshots}a) provides a unified entry point. It displays the active engine configuration, flagship search depth (D6), peak relative self-play Elo (1{,}485), and quick-access buttons for each mode. Notably, it surfaces live statistics from the engine, reinforcing Kronos's identity as a research tool rather than just a game client.
+The \textbf{Dashboard} (Figure~\ref{fig:app_screenshots}a) provides a unified entry point. It displays the active engine configuration, search settings, internal Bradley-Terry self-play ratings (detailed in Chapter~\ref{ch:experimental_results}), and quick-access buttons for each mode. Notably, it surfaces live statistics from the engine, reinforcing Kronos's identity as a research tool rather than just a game client.
 
 
 The \textbf{Play Engine} page (Figure~\ref{fig:app_screenshots}b) exposes the depth-configuration selector from D2 to D7, each with NPS estimates printed directly in the UI. This transparency—showing users approximately how many nodes per second the engine processes at each depth—was a deliberate design choice to make the research context visible during play.
@@ -40,7 +40,7 @@ The overall system topology is shown in Figure~\ref{fig:overall_architecture}, a
 \input{figures/overall_architecture}
 \input{figures/tournament_scheduler}
 
-This design has a measurable consequence: the main UI thread remains at 60\,FPS even while the engine is searching at depth 6, because the 11-second search at D7 runs entirely in the worker thread without blocking any UI events.
+This design has a measurable consequence: the main UI thread remains at 60\,FPS even while search execution runs entirely in the worker thread without blocking UI events.
 
 \subsection{Software Subsystem Decomposition}
 The engine code is divided into modular classes. Table~\ref{tab:subsystems_summary} details each subsystem, its source files, and its primary responsibility.
@@ -52,8 +52,8 @@ The modularity of this design is what enables the ablation study in Chapter~\ref
 \section{Engine Design and Memory Optimization}
 The search core is engineered to minimize heap allocations on every hot path. This section describes the three key techniques.
 
-\subsection{GC-Neutral Board Mutation}
-Kronos delegates board representation to the third-party \texttt{chess.js} library, which normally clones the entire board state on every move validation. For a depth-6 search expanding hundreds of thousands of nodes, this would allocate millions of temporary objects, triggering frequent GC sweeps.
+\subsection{GC-Neutral Search Path}
+Kronos delegates board representation to the third-party \texttt{chess.js} library, which normally clones the entire board state on every move validation. For a search expanding hundreds of thousands of nodes, this would allocate millions of temporary objects, triggering frequent GC sweeps.
 
 To prevent this, Kronos wraps the library in a custom class, \texttt{ChessInstanceClone}, that bypasses the public API and directly calls the library's private methods: \texttt{\_moves()} to enumerate legal moves, \texttt{\_makeMove()} to mutate the board in-place, and \texttt{\_undoMove()} to revert changes using an internal history stack. This eliminates all heap allocations from the move-make/unmake loop—the hottest path in the entire engine.
 
@@ -65,7 +65,7 @@ The transposition table indexes search results by 64-bit Zobrist hash keys. Keys
 \begin{verbatim}
 this.table.delete(this.table.keys().next().value);
 \end{verbatim}
-This simple policy keeps the table footprint bounded under 30\,MB and achieves a peak hit rate of 85.2\%, preventing the cache from competing with the search core for heap space.
+This simple policy bounds the transposition table memory footprint, preventing the cache from competing with the search core for heap space, while achieving high hit rates (detailed in Chapter~\ref{ch:experimental_results}).
 
 \subsection{Engine Evolution Mapping}
 Table~\ref{tab:engine_feature_matrix} documents which search optimizations are active in each engine version, from the baseline Minimax (v1.0) to the full Kronos engine (v2.0). This table serves as the ground truth for the ablation study.
@@ -75,10 +75,9 @@ Table~\ref{tab:engine_feature_matrix} documents which search optimizations are a
 \section{Benchmarking and Calibration Pipelines}
 Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run benchmark} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to compare the relative self-play Elo ratings against an external reference scale.
 
-
 These pipelines are the experimental foundation for Chapter~\ref{ch:experimental_results}. All results reported in this paper are produced by these pipelines with fixed seeds and are fully reproducible from the repository.
 
 \section{Engine Development Progression}
-Figure~\ref{fig:kronos_evolution} provides a comprehensive view of how the engine evolved from Phase 1 through Phase 4, documenting the features added, node count reductions, and Elo improvements at each stage.
+Figure~\ref{fig:kronos_evolution} provides a comprehensive view of how the engine evolved from Phase 1 through Phase 4, documenting the milestones and core features added at each stage of development.
 
 \input{figures/kronos_evolution}

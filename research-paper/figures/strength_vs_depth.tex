@@ -7,9 +7,9 @@
     xlabel={Search Depth (plies)},
     ylabel={Elo Rating},
     xmin=1, xmax=7,
-    ymin=1050, ymax=1560,
+    ymin=950, ymax=1480,
     xtick={1,2,3,4,5,6,7},
-    ytick={1100,1200,1300,1400,1500},
+    ytick={1000,1100,1200,1300,1400},
     legend pos=south east,
     ymajorgrids=true,
     grid style={dashed, gray!30},
@@ -27,27 +27,27 @@
     line width=2pt
 ]
 coordinates {
-    (1, 1100)
-    (2, 1250)
-    (3, 1380)
-    (4, 1468)
-    (5, 1468)
-    (6, 1485)
-    (7, 1450)
+    (1, 1015)
+    (2, 1165)
+    (3, 1295)
+    (4, 1383)
+    (5, 1383)
+    (6, 1400)
+    (7, 1365)
 };
 
 \addlegendentry{Kronos Elo (measured)}
 
 % Peak label
 \node[font=\scriptsize, fill=blue!10, draw=blue!50, rounded corners, inner sep=2pt,
-      anchor=south] at (axis cs:6,1485) {\textbf{Peak: 1{,}485 Elo}};
+      anchor=south] at (axis cs:6,1400) {\textbf{Peak: 1{,}400 Elo}};
 
 % Regression label
 \node[font=\scriptsize, fill=red!10, draw=red!50, rounded corners, inner sep=2pt,
-      anchor=north] at (axis cs:7,1450) {D7: $-$35 Elo (timeout)};
+      anchor=north] at (axis cs:7,1365) {D7: $-$35 Elo (timeout)};
 
 % D5 plateau label
-\node[font=\scriptsize, text=gray, anchor=north west] at (axis cs:4.2,1463) {Plateau};
+\node[font=\scriptsize, text=gray, anchor=north west] at (axis cs:4.2,1378) {Plateau};
 
 \end{axis}
 \end{tikzpicture}

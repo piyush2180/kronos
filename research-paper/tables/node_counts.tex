@@ -1,6 +1,6 @@
 \begin{table}[htbp]
 \centering
-\caption[Search Node Ablation Study at Depth 4]{Search Node Ablation Study at Depth 4. Nodes Searched is the count of visited nodes; Node Reduction is the percentage tree size compression $(N_{\text{disabled}} - N_{\text{baseline}}) / N_{\text{disabled}} \times 100\%$; Speedup is the search speed ratio $T_{\text{disabled}} / T_{\text{baseline}}$.}
+\caption[Search Node Ablation Study at Depth 4]{Search node count ablation study at depth 4.}
 \label{tab:node_counts}
 \begin{tabularx}{\textwidth}{Xrrr}
 \toprule
@@ -11,7 +11,7 @@ No Principal Variation Search (PVS) & 8,739  & 5.2\%  & 0.78x \\
 No History Heuristic              & 8,869  & 6.6\%  & 0.78x \\
 No Late Move Reductions (LMR)     & 24,572 & 66.3\% & 0.24x \\
 No Null Move Pruning (NMP)        & 8,360  & 0.9\%  & 0.67x \\
-Raw Alpha-Beta (No Pruning/Ordering) & 21,784 & 62.0\% & 0.22x \\
+Baseline Alpha-Beta (unordered) & 47,159 & 82.4\% & 0.12x \\
 \bottomrule
 \end{tabularx}
 \end{table}

@@ -33,7 +33,7 @@ coordinates {
     (5, 6000000)
     (6, 120000000)
 };
-\addlegendentry{Unoptimized Alpha-Beta}
+\addlegendentry{Baseline Alpha-Beta (unordered)}
 
 % Kronos full heuristics
 \addplot[
@@ -52,14 +52,10 @@ coordinates {
 };
 \addlegendentry{Kronos (Full Heuristics)}
 
-% Gap label at depth 4
-\node[font=\scriptsize, fill=gray!10, draw=gray!50, rounded corners, inner sep=2pt, align=center]
-    at (axis cs:4.6, 50000) {$\times$36 fewer nodes\\at depth 4};
-
 
 \end{axis}
 \end{tikzpicture}
-\caption[Node Expansion Growth vs. Search Depth]{Exponential node expansion comparison between unoptimized Alpha-Beta and Kronos with all heuristics active (log scale). The unoptimized baseline represents search tree expansion without alpha-beta move ordering, whereas the optimized Kronos curve demonstrates the compounding impact of our full heuristic stack.}
+\caption[Node Expansion Growth vs. Search Depth]{Search node count comparison between Baseline Alpha-Beta (unordered) and Kronos.}
 
 \label{fig:node_growth}
 \end{figure}

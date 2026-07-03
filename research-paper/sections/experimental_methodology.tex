@@ -50,6 +50,17 @@ Finally, the Effective Branching Factor (EBF) measures search tree expansion:
 \input{equations/ebf}
 
 
+\subsection{Metric Definitions}
+To ensure clarity and consistency in our evaluation, we define the primary quantitative metrics used in this work as follows:
+\begin{itemize}
+    \item \textbf{Internal Bradley-Terry Self-Play Rating (Elo):} The relative playing strength calculated within the closed tournament pool of Kronos engine variants, fitted using the Bradley-Terry logistic model and anchored at 1,000 Elo for the Baseline Minimax engine.
+    \item \textbf{Relative Gain (Elo):} The incremental change in the internal self-play rating between adjacent search depths ($d$ vs.\ $d-1$ plies) in the closed self-play pool.
+    \item \textbf{Node Reduction (\%):} The percentage of search tree size compression achieved by enabling a search heuristic, defined as $(N_{\text{disabled}} - N_{\text{baseline}}) / N_{\text{disabled}} \times 100\%$, where $N_{\text{disabled}}$ is the number of visited nodes with the heuristic deactivated, and $N_{\text{baseline}}$ is the number of visited nodes with the heuristic active.
+    \item \textbf{Speedup:} The ratio of search execution speed (based on time elapsed per search) of a disabled variant compared to the active baseline variant ($T_{\text{disabled}} / T_{\text{baseline}}$).
+    \item \textbf{Effective Branching Factor (EBF):} The geometric mean number of branches expanded per ply, calculated as $b = N^{1/d}$ for search nodes $N$ at depth $d$.
+    \item \textbf{External Calibration Offset (Elo):} The measured playing strength difference obtained by benchmarking the final Kronos engine (Depth 6) against fixed-depth reference configurations of Stockfish 18.
+\end{itemize}
+
 \section{Checkpointing and Memory Profiling}
 Tournaments run for hundreds of games, taking hours to execute. The framework implements two mechanisms to ensure robustness:
 \begin{itemize}

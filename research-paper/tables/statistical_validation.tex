@@ -1,15 +1,17 @@
 \begin{table}[htbp]
 \centering
-\caption[Statistical Validation of Search Enhancements under SPRT]{Statistical Validation of Search Enhancements under SPRT. SPRT bounds represent Wald decision limits $[-2.94, 2.94]$; LLR is the Log-Likelihood Ratio; decision accepts the alternative hypothesis ($H_1$, Elo $\ge 10$) or null ($H_0$, Elo $\le 0$).}
+\caption[Statistical Significance Validation Matrix (SPRT)]{Statistical significance validation matrix (SPRT) at depth 4.}
 \label{tab:statistical_validation}
 \begin{tabularx}{\textwidth}{Xcrrc}
 \toprule
-\textbf{Enhancement} & \textbf{SPRT Bounds} & \textbf{Total Games} & \textbf{LLR at Term.} & \textbf{SPRT Decision} \\
+\textbf{Enhancement / Comparison} & \textbf{SPRT Bounds} & \textbf{Total Games} & \textbf{LLR at Term.} & \textbf{SPRT Decision} \\
 \midrule
-PVS vs Alpha-Beta     & $[-2.94, 2.94]$ & 185 & 2.98 & Accepted ($H_1$) \\
-NMP vs Baseline       & $[-2.94, 2.94]$ & 100 & -1.25 & Inconclusive \\
-LMR vs Baseline       & $[-2.94, 2.94]$ & 100 & 3.01 & Accepted ($H_1$) \\
-Killer + History vs Base & $[-2.94, 2.94]$ & 400 & 3.12 & Accepted ($H_1$) \\
+Alpha-Beta vs.\ Minimax (EXP-1)            & $[-2.944, 2.944]$ & 223 & $-$0.312 & Inconclusive \\
+Move Ordering vs.\ Alpha-Beta Only (EXP-2) & $[-2.944, 2.944]$ & 185 & 0.859  & Inconclusive \\
+Killer Moves vs.\ Move Ordering (EXP-3)    & $[-2.944, 2.944]$ & 155 & $-$0.311 & Inconclusive \\
+Transposition Table vs.\ Killer (EXP-4)   & $[-2.944, 2.944]$ & 155 & $-$0.311 & Inconclusive \\
+Iterative Deepening vs.\ TT (EXP-5)        & $[-2.944, 2.944]$ & 153 & $-$0.171 & Inconclusive \\
+Quiescence Search vs.\ No Quiescence (EXP-6) & $[-2.944, 2.944]$ & 400 & 75.433 & Accepted ($H_1$) \\
 \bottomrule
 \end{tabularx}
 \end{table}

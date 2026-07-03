@@ -1,18 +1,18 @@
 \begin{table}[htbp]
 \centering
-\caption[Tournament Results Summary at Depth 3]{Tournament Results Summary at Depth 3. Elo Rating represents the relative playing strength fitted using the Bradley-Terry model; Score (\%) is the percentage of total possible points (1 point per win, 0.5 per draw).}
+\caption[Tournament Results Summary at Depth 3]{Round-robin tournament results summary at search depth 3.}
 \label{tab:tournament_results}
 \begin{tabularx}{\textwidth}{Xrrrrrr}
 \toprule
 \textbf{Engine Variant} & \textbf{Played} & \textbf{Wins} & \textbf{Draws} & \textbf{Losses} & \textbf{Score (\%)} & \textbf{Elo Rating} \\
 \midrule
-Baseline Minimax          & 223 & 0 & 223 & 0 & 50.0\% & 978 \\
-Alpha-Beta Only           & 223 & 0 & 223 & 0 & 50.0\% & 977 \\
-Move Ordering (MVV-LVA)   & 185 & 10 & 172 & 3 & 51.9\% & 991 \\
-Killer Moves Heuristic    & 400 & 11 & 385 & 4 & 50.9\% & 984 \\
-Transposition Table       & 400 & 3 & 389 & 8 & 49.4\% & 974 \\
-Full Kronos (No Quiescence)& 400 & 0 & 383 & 17 & 47.9\% & 963 \\
-Full Kronos Engine        & 400 & 328 & 72 & 0 & 91.0\% & 1,380 \\
+Baseline Minimax            & 60 & 5  & 41 & 14 & 42.5\% & 1,000 \\
+Alpha-Beta Only             & 60 & 5  & 41 & 14 & 42.5\% & 1,000 \\
+Move Ordering (MVV-LVA)     & 60 & 5  & 42 & 13 & 43.3\% & 1,005 \\
+Killer Moves Heuristic      & 60 & 5  & 42 & 13 & 43.3\% & 1,005 \\
+Transposition Table         & 60 & 5  & 42 & 13 & 43.3\% & 1,005 \\
+Full Kronos (No Quiescence) & 60 & 7  & 40 & 13 & 45.0\% & 1,016 \\
+Full Kronos Engine          & 60 & 48 & 12 & 0  & 90.0\% & 1,387 \\
 \bottomrule
 \end{tabularx}
 \end{table}

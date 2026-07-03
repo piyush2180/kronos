@@ -7,10 +7,10 @@
     xlabel={Stockfish Reference Depth},
     ylabel={Kronos Score (\%)},
     xmin=0.5, xmax=3.5,
-    ymin=25, ymax=65,
+    ymin=15, ymax=55,
     xtick={1,2,3},
     xticklabels={Stockfish D1, Stockfish D2, Stockfish D3},
-    ytick={30,37.5,40,45,50,60},
+    ytick={20,22.5,30,32.5,35,40,45,50},
     ymajorgrids=true,
     grid style={dashed, gray!30},
     width=0.88\textwidth,
@@ -28,9 +28,9 @@
     line width=2pt
 ]
 coordinates {
-    (1, 37.5)
-    (2, 45.0)
-    (3, 40.0)
+    (1, 32.5)
+    (2, 35.0)
+    (3, 22.5)
 };
 \addlegendentry{Kronos D6 score (measured)}
 
@@ -47,9 +47,9 @@ coordinates {
 \addlegendentry{Equal strength (50\%)}
 
 % Annotate each point
-\node[font=\scriptsize, anchor=north east] at (axis cs:1,37.5) {$-$89 Elo};
-\node[font=\scriptsize, anchor=south west] at (axis cs:2,45.0) {$-$35 Elo};
-\node[font=\scriptsize, anchor=north west] at (axis cs:3,40.0) {$-$70 Elo};
+\node[font=\scriptsize, anchor=north east] at (axis cs:1,32.5) {$-$127 Elo};
+\node[font=\scriptsize, anchor=south west] at (axis cs:2,35.0) {$-$108 Elo};
+\node[font=\scriptsize, anchor=north west] at (axis cs:3,22.5) {$-$215 Elo};
 
 \end{axis}
 \end{tikzpicture}

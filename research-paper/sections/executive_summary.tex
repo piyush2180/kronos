@@ -12,9 +12,9 @@ Historically, dynamic runtimes were considered unsuitable for latency-sensitive 
 \end{enumerate}
 
 \subsection*{Key Experimental Outcomes}
-*   \textbf{Heap Bounded Memory:} Heap usage remains stable between 32.85\,MB and 445.66\,MB during continuous search (with single-game telemetry down to 24.98\,MB), avoiding major GC sweeps.
-*   \textbf{Search Reduction:} Late Move Reductions (LMR) is the dominant pruning heuristic, yielding a 66.3\% node reduction at depth 4.
-*   \textbf{Relative Strength \& Calibration:} Kronos reaches a peak relative self-play Elo of 1,485 at search depth 6. Preliminary calibration matches establish a relative score gap of 40.0\% ($-70 \pm 86$ Elo difference) against depth-limited Stockfish Depth 3 reference levels.
-*   \textbf{Statistical Validation:} All core search heuristics (PVS, LMR, and combined ordering) are statistically validated under Wald Sequential Probability Ratio Tests (SPRT).
+*   \textbf{Heap Bounded Memory:} Heap usage remains stable during continuous search (detailed in Chapter~\ref{ch:experimental_results}), avoiding major GC sweeps.
+*   \textbf{Search Reduction:} Late Move Reductions (LMR) is the dominant pruning heuristic, yielding substantial search space compression.
+*   \textbf{Relative Strength \& Calibration:} Chapter~\ref{ch:experimental_results} reports the measured internal playing strength across search depths, along with external calibration offsets against depth-limited Stockfish references.
+*   \textbf{Statistical Validation:} Node-count reductions were consistently observed for several heuristics, whereas only Quiescence Search demonstrated statistically significant playing-strength improvement under the configured SPRT evaluation protocol.
 
 This work suggests that managed runtime environments can execute complex game-tree searches efficiently and stably, providing a highly accessible web-deployable systems research framework.

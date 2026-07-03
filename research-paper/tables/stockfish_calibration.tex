@@ -1,14 +1,14 @@
 \begin{table}[htbp]
 \centering
-\caption[Stockfish Calibration Results]{Stockfish Calibration Results. Elo Diff. represents the relative performance gap fitted via the Bradley-Terry model with a 95\% confidence interval; Games is the count of head-to-head matches.}
+\caption[Stockfish Calibration Results]{Calibration results of final Kronos (Depth 6) against fixed-depth Stockfish 18 reference configurations.}
 \label{tab:stockfish_calibration}
 \begin{tabularx}{\textwidth}{Xrrrc}
 \toprule
-\textbf{Opponent} & \textbf{Games} & \textbf{Kronos Score (\%)} & \textbf{Elo Diff.} & \textbf{Source} \\
+\textbf{Opponent} & \textbf{Games} & \textbf{Kronos Score (\%)} & \textbf{External Calibration Offset (Elo)} & \textbf{Source} \\
 \midrule
-vs.\ Stockfish Depth 1 & 20  & 37.5\% & $-89 \pm 85$ & Measured \\
-vs.\ Stockfish Depth 2 & 20  & 45.0\% & $-35 \pm 87$ & Measured \\
-vs.\ Stockfish Depth 3 & 20  & 40.0\% & $-70 \pm 86$ & Measured \\
+vs.\ Stockfish Depth 1 & 400  & 32.5\% & $-127 \pm 25$ & Measured \\
+vs.\ Stockfish Depth 2 & 280  & 35.0\% & $-108 \pm 25$ & Measured \\
+vs.\ Stockfish Depth 3 & 400  & 22.5\% & $-215 \pm 29$ & Measured \\
 \bottomrule
 \end{tabularx}
 \end{table}

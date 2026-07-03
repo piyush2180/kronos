@@ -24,10 +24,10 @@ To isolate dynamic runtime effects, we adopt several standard search and evaluat
 \section{Engineering Contributions}
 The contributions of this work lie in the runtime engineering, memory optimization, and deterministic benchmarking infrastructure designed to evaluate these heuristics:
 \begin{itemize}
-    \item \textbf{GC-Neutral Search Architecture:} An implementation that bounds V8 heap usage between 32.85\,MB and 445.66\,MB during tournament play (with single-game telemetry profiling showing active heap usage down to 24.98\,MB) by avoiding hot-path heap allocations via direct in-place board state mutations, flat TypedArray move buffers, and size-capped transposition table eviction.
+    \item \textbf{GC-Neutral Search Architecture:} An implementation that bounds V8 heap usage during tournament play (detailed in Chapter~\ref{ch:experimental_results}) by avoiding hot-path heap allocations via direct in-place board state mutations, flat TypedArray move buffers, and size-capped transposition table eviction.
     \item \textbf{Web Worker Concurrency Model:} An asynchronous coordination architecture separating the React user interface thread from concurrent background search threads (Web Workers) to prevent UI thread starvation.
     \item \textbf{Deterministic Benchmarking Pipeline:} A CLI-driven tournament suite executing paired, color-flipped matches using LCG-based opening book shuffles, ensuring identical game sequences across different host hardware configurations.
-    \item \textbf{SPRT and Bradley-Terry Integration:} An automated verification framework utilizing Sequential Probability Ratio Testing (SPRT) bounds and Bradley-Terry rating regression to validate playing strength variations.
+    \item \textbf{SPRT and Bradley-Terry Integration:} An automated verification framework utilizing Sequential Probability Ratio Testing (SPRT) bounds and Bradley-Terry rating regression to assess playing strength variations.
     \item \textbf{Incremental Checkpoint Scheduler:} A stateful scheduling architecture that logs tournament telemetry and matches incrementally to disk, enabling long-running evaluations to survive execution interrupts.
 \end{itemize}
 
