@@ -1,7 +1,7 @@
 \section*{Executive Summary}
 \addcontentsline{toc}{chapter}{Executive Summary}
 
-This report presents the engineering design and empirical findings of Kronos, a modular chess engine and benchmarking framework implemented in Node.js/JavaScript. Kronos serves as a reproducible systems testbed for game-tree search heuristics in managed, garbage-collected runtimes.
+This report presents the engineering design and empirical findings of Kronos, a modular chess engine and benchmarking framework implemented in Node.js and JavaScript. Kronos serves as a reproducible systems testbed for game-tree search heuristics in managed, garbage-collected runtimes.
 
 \subsection*{V8 Engineering Solutions}
 Historically, dynamic runtimes were considered unsuitable for latency-sensitive search systems due to event loop freezing and garbage collection (GC) sweeps. Kronos resolves these issues through three implementations:
@@ -12,11 +12,9 @@ Historically, dynamic runtimes were considered unsuitable for latency-sensitive 
 \end{enumerate}
 
 \subsection*{Key Experimental Outcomes}
-*   \textbf{Heap Bounded Memory:} Heap usage remains stable between 14.8\,MB and 28.4\,MB during continuous search, eliminating major GC sweeps.
+*   \textbf{Heap Bounded Memory:} Heap usage remains stable between 32.85\,MB and 445.66\,MB during continuous search (with single-game telemetry down to 24.98\,MB), avoiding major GC sweeps.
 *   \textbf{Search Reduction:} Late Move Reductions (LMR) is the dominant pruning heuristic, yielding a 66.3\% node reduction at depth 4.
-*   \textbf{Calibrated Strengths:} Stockfish 18 matchups calibrate the peak playing strength at $1485 \pm 86$ Elo (at depth 6), after which single-threaded latency constraints cause search timeouts.
+*   \textbf{Relative Strength \& Calibration:} Kronos reaches a peak relative self-play Elo of 1,485 at search depth 6. Preliminary calibration matches establish a relative score gap of 40.0\% ($-70 \pm 86$ Elo difference) against depth-limited Stockfish Depth 3 reference levels.
 *   \textbf{Statistical Validation:} All core search heuristics (PVS, LMR, and combined ordering) are statistically validated under Wald Sequential Probability Ratio Tests (SPRT).
 
-This work establishes that managed runtime environments can execute complex game-tree searches efficiently and stably, providing a highly accessible web-deployable systems research framework.
-
-
+This work suggests that managed runtime environments can execute complex game-tree searches efficiently and stably, providing a highly accessible web-deployable systems research framework.

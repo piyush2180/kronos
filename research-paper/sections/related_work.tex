@@ -36,6 +36,7 @@ We contrast Kronos with other JavaScript-based engines to locate it within the d
 
 \input{tables/engine_comparison}
 
-Native engines such as Lozza and GarboChess do not implement strict heap-allocation constraints, leaving them susceptible to garbage collection pauses during sustained search. Stockfish.js bypasses V8 memory management by operating within WebAssembly's linear memory space, but it relies on modern browser support for SharedArrayBuffer to run parallel searches. Kronos, by contrast, executes natively within the JavaScript runtime, using target memory engineering to control collection pauses while providing a built-in benchmarking and statistical validation suite.
+Lozza and GarboChess do not implement strict heap-allocation constraints, leaving them susceptible to garbage collection pauses during sustained search. Stockfish.js bypasses V8 memory management by operating within WebAssembly's linear memory space, but it relies on browser support for SharedArrayBuffer to run parallel searches. Kronos, by contrast, executes natively within the JavaScript runtime, using targeted memory engineering to control collection pauses while providing a built-in benchmarking and statistical validation suite.
+
 
 

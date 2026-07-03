@@ -1,7 +1,8 @@
 \chapter{System Overview}
 \label{ch:system_overview}
 
-Kronos is not only a chess engine—it is a complete research platform. This chapter describes both the software architecture that makes high-performance search possible in JavaScript, and the user-facing application that makes the research accessible and reproducible. The engineering decisions described here are themselves the primary contribution of this work.
+Kronos is not only a chess engine—it is a complete research platform. This chapter describes both the software architecture that makes optimized search execution possible in JavaScript, and the user-facing application that makes the research accessible and reproducible. The engineering decisions described here are themselves the primary contribution of this work.
+
 
 \section{User-Facing Application Platform}
 The Kronos application is a React-based single-page application running in the browser. It exposes six distinct interaction modes, each serving a different research or gameplay purpose. Figure~\ref{fig:app_screenshots} shows the four most research-relevant pages.
@@ -20,7 +21,8 @@ The Kronos application is a React-based single-page application running in the b
 \label{fig:app_screenshots}
 \end{figure}
 
-The \textbf{Dashboard} (Figure~\ref{fig:app_screenshots}a) provides a unified entry point. It displays the active engine configuration, flagship search depth (D6), peak estimated Elo (1{,}485), and quick-access buttons for each mode. Notably, it surfaces live statistics from the engine, reinforcing Kronos's identity as a research tool rather than just a game client.
+The \textbf{Dashboard} (Figure~\ref{fig:app_screenshots}a) provides a unified entry point. It displays the active engine configuration, flagship search depth (D6), peak relative self-play Elo (1{,}485), and quick-access buttons for each mode. Notably, it surfaces live statistics from the engine, reinforcing Kronos's identity as a research tool rather than just a game client.
+
 
 The \textbf{Play Engine} page (Figure~\ref{fig:app_screenshots}b) exposes the depth-configuration selector from D2 to D7, each with NPS estimates printed directly in the UI. This transparency—showing users approximately how many nodes per second the engine processes at each depth—was a deliberate design choice to make the research context visible during play.
 
@@ -71,7 +73,8 @@ Table~\ref{tab:engine_feature_matrix} documents which search optimizations are a
 \input{tables/engine_feature_matrix}
 
 \section{Benchmarking and Calibration Pipelines}
-Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run benchmark} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to anchor the internal Elo ratings to an absolute reference scale.
+Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run benchmark} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to compare the relative self-play Elo ratings against an external reference scale.
+
 
 These pipelines are the experimental foundation for Chapter~\ref{ch:experimental_results}. All results reported in this paper are produced by these pipelines with fixed seeds and are fully reproducible from the repository.
 

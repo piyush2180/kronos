@@ -5,25 +5,26 @@ This chapter presents the empirical outcomes of our evaluation, focusing on sear
 
 \begin{table}[htbp]
 \centering
-\caption[Key Findings: Quantitative Outcomes]{Key Findings: Quantitative Outcomes.}
+\caption[Key Findings: Quantitative Outcomes]{Key Findings: Quantitative Outcomes. Node Reduction measures tree size compression; Elo ladder gain represents relative playing strength changes fitted via Bradley-Terry; EBF is the Effective Branching Factor; Heap Used is V8 heap occupancy.}
 \label{tab:key_findings}
 \begin{tabularx}{\textwidth}{lX}
 \toprule
 \textbf{Finding} & \textbf{Value / Outcome} \\
 \midrule
-Peak Calibrated Rating & \textbf{1,485 Elo} at search depth 6 (anchored to Stockfish) \\
+Peak Relative Rating & \textbf{1,485 Elo} at search depth 6 (internal relative self-play) \\
 Depth-7 Regression & Drops to 1,450 Elo ($-$35) due to worker search timeout aborts \\
 Largest Node Reduction & LMR: \textbf{66.3\%} node reduction (8,286 vs.\ 24,572 nodes at Depth 4) \\
 Largest Elo Gain & Quiescence Search: $+$417 Elo ladder gain at Depth 3 \\
 Positional Evaluation Gain & PSTs: $+$358.8 Elo ladder gain at Depth 2 \\
 EBF Reduction & EBF drops from 9.22 (Depth 2) to 4.43 (Depth 8) \\
-Memory Stability & 14.8\,MB -- 28.4\,MB heap usage across optimized runs \\
+Memory Stability & 32.85\,MB -- 445.66\,MB heap usage across optimized runs \\
 Transposition Hit Rate & 85.2\% peak hit rate with 500,000-entry FIFO cap \\
 Statistical Significance & PVS, LMR, Killer+History accepted under SPRT \\
-Stockfish Calibration & Scores 40.0\% vs.\ Stockfish Depth 3 ($-$70 Elo difference) \\
+Stockfish Calibration & Scores 40.0\% vs.\ Stockfish Depth 3 ($-$70 Elo difference, preliminary) \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
 
 
 \clearpage
@@ -81,25 +82,25 @@ Table~\ref{tab:memory_profile} documents memory usage across configurations. Spe
 
 \input{tables/memory_profile}
 
-The 500,000-entry capacity limit restricts the active cache memory to approximately 30\,MB while maintaining an 85.2\% hit rate. This hit rate is sustained because chess searches frequently evaluate transposed board states during middle-game traversal.
+With the FIFO capacity limit active, the V8 heap occupancy remains bounded between 32.85\,MB and 445.66\,MB across final optimized tournament runs (depending on search depth and match count), with single-game telemetry profiling showing active heap usage as low as 24.98\,MB. This simple policy restricts the active cache memory to approximately 30\,MB while maintaining an 85.2\% hit rate. This hit rate is sustained because chess searches frequently evaluate transposed board states during middle-game traversal.
 
 \section{Search Depth Scaling and NPS Throughput}
 Table~\ref{tab:cross_depth_elo} documents search throughput and playing strength scaling across depths 1 through 7.
 
 \input{tables/cross_depth_elo}
 
-Calibrated playing strength scales from 1,100 Elo at depth 1 to a peak of 1,485 Elo at depth 6. At depth 5, the rating plateaus at 1,468 Elo, suggesting that the additional search ply does not consistently find better moves within the configured tournament time controls.
+The internal relative self-play Elo rating scales from 1,100 (estimated) at depth 1 to a peak internal rating of 1,485 Elo at depth 6. At depth 5, the rating plateaus at 1,468 Elo, suggesting that the additional search ply does not consistently find better moves within the configured tournament time controls.
 
-The performance regression at depth 7 ($-$35 Elo) is caused by single-threaded latency constraints. When search time at depth 7 exceeds the tournament time limit, the engine returns the best move from the last fully completed iterative deepening iteration (depth 6) rather than the incomplete depth-7 results. This timeout behavior introduces a performance ceiling, demonstrating that single-threaded JavaScript search workers cannot reliably sustain depth-7 calculations under standard time controls.
+The performance regression at depth 7 ($-$35 Elo) is caused by single-threaded latency constraints. When search time at depth 7 exceeds the tournament time limit, the engine returns the best move from the last fully completed iterative deepening iteration (depth 6) rather than the incomplete depth-7 results. This timeout behavior introduces a performance ceiling, indicating that single-threaded JavaScript search workers cannot reliably sustain depth-7 calculations under standard time controls.
 
 The Effective Branching Factor (EBF) decreases from 9.22 at depth 2 to 4.43 at depth 8 (Figure~\ref{fig:effective_branching_factor}). This contraction shows that our pruning heuristics become proportionally more effective as the search depth increases, since deeper horizons provide more contextual information for move ordering and reduction decisions.
 
 \section{Stockfish Reference Calibration}
-We calibrated the relative playing strength by matching the Depth 6 engine configuration against three depth-limited Stockfish 18 variants.
+To provide an external reference anchor for Kronos's internal relative ratings, we benchmarked the final Depth 6 engine configuration against three depth-limited Stockfish 18 configurations. These calibration matches evaluate the relative performance gap (representing a preliminary calibration of absolute strength, as direct FIDE-style ratings are not claimed).
 
 \input{tables/stockfish_calibration}
 
-Kronos scores 37.5\% against Stockfish Depth 1, 45.0\% against Stockfish Depth 2, and 40.0\% against Stockfish Depth 3, corresponding to relative Elo differences of $-$89, $-$35, and $-$70. The non-monotonic score distribution falls within the statistical uncertainty ($\pm$86 Elo) of the 20-game sample sizes.
+Over a sample size of 20 games per reference depth, Kronos scores 37.5\% against Stockfish Depth 1, 45.0\% against Stockfish Depth 2, and 40.0\% against Stockfish Depth 3. These outcomes correspond to relative Elo differences of $-89 \pm 85$ Elo, $-35 \pm 87$ Elo, and $-70 \pm 86$ Elo, respectively. Due to the small sample size and wide confidence intervals, this calibration remains preliminary. Projected ratings for deeper Stockfish configurations are moved to Appendix~\ref{app:sf_projections} as speculative reference points only and are excluded from measured results.
 
 \subsection{Statistical Significance of Heuristic Gains}
 Sequential Probability Ratio Tests (SPRT) validate the statistical significance of these playing strength gains under Wald boundaries $[-2.94, 2.94]$.
