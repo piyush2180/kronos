@@ -78,7 +78,7 @@ Disabling quiescence search at depth 3 decreases playing strength from 1,387 to 
 Substituting a material-only evaluation with Piece-Square Tables (PSTs) provides an internal rating improvement of 358.8 Elo at depth 2. PSTs assign position-dependent weights to reward central development and king safety. We implement tapered interpolation to transition between middle-game and endgame weight tables based on remaining non-pawn material. Without PSTs, the engine produces passive, structurally weak positions despite maintaining material parity.
 
 \subsection{Memory Engineering and GC Stability}
-Table~\ref{tab:memory_profile} documents memory usage across configurations. Specifically, the uncapped transposition table configurations (EXP-5-TRANSPOSITION and EXP-6-ITERATIVE) resulted in RSS exceeding 2\,GB. These early outcomes motivated the implementation of the 500,000-entry FIFO capacity limit.
+Table~\ref{tab:memory_profile} documents memory usage across configurations. Specifically, the early unoptimized configurations (EXP-5-TRANSPOSITION and EXP-6-ITERATIVE) utilized a Map-based transposition table capped at a default soft limit of 200,000 entries. Due to the high object allocation overhead of V8 Map entries (each wrapping a complex key-value structure in heap memory), even this entry limit resulted in heap exhaustion, with RSS exceeding 2\,GB and 3.4\,GB respectively. These early outcomes motivated the implementation of our final, global flat-array transposition table with a size-bounded capacity.
 
 \input{tables/memory_profile}
 
