@@ -110,7 +110,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function LocalPage({ boardTheme, soundEnabled }) {
   const game = useChessGame('kronos_v2_local_state', 'local');
-  const [previewIndex, setPreviewIndex] = useState(null);
+  const { previewIndex, setPreviewIndex } = game;
   const [reviewTabActive, setReviewTabActive] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
 
@@ -263,12 +263,15 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
               winner={game.winner}
               playerColor={game.playerColor}
               modeSelected={game.modeSelected}
+              difficulty={game.difficulty}
               onReset={handleResetToLobby}
               onSelectMoveIndex={(idx) => setPreviewIndex(idx)}
               isAnalyzing={game.isAnalyzing}
               analysisProgress={game.analysisProgress}
               showHeatmap={showHeatmap}
               onToggleHeatmap={setShowHeatmap}
+              triggerAnalysis={game.triggerPostGameAnalysis}
+              cancelAnalysis={game.cancelPostGameAnalysis}
             />
           ) : (
             <>

@@ -1,5 +1,6 @@
 import { spawn } from 'child_process';
 import readline from 'readline';
+import fs from 'fs';
 
 export class UCIEngineAdapter {
   constructor(binaryPath = 'stockfish', options = {}) {
@@ -13,50 +14,74 @@ export class UCIEngineAdapter {
   async init() {
     return new Promise((resolve, reject) => {
       let isSettled = false;
+      
+      const trySpawn = (binary) => {
+        try {
+          this.process = spawn(binary, [], { stdio: ['pipe', 'pipe', 'pipe'] });
+          
+          this.process.on('error', (err) => {
+            if (binary === 'stockfish' && err.code === 'ENOENT') {
+              const fallback = 'C:\\Users\\Piyush\\AppData\\Local\\Microsoft\\WinGet\\Links\\stockfish.exe';
+              if (fs.existsSync(fallback)) {
+                trySpawn(fallback);
+                return;
+              }
+            }
+            if (!isSettled) {
+              isSettled = true;
+              reject(new Error(`UCI Process Error (${binary}): ${err.message}`));
+            }
+          });
 
-      try {
-        this.process = spawn(this.binaryPath, [], { stdio: ['pipe', 'pipe', 'pipe'] });
-      } catch (err) {
-        return reject(new Error(`Failed to spawn UCI binary "${this.binaryPath}": ${err.message}`));
-      }
-
-      this.process.on('error', (err) => {
-        if (!isSettled) {
-          isSettled = true;
-          reject(new Error(`UCI Process Error (${this.binaryPath}): ${err.message}`));
-        }
-      });
-
-      if (!this.process.stdout || !this.process.stdin) {
-        if (!isSettled) {
-          isSettled = true;
-          reject(new Error(`UCI Process streams unavailable (${this.binaryPath})`));
-        }
-        return;
-      }
-
-      this.rl = readline.createInterface({ input: this.process.stdout });
-
-      let uciOK = false;
-      const onLine = (line) => {
-        if (line === 'uciok') {
-          uciOK = true;
-          for (const [key, value] of Object.entries(this.options)) {
-            this.sendCommand(`setoption name ${key} value ${value}`);
+          if (!this.process.stdout || !this.process.stdin) {
+            if (!isSettled) {
+              isSettled = true;
+              reject(new Error(`UCI Process streams unavailable (${binary})`));
+            }
+            return;
           }
-          this.sendCommand('isready');
-        } else if (line === 'readyok' && uciOK) {
-          this.isReady = true;
-          this.rl.removeListener('line', onLine);
+
+          if (this.rl) {
+            this.rl.close();
+          }
+          this.rl = readline.createInterface({ input: this.process.stdout });
+
+          let uciOK = false;
+          const onLine = (line) => {
+            if (line === 'uciok') {
+              uciOK = true;
+              for (const [key, value] of Object.entries(this.options)) {
+                this.sendCommand(`setoption name ${key} value ${value}`);
+              }
+              this.sendCommand('isready');
+            } else if (line === 'readyok' && uciOK) {
+              this.isReady = true;
+              this.rl.removeListener('line', onLine);
+              if (!isSettled) {
+                isSettled = true;
+                resolve(true);
+              }
+            }
+          };
+
+          this.rl.on('line', onLine);
+          this.sendCommand('uci');
+        } catch (err) {
+          if (binary === 'stockfish') {
+            const fallback = 'C:\\Users\\Piyush\\AppData\\Local\\Microsoft\\WinGet\\Links\\stockfish.exe';
+            if (fs.existsSync(fallback)) {
+              trySpawn(fallback);
+              return;
+            }
+          }
           if (!isSettled) {
             isSettled = true;
-            resolve(true);
+            reject(new Error(`Failed to spawn UCI binary "${binary}": ${err.message}`));
           }
         }
       };
 
-      this.rl.on('line', onLine);
-      this.sendCommand('uci');
+      trySpawn(this.binaryPath);
     });
   }
 
@@ -177,6 +202,10 @@ export class UCIEngineAdapter {
       this.process.kill();
       this.process = null;
       this.isReady = false;
+    }
+    if (this.rl) {
+      this.rl.close();
+      this.rl = null;
     }
   }
 }

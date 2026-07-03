@@ -3,6 +3,7 @@
 
 import React, { useMemo, useState, useCallback } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { Chess } from 'chess.js';
 import EvaluationBar from './EvaluationBar';
 
 const BOARD_COLORS = {
@@ -85,6 +86,20 @@ export default function ChessBoard({
       : {};
   }, [fen, inCheck]);
 
+  // ── Legal Moves calculation ────────────────────────────────────────────────
+  const legalMovesForSelected = useMemo(() => {
+    if (!selectedSquare || !fen) return [];
+    try {
+      const chess = new Chess(fen);
+      return chess.moves({ square: selectedSquare, verbose: true }).map(m => ({
+        to: m.to,
+        isCapture: !!chess.get(m.to)
+      }));
+    } catch {
+      return [];
+    }
+  }, [fen, selectedSquare]);
+
   // ── Square highlight styles ───────────────────────────────────────────────
   const squareStyles = useMemo(() => {
     const s = {};
@@ -119,6 +134,18 @@ export default function ChessBoard({
         boxShadow: 'inset 0 0 0 3px rgba(212, 175, 55, 0.9)'
       };
     }
+
+    // 2.5. Legal Moves Highlighting (radial dots or capture rings)
+    legalMovesForSelected.forEach(({ to, isCapture }) => {
+      s[to] = {
+        ...s[to],
+        background: isCapture
+          ? 'radial-gradient(circle, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0.5) 85%, transparent 90%)'
+          : 'radial-gradient(circle, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.3) 25%, transparent 28%)',
+        cursor: 'pointer'
+      };
+    });
+
     if (gameHistory && gameHistory.length > 0) {
       const last = gameHistory[gameHistory.length - 1];
       if (last?.from) s[last.from] = { ...s[last.from], backgroundColor: 'rgba(212, 175, 55, 0.2)' };
@@ -180,7 +207,7 @@ export default function ChessBoard({
     }
 
     return s;
-  }, [checkSquareStyle, selectedSquare, gameHistory, premove, modeSelected, candidateMoves, reviewedMove, showHeatmap]);
+  }, [checkSquareStyle, selectedSquare, gameHistory, premove, modeSelected, candidateMoves, reviewedMove, showHeatmap, legalMovesForSelected]);
 
   // ── Best move arrow suggestion ─────────────────────────────────────────────
   const arrows = useMemo(() => {
@@ -296,6 +323,7 @@ export default function ChessBoard({
     onSquareRightClick: handleSquareRightClick,
     animationDurationInMs: 150,
     showAnimations: true,
+    showBoardLabels: true,
     boardStyle: {
       borderRadius: '2px',
       boxShadow: '0 8px 30px rgba(0, 0, 0, 0.6)',

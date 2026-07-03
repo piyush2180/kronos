@@ -1,0 +1,12 @@
+{
+  "name": "Full Kronos D7",
+  "description": "All search optimizations active at search Depth 7.",
+  "useAlphaBeta": true,
+  "useIterativeDeepening": true,
+  "useMoveOrdering": true,
+  "useMVVLVA": true,
+  "useKillerMoves": true,
+  "useTranspositionTable": true,
+  "useQuiescence": true,
+  "fixedDepth": 7
+}

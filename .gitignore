@@ -38,3 +38,39 @@ benchmark/output/*
 
 # Coverage (if you add tests later)
 coverage
+
+# Generated Reports & Analysis files
+/CROSS_DEPTH_ANALYSIS.md
+/DEPTH5_INVESTIGATION.md
+/DEPTH_SCALING.md
+/DISCUSSION.md
+/ENGINE_FEATURE_MATRIX.md
+/ENGINE_RATINGS.csv
+/ENGINE_RATINGS.json
+/FRAMEWORK_VERSION.md
+/MASTER_RESULTS.md
+/MAXIMUM_STRENGTH_REPORT.md
+/MEMORY_LEAK_INVESTIGATION.md
+/MEMORY_PROFILE.md
+/OPTIMISATION_REPORT.md
+/REPORT.md
+/ROADMAP_NEXT.md
+/SEARCH_EQUIVALENCE.md
+/STATISTICAL_VALIDATION_REPORT.md
+/STOCKFISH_CALIBRATION.md
+/STRENGTH_VS_COST.md
+/TOURNAMENT_FAIRNESS_REPORT.md
+/TOURNAMENT_INTEGRITY_REPORT.md
+/strength_vs_depth.svg
+/audit_out.txt
+/audit_out2.txt
+/phase2_out.txt
+/phase2_out_fast.txt
+
+# Benchmark docs reports
+benchmark/docs/FRAMEWORK_VERSION.md
+benchmark/docs/STATISTICAL_VALIDATION_REPORT.md
+benchmark/docs/TOURNAMENT_FAIRNESS_REPORT.md
+benchmark/docs/TOURNAMENT_INTEGRITY_REPORT.md
+benchmark/docs/verification_report.md
+benchmark/verification_report.md

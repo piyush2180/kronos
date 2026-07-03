@@ -1,5 +1,4 @@
-// Kronos Research Suite — Central Benchmark Data Service
-// Abstracts data storage (IndexedDB/localStorage/pre-bundled outputs) and calibration logic.
+import { DEFAULT_EXPERIMENTS } from './defaultExperiments';
 
 const STORAGE_KEY_EXPERIMENTS = 'kronos_research_experiments_v2';
 const STORAGE_KEY_CALIBRATIONS = 'kronos_research_calibrations_v2';
@@ -17,7 +16,7 @@ export const BenchmarkDataService = {
     } catch (e) {
       console.error('Failed to load stored benchmark experiments:', e);
     }
-    return [];
+    return DEFAULT_EXPERIMENTS || [];
   },
 
   // Save a new benchmark dataset record

@@ -8,11 +8,11 @@
     "build": "vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "benchmark": "node benchmark/runner.js tournament",
-    "benchmark:positions": "node benchmark/runner.js position",
-    "benchmark:calibrate": "node benchmark/runner.js calibrate",
-    "benchmark:suite": "node benchmark/runFullSuite.js",
-    "research": "node benchmark/pipelineManager.js"
+    "benchmark": "node benchmark/scripts/runner.js tournament",
+    "benchmark:positions": "node benchmark/scripts/runner.js position",
+    "benchmark:calibrate": "node benchmark/scripts/runner.js calibrate",
+    "benchmark:suite": "node benchmark/scripts/runFullSuite.js",
+    "research": "node benchmark/pipeline/pipelineManager.js"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

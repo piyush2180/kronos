@@ -9,11 +9,11 @@ import { playChessSound } from '../utils/sound';
 import CustomChessWorker from '../engine/worker.js?worker';
 
 export const DIFFICULTY_SETTINGS = {
-  beginner: { label: 'Beginner (600 ELO)',  maxDepth: 2, timeLimitMs: 400,  blunderRate: 0.35 },
-  casual:   { label: 'Casual (1000 ELO)',   maxDepth: 3, timeLimitMs: 800,  blunderRate: 0.20 },
-  club:     { label: 'Club (1400 ELO)',     maxDepth: 5, timeLimitMs: 1500, blunderRate: 0.08 },
-  advanced: { label: 'Advanced (1800 ELO)', maxDepth: 7, timeLimitMs: 3000, blunderRate: 0.02 },
-  expert:   { label: 'Expert (2200 ELO)',   maxDepth: 9, timeLimitMs: 5000, blunderRate: 0.00 }
+  beginner: { label: 'Kronos D2',             maxDepth: 2, timeLimitMs: 400,  blunderRate: 0.20 },
+  casual:   { label: 'Kronos D4',             maxDepth: 4, timeLimitMs: 800,  blunderRate: 0.10 },
+  club:     { label: 'Kronos D5',             maxDepth: 5, timeLimitMs: 1500, blunderRate: 0.05 },
+  advanced: { label: '⭐ Kronos D6 Flagship',   maxDepth: 6, timeLimitMs: 3000, blunderRate: 0.00 },
+  expert:   { label: 'Kronos D7 Experimental', maxDepth: 7, timeLimitMs: 5000, blunderRate: 0.00 }
 };
 
 export function getInitialTime(control) {
@@ -95,6 +95,12 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
   const [difficulty,      setDifficulty]      = useState(() => getSaved(sk, 'difficulty', 'club'));
   const [playerColor,     setPlayerColor]     = useState(() => getSaved(sk, 'playerColor', 'w'));
 
+  // ── History Preview / Display state ────────────────────────────────────────
+  const [previewIndex,    setPreviewIndex]    = useState(null);
+  const displayedFen = previewIndex !== null && gameHistory[previewIndex]
+    ? gameHistory[previewIndex].after
+    : fen;
+
   // ── Game parameters ───────────────────────────────────────────────────────
   const [gameStatus, setGameStatus] = useState('active');  // never restore finished state
   const [winner,     setWinner]     = useState(null);
@@ -145,7 +151,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     if (!premoveEnabled) setPremove(null);
   }, [premoveEnabled]);
 
-  // ── Refs ──────────────────────────────────────────────────────────────────
+  // ── Refs & Search State ───────────────────────────────────────────────────
   const customWorkerRef    = useRef(null);
   const stockfishWorkerRef = useRef(null);
   const stockfishCodeRef   = useRef(null);
@@ -157,11 +163,96 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
   const currentSearchFenRef = useRef(null);
   const simulateTimeoutRef   = useRef(null);
 
+  const searchStateRef = useRef({
+    currentSearchId: 0,
+    latestDepth: 0,
+    depthData: {},
+    completedDepth: 0,
+    completedData: [],
+    nodes: 0,
+    nps: 0,
+    betaCutoffs: 0,
+    transpositionHits: 0,
+    timeTaken: 0,
+  });
+
+  const lastUIUpdateTimeRef = useRef(0);
+  const throttleTimeoutRef = useRef(null);
+
+  const triggerUIUpdate = useCallback(() => {
+    if (!isMounted.current) return;
+    const state = searchStateRef.current;
+    if (state.completedData && state.completedData.length > 0) {
+      const bestLine = state.completedData[0];
+      setEvalScore(bestLine.score);
+      setCandidateMoves(state.completedData);
+    }
+    setEngineStats({
+      depth: state.latestDepth,
+      nodes: state.nodes,
+      nps: state.nps,
+      betaCutoffs: state.betaCutoffs,
+      transpositionHits: state.transpositionHits,
+      timeTaken: state.timeTaken,
+    });
+  }, []);
+
+  const scheduleUIUpdate = useCallback(() => {
+    const now = Date.now();
+    const timeSinceLastUpdate = now - lastUIUpdateTimeRef.current;
+    const throttleLimit = 150;
+
+    if (throttleTimeoutRef.current) return;
+
+    if (timeSinceLastUpdate >= throttleLimit) {
+      triggerUIUpdate();
+      lastUIUpdateTimeRef.current = now;
+    } else {
+      const delay = throttleLimit - timeSinceLastUpdate;
+      throttleTimeoutRef.current = setTimeout(() => {
+        triggerUIUpdate();
+        lastUIUpdateTimeRef.current = Date.now();
+        throttleTimeoutRef.current = null;
+      }, delay);
+    }
+  }, [triggerUIUpdate]);
+
+  const forceFinalUIUpdate = useCallback(() => {
+    if (throttleTimeoutRef.current) {
+      clearTimeout(throttleTimeoutRef.current);
+      throttleTimeoutRef.current = null;
+    }
+    triggerUIUpdate();
+    lastUIUpdateTimeRef.current = Date.now();
+  }, [triggerUIUpdate]);
+
+  const resetSearchState = useCallback(() => {
+    searchStateRef.current = {
+      currentSearchId: searchStateRef.current.currentSearchId + 1,
+      latestDepth: 0,
+      depthData: {},
+      completedDepth: 0,
+      completedData: [],
+      nodes: 0,
+      nps: 0,
+      betaCutoffs: 0,
+      transpositionHits: 0,
+      timeTaken: 0,
+    };
+    if (throttleTimeoutRef.current) {
+      clearTimeout(throttleTimeoutRef.current);
+      throttleTimeoutRef.current = null;
+    }
+  }, []);
+
   const modeSelectedRef = useRef(null);
   const difficultyRef = useRef(null);
   const classifyMoveRef = useRef(null);
   const triggerMoveSoundRef = useRef(null);
   const updateGameStatusAndSaveRef = useRef(null);
+  const playerColorRef = useRef(null);
+  // Monotonically incrementing search ID — any result with a stale ID is discarded
+  const searchIdRef = useRef(0);
 
   // ─────────────────────────────────────────────────────────────────────────
   // PERSIST TO STORAGE
@@ -416,36 +507,73 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
 
     customWorkerRef.current.onmessage = (e) => {
       if (!isMounted.current) return;
-      const { type, depth, bestMove, score, stats, timeTaken } = e.data;
+      const { type, depth, bestMove, score, stats, timeTaken, pv, searchId } = e.data;
+
+      // Discard results from any search that has been superseded
+      if (searchId !== undefined && searchId !== searchIdRef.current) return;
 
       if (type === 'ITERATION_COMPLETE' || type === 'SEARCH_COMPLETE') {
         const nps = stats ? Math.round((stats.nodesSearched + stats.quiescenceNodes) / (timeTaken / 1000)) : 0;
         let displayScore = '0.00';
         const MATE_THRESHOLD = 90000;
         if (score !== undefined) {
+          const isWhiteTurn = chessRef.current.turn() === 'w';
           if (score > MATE_THRESHOLD) {
-            displayScore = `M${Math.ceil((100000 - score) / 2)}`;
+            const plies = 100000 - score;
+            const moves = Math.ceil(plies / 2);
+            displayScore = isWhiteTurn ? `M${moves}` : `-M${moves}`;
           } else if (score < -MATE_THRESHOLD) {
-            displayScore = `-M${Math.ceil((100000 + score) / 2)}`;
+            const plies = 100000 + score;
+            const moves = Math.ceil(plies / 2);
+            displayScore = isWhiteTurn ? `-M${moves}` : `M${moves}`;
           } else {
-            const sign = chessRef.current.turn() === 'w' ? 1 : -1;
+            const sign = isWhiteTurn ? 1 : -1;
             displayScore = ((score * sign) / 100).toFixed(2);
           }
         }
 
-        setEvalScore(displayScore);
-        setEngineStats({ depth: depth || stats?.maxDepthReached || 0, nodes: (stats?.nodesSearched || 0) + (stats?.quiescenceNodes || 0), nps: isFinite(nps) ? nps : 0, betaCutoffs: stats?.betaCutoffs || 0, transpositionHits: stats?.transpositionHits || 0, timeTaken });
+        const cand = {
+          pvIdx: 1,
+          depth: depth || stats?.maxDepthReached || 0,
+          score: displayScore,
+          bestMove: bestMove ? (bestMove.from + bestMove.to) : '',
+          line: pv || (bestMove ? bestMove.san || (bestMove.from + bestMove.to) : '')
+        };
+
+        const state = searchStateRef.current;
+        if (depth > 0) {
+          state.latestDepth = Math.max(state.latestDepth, depth);
+          state.depthData[depth] = [cand];
+          state.nodes = (stats?.nodesSearched || 0) + (stats?.quiescenceNodes || 0);
+          state.nps = isFinite(nps) ? nps : 0;
+          state.betaCutoffs = stats?.betaCutoffs || 0;
+          state.transpositionHits = stats?.transpositionHits || 0;
+          state.timeTaken = timeTaken || 0;
+
+          for (let d = 1; d <= depth; d++) {
+            if (state.depthData[d] && d > state.completedDepth) {
+              state.completedDepth = d;
+              state.completedData = state.depthData[d];
+            }
+          }
+        }
 
         if (type === 'SEARCH_COMPLETE') {
-          setIsSearching(false);
-          setThinkingStatus('Waiting for move...');
-
-          if (chessRef.current.fen() !== currentSearchFenRef.current) {
-            // Discard stale search result (e.g. from an undo or reset)
-            return;
+          if (depth) {
+            state.latestDepth = depth;
+            state.completedDepth = depth;
+            state.completedData = [cand];
           }
+          forceFinalUIUpdate();
+          setIsSearching(false);
+          setThinkingStatus('Your move');
 
-          if (bestMove && (modeSelectedRef.current === 'ai' || modeSelectedRef.current === 'simulate')) {
+          if (chessRef.current.fen() !== currentSearchFenRef.current) return;
+
+          const isEngineTurn = modeSelectedRef.current === 'simulate' ||
+            (modeSelectedRef.current === 'ai' && chessRef.current.turn() !== playerColorRef.current);
+
+          if (bestMove && isEngineTurn) {
             let finalMove = bestMove;
             const settings = DIFFICULTY_SETTINGS[difficultyRef.current];
             if (settings.blunderRate > 0 && Math.random() < settings.blunderRate) {
@@ -481,10 +609,12 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
               applyEngineMove();
             }
           }
+        } else {
+          scheduleUIUpdate();
         }
       }
     };
-  }, []);
+  }, [forceFinalUIUpdate, scheduleUIUpdate]);
 
   // ── Helper to resolve Stockfish worker asynchronously ─────────────────────
   const getStockfishWorker = useCallback(() => {
@@ -509,11 +639,18 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
         worker.postMessage('setoption name MultiPV value 3');
         worker.postMessage('isready');
 
-        const parsedLines = [];
         worker.onmessage = (e) => {
           if (!isMounted.current) return;
           const line = e.data;
           if (line.startsWith('bestmove')) {
+            const state = searchStateRef.current;
+            const maxDepth = Math.max(...Object.keys(state.depthData).map(Number), 0);
+            if (maxDepth > state.completedDepth && state.depthData[maxDepth]) {
+              state.completedDepth = maxDepth;
+              state.completedData = state.depthData[maxDepth].filter(Boolean);
+            }
+            forceFinalUIUpdate();
+
             setIsSearching(false);
             setThinkingStatus('Analysis ready');
           }
@@ -526,26 +663,45 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
             if (pvM) {
               const pvIdx  = pvIdxM ? parseInt(pvIdxM[1]) : 1;
               const moves  = pvM[1].split(' ');
+              const depth  = depthM ? parseInt(depthM[1]) : 0;
+              
               let scoreStr = '0.00';
               if (cpM) {
                 const v = parseInt(cpM[1]);
                 scoreStr = chessRef.current.turn() === 'w' ? (v / 100).toFixed(2) : (-v / 100).toFixed(2);
               } else if (mateM) {
                 const mv = parseInt(mateM[1]);
-                scoreStr = chessRef.current.turn() === 'w' ? `M${mv}` : `-M${mv}`;
+                if (chessRef.current.turn() === 'w') {
+                  scoreStr = mv > 0 ? `M${mv}` : `-M${Math.abs(mv)}`;
+                } else {
+                  scoreStr = mv > 0 ? `-M${mv}` : `M${Math.abs(mv)}`;
+                }
               }
-              parsedLines[pvIdx - 1] = {
+
+              const cand = {
                 pvIdx,
-                depth: depthM ? parseInt(depthM[1]) : 0,
+                depth,
                 score: scoreStr,
                 bestMove: moves[0],
                 line: moves.slice(0, 5).join(' ')
               };
-              if (pvIdx === 1 || pvIdx === 3) {
-                const clean = parsedLines.filter(Boolean);
-                setCandidateMoves(clean);
-                if (clean.length > 0) setEvalScore(clean[0].score);
+
+              const state = searchStateRef.current;
+              if (depth > 0) {
+                state.latestDepth = Math.max(state.latestDepth, depth);
+                state.depthData[depth] = state.depthData[depth] || [];
+                state.depthData[depth][pvIdx - 1] = cand;
+
+                // All depths strictly less than latestDepth are complete
+                for (let d = 1; d < state.latestDepth; d++) {
+                  if (state.depthData[d] && d > state.completedDepth) {
+                    state.completedDepth = d;
+                    state.completedData = state.depthData[d].filter(Boolean);
+                  }
+                }
               }
+
+              scheduleUIUpdate();
             }
           }
         };
@@ -560,43 +716,53 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     })();
 
     return stockfishPromiseRef.current;
-  }, []);
+  }, [forceFinalUIUpdate, scheduleUIUpdate]);
 
   // ── Trigger Engine search on FEN changes ──────────────────────────────────
   useEffect(() => {
     if (gameStatus !== 'active') return;
 
     if (modeSelected === 'analysis') {
+      resetSearchState();
       setIsSearching(true);
       setThinkingStatus('Stockfish is analysing...');
       getStockfishWorker()
         .then(worker => {
           if (!isMounted.current || modeSelected !== 'analysis') return;
-          worker.postMessage(`position fen ${fen}`);
+          worker.postMessage(`position fen ${displayedFen}`);
           worker.postMessage('go depth 16');
         })
-        .catch(err => {
+        .catch(() => {
           if (!isMounted.current) return;
           setIsSearching(false);
           setThinkingStatus('Failed to load Stockfish engine');
         });
     } else if (modeSelected === 'simulate') {
       if (!customWorkerRef.current) startCustomWorker();
+      resetSearchState();
+      const sid = searchIdRef.current + 1;
+      searchIdRef.current = sid;
       setIsSearching(true);
       setThinkingStatus('Engine simulation calculating...');
-      currentSearchFenRef.current = fen;
-      customWorkerRef.current.postMessage({ type: 'SEARCH', fen, maxDepth: DIFFICULTY_SETTINGS[difficulty].maxDepth, timeLimitMs: DIFFICULTY_SETTINGS[difficulty].timeLimitMs });
-    } else if (modeSelected === 'ai' && chessRef.current.turn() !== playerColor) {
-      if (!customWorkerRef.current) startCustomWorker();
-      setIsSearching(true);
-      setThinkingStatus('Engine is calculating...');
-      currentSearchFenRef.current = fen;
-      customWorkerRef.current.postMessage({ type: 'SEARCH', fen, maxDepth: DIFFICULTY_SETTINGS[difficulty].maxDepth, timeLimitMs: DIFFICULTY_SETTINGS[difficulty].timeLimitMs });
+      currentSearchFenRef.current = displayedFen;
+      customWorkerRef.current.postMessage({ type: 'SEARCH', fen: displayedFen, maxDepth: DIFFICULTY_SETTINGS[difficulty].maxDepth, timeLimitMs: DIFFICULTY_SETTINGS[difficulty].timeLimitMs, searchId: sid });
+    } else if (modeSelected === 'ai') {
+      if (chessRef.current.turn() !== playerColor) {
+        // Engine's turn — dedicate the worker entirely to finding a move
+        if (!customWorkerRef.current) startCustomWorker();
+        resetSearchState();
+        const sid = searchIdRef.current + 1;
+        searchIdRef.current = sid;
+        setIsSearching(true);
+        setThinkingStatus('Engine is calculating...');
+        currentSearchFenRef.current = displayedFen;
+        customWorkerRef.current.postMessage({ type: 'SEARCH', fen: displayedFen, maxDepth: DIFFICULTY_SETTINGS[difficulty].maxDepth, timeLimitMs: DIFFICULTY_SETTINGS[difficulty].timeLimitMs, searchId: sid });
+      }
+      // On player's turn: do not run a background search — keep the worker free for the next engine turn
     }
-  }, [fen, modeSelected, gameStatus, playerColor, difficulty, getStockfishWorker, startCustomWorker]);
+  }, [displayedFen, modeSelected, gameStatus, playerColor, difficulty, getStockfishWorker, startCustomWorker, resetSearchState]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // PREMOVE EXECUTION — fires when it becomes the player's turn after engine moves
+  // ── PREMOVE EXECUTION — fires when it becomes the player's turn after engine moves
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!premoveEnabled || !premove || isSearching || gameStatus !== 'active') return;
@@ -616,7 +782,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     } catch {
       // Premove was illegal — silently discard
     }
-  }, [isSearching, premove, gameStatus, modeSelected, playerColor, triggerMoveSound, updateGameStatusAndSave]);
+  }, [isSearching, premove, gameStatus, modeSelected, playerColor, triggerMoveSound, updateGameStatusAndSave, premoveEnabled]);
 
   // Reset searching on mode change
   useEffect(() => {
@@ -635,6 +801,15 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     if (modeSelected === 'simulate') return false;
     if (modeSelected === 'ai' && (isSearching || chess.turn() !== playerColor)) return false;
 
+    // Truncate history if making a move from a previewed state
+    if (previewIndex !== null && gameHistory[previewIndex]) {
+      const targetFen = gameHistory[previewIndex].after;
+      chess.load(targetFen);
+      const newHistory = gameHistory.slice(0, previewIndex + 1);
+      setGameHistory(newHistory);
+      setPreviewIndex(null);
+    }
+
     try {
       const res = chess.move(moveInput);
       if (res) {
@@ -645,7 +820,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
       }
     } catch { return false; }
     return false;
-  }, [modeSelected, playerColor, isSearching, triggerMoveSound, updateGameStatusAndSave]);
+  }, [modeSelected, playerColor, isSearching, triggerMoveSound, updateGameStatusAndSave, previewIndex, gameHistory]);
 
   const queuePremove = useCallback((from, to) => {
     if (premoveEnabled) {
@@ -671,6 +846,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
       simulateTimeoutRef.current = null;
     }
     currentSearchFenRef.current = null;
+    setPreviewIndex(null);
     setAnalysisCompleted(false);
     cancelPostGameAnalysis();
     updateGameStatusAndSave();
@@ -690,6 +866,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     setThinkingStatus('Waiting for move...');
     setCandidateMoves([]);
     setPremove(null);
+    setPreviewIndex(null);
 
     if (customWorkerRef.current) customWorkerRef.current.postMessage({ type: 'CLEAR_CACHE' });
 
@@ -738,6 +915,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
       setCandidateMoves([]);
       setEvalScore('0.00');
       setPremove(null);
+      setPreviewIndex(null);
       setAnalysisCompleted(false);
       cancelPostGameAnalysis();
       updateGameStatusAndSave();
@@ -757,6 +935,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
       setWinner(null);
       setGameStatus('active');
       setPremove(null);
+      setPreviewIndex(null);
       setAnalysisCompleted(false);
       cancelPostGameAnalysis();
       updateGameStatusAndSave();
@@ -833,14 +1012,8 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     setEngineTime(t);
   }, []);
 
-  // ── Auto trigger post-game analysis ───────────────────────────────────────
-  useEffect(() => {
-    const isCompleted = ['checkmate', 'draw', 'resign', 'timeout'].includes(gameStatus);
-    if (isCompleted && gameHistory.length > 0 && !analysisCompleted && !isAnalyzing) {
-      setAnalysisCompleted(true);
-      triggerPostGameAnalysis();
-    }
-  }, [gameStatus, gameHistory.length, analysisCompleted, isAnalyzing, triggerPostGameAnalysis]);
+  // ── Post-game analysis is now user-triggered, not auto-fired ──────────────
+  // (triggerPostGameAnalysis is exposed and called by the PostGameReview component)
 
   // Update stable refs for worker closure safety
   modeSelectedRef.current = modeSelected;
@@ -848,13 +1021,14 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
   classifyMoveRef.current = classifyMove;
   triggerMoveSoundRef.current = triggerMoveSound;
   updateGameStatusAndSaveRef.current = updateGameStatusAndSave;
+  playerColorRef.current = playerColor;
 
   // ─────────────────────────────────────────────────────────────────────────
   // RETURN
   // ─────────────────────────────────────────────────────────────────────────
   return {
     // Board state
-    fen, gameHistory, boardOrientation, difficulty, playerColor,
+    fen, gameHistory, boardOrientation, difficulty, playerColor, previewIndex,
     // Game state
     isSearching, gameStatus, winner, inCheck,
     isAnalyzing, analysisProgress,
@@ -871,6 +1045,7 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
     // Setters
     setBoardTheme, setRulesLevel, setSoundEnabled, setModeSelected,
     setDifficulty, setPlayerColor, setBoardOrientation, setPremoveEnabled,
+    setPreviewIndex,
     setTimeControl: setTimeControlWithReset,
     // Actions
     makeMove, queuePremove, clearPremove,

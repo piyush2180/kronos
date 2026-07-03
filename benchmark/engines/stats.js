@@ -46,7 +46,16 @@ export class BenchmarkStats {
       ciLowerPct: Number((ciLowerPctVal * 100).toFixed(2)),
       ciUpperPct: Number((ciUpperPctVal * 100).toFixed(2)),
       eloCiLower: Number(eloCiLower.toFixed(1)),
-      eloCiUpper: Number(eloCiUpper.toFixed(1))
+      eloCiUpper: Number(eloCiUpper.toFixed(1)),
+      eloClassification: BenchmarkStats.getEloClassification(eloDiff)
     };
+  }
+
+  static getEloClassification(eloDiff) {
+    const absElo = Math.abs(eloDiff);
+    if (absElo < 10) return 'negligible';
+    if (absElo >= 10 && absElo < 30) return 'small';
+    if (absElo >= 30 && absElo < 70) return 'moderate';
+    return 'major';
   }
 }

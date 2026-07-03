@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { EngineFactory } from './engineFactory.js';
+import { EngineFactory } from '../engines/engineFactory.js';
 
 export class PositionBenchmarkRunner {
   constructor(options = {}) {

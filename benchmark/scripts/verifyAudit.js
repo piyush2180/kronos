@@ -1,12 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { Chess } from 'chess.js';
-import { ConfigurableKronosEngine } from './configurableEngine.js';
-import { TournamentRunner } from './tournament.js';
-import { BenchmarkStats } from './stats.js';
-import { TelemetryCollector } from './telemetry.js';
-import { UCIEngineAdapter } from './uciAdapter.js';
-import { ReportGenerator } from './reportGenerator.js';
+import { ConfigurableKronosEngine } from '../engines/configurableEngine.js';
+import { TournamentRunner } from '../pipeline/tournament.js';
+import { BenchmarkStats } from '../engines/stats.js';
+import { TelemetryCollector } from '../engines/telemetry.js';
+import { UCIEngineAdapter } from '../engines/uciAdapter.js';
 
 export async function runFrameworkAudit() {
   const auditResults = {

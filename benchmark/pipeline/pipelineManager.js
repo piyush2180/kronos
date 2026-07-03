@@ -3,12 +3,10 @@
 
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import { TournamentRunner } from './tournament.js';
-import { PositionBenchmarkRunner } from './positionBenchmark.js';
-import { ReportGenerator } from './reportGenerator.js';
-import { OrdoExporter } from './exportOrdo.js';
-import { IntegrityValidator } from './integrityValidator.js';
+import { PositionBenchmarkRunner } from '../positions/positionBenchmark.js';
+import { ReportGenerator } from '../reports/reportGenerator.js';
+import { OrdoExporter } from '../reports/exportOrdo.js';
 
 const QUEUE_FILE = path.resolve('benchmark/output/queue_state.json');
 const INDEX_FILE = path.resolve('benchmark/output/index.json');
@@ -29,6 +27,13 @@ const FAMILY_B_ABLATION = [
   { id: 'EXP-B3', name: 'Ablation: Full Kronos vs No Quiescence', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/ablation_no_quiescence.json' },
   { id: 'EXP-B4', name: 'Ablation: Full Kronos vs No Killer', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/ablation_no_killer.json' },
   { id: 'EXP-B5', name: 'Ablation: Full Kronos vs No MoveOrdering', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/ablation_no_moveordering.json' }
+];
+
+const FAMILY_E_SCALABILITY = [
+  { id: 'EXP-E2', name: 'Scalability: Full Kronos at Depth 2', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/full_kronos.json', depth: 2 },
+  { id: 'EXP-E3', name: 'Scalability: Full Kronos at Depth 3', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/full_kronos.json', depth: 3 },
+  { id: 'EXP-E4', name: 'Scalability: Full Kronos at Depth 4', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/full_kronos.json', depth: 4 },
+  { id: 'EXP-E5', name: 'Scalability: Full Kronos at Depth 5', configA: 'benchmark/configs/full_kronos.json', configB: 'benchmark/configs/full_kronos.json', depth: 5 }
 ];
 
 function parseArgs() {
@@ -95,7 +100,8 @@ async function main() {
 
   const plannedTasks = [
     ...FAMILY_A_CUMULATIVE,
-    ...FAMILY_B_ABLATION
+    ...FAMILY_B_ABLATION,
+    ...FAMILY_E_SCALABILITY
   ];
 
   const manifest = [];
@@ -109,30 +115,34 @@ async function main() {
 
     logTimestamp(`Executing Task: ${task.name} (${task.id})...`);
     const runner = new TournamentRunner({
+      experimentId: task.id,
       configA: task.configA,
       configB: task.configB,
       games: options.games,
-      depth: options.depth,
+      depth: task.depth || options.depth,
       seed: options.seed,
       sprt: options.sprt,
-      allowMultiDiff: task.id.startsWith('EXP-B')
+      allowMultiDiff: task.id.startsWith('EXP-B') || task.id.startsWith('EXP-E')
     });
 
     try {
       const results = await runner.run();
       const { outputDir, certification } = ReportGenerator.generate(results, { 
         ...options, 
+        experimentId: task.id,
         configA: task.configA, 
         configB: task.configB,
-        allowMultiDiff: task.id.startsWith('EXP-B')
+        allowMultiDiff: task.id.startsWith('EXP-B') || task.id.startsWith('EXP-E')
       });
 
       if (results.pgnContent) OrdoExporter.export(path.join(outputDir, 'games.pgn'), outputDir);
 
+      const relativePath = path.relative('benchmark/output', outputDir).replace(/\\/g, '/');
+
       const experimentRecord = {
         id: task.id,
         name: task.name,
-        path: outputDir,
+        path: relativePath,
         timestamp: new Date().toISOString(),
         certification,
         engineA: results.engineA,
@@ -140,7 +150,7 @@ async function main() {
         stats: results.stats
       };
 
-      updateIndex(experimentRecord);
+      // index.json is updated inside ReportGenerator.generate automatically using the correct relative path
       queueState.completed.push(experimentRecord);
       saveQueue(queueState);
       manifest.push(experimentRecord);

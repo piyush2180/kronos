@@ -97,42 +97,21 @@ const KING_END_PST = [
  * Detects the game phase based on the remaining non-pawn material.
  * Returns a value from 0 (opening/middlegame) to 1 (pure endgame).
  */
-function getGamePhase(board) {
-  let nonPawnMaterial = 0;
-  for (let r = 0; r < 8; r++) {
-    for (let c = 0; c < 8; c++) {
-      const piece = board[r][c];
-      if (piece && piece.type !== 'p' && piece.type !== 'k') {
-        nonPawnMaterial += PIECE_VALUES[piece.type];
-      }
-    }
-  }
-
-  const maxEndgameMaterial = 1600;
-  const minEndgameMaterial = 0;
-
-  if (nonPawnMaterial >= maxEndgameMaterial) return 0; // Middlegame
-  if (nonPawnMaterial <= minEndgameMaterial) return 1; // Pure endgame
-
-  return (maxEndgameMaterial - nonPawnMaterial) / maxEndgameMaterial;
-}
-
-/**
- * Evaluates the board position.
- * @param {import('chess.js').Chess} chess - The chess.js instance
- */
 export function evaluateBoard(chess) {
   const board = chess.board();
   let score = 0;
 
-  // Detect game phase for tapered king evaluation
-  const phase = getGamePhase(board);
+  let nonPawnMaterial = 0;
+  let whiteKingPos = null;
+  let blackKingPos = null;
+  let whiteBishops = 0;
+  let blackBishops = 0;
 
   // Pawn tracking for pawn structure evaluation
   const whitePawnFiles = Array(8).fill(0);
   const blackPawnFiles = Array(8).fill(0);
 
-  // Gather piece locations and count
+  // Gather piece locations and count in a single pass
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
       const piece = board[r][c];
@@ -141,44 +120,79 @@ export function evaluateBoard(chess) {
       const type = piece.type;
       const color = piece.color;
       const isWhite = color === 'w';
+      const sign = isWhite ? 1 : -1;
 
       // 1. Material score
       const materialVal = PIECE_VALUES[type];
-      const sign = isWhite ? 1 : -1;
       score += materialVal * sign;
+
+      if (type !== 'p' && type !== 'k') {
+        nonPawnMaterial += materialVal;
+      }
 
       // 2. Positional (PST) score
       const pstRow = isWhite ? r : 7 - r;
       const pstCol = isWhite ? c : 7 - c;
 
-      let pstVal = 0;
-      switch (type) {
-        case 'p':
-          pstVal = PAWN_PST[pstRow][pstCol];
-          if (isWhite) whitePawnFiles[c]++;
-          else blackPawnFiles[c]++;
-          break;
-        case 'n':
-          pstVal = KNIGHT_PST[pstRow][pstCol];
-          break;
-        case 'b':
-          pstVal = BISHOP_PST[pstRow][pstCol];
-          break;
-        case 'r':
-          pstVal = ROOK_PST[pstRow][pstCol];
-          break;
-        case 'q':
-          pstVal = QUEEN_PST[pstRow][pstCol];
-          break;
-        case 'k':
-          // Interpolate king evaluation based on game phase
-          const middleVal = KING_MIDDLE_PST[pstRow][pstCol];
-          const endVal = KING_END_PST[pstRow][pstCol];
-          pstVal = Math.round((1 - phase) * middleVal + phase * endVal);
-          break;
+      if (type === 'k') {
+        if (isWhite) {
+          whiteKingPos = { r: pstRow, c: pstCol };
+        } else {
+          blackKingPos = { r: pstRow, c: pstCol };
+        }
+      } else {
+        let pstVal = 0;
+        switch (type) {
+          case 'p':
+            pstVal = PAWN_PST[pstRow][pstCol];
+            if (isWhite) whitePawnFiles[c]++;
+            else blackPawnFiles[c]++;
+            break;
+          case 'n':
+            pstVal = KNIGHT_PST[pstRow][pstCol];
+            break;
+          case 'b':
+            pstVal = BISHOP_PST[pstRow][pstCol];
+            if (isWhite) whiteBishops++;
+            else blackBishops++;
+            break;
+          case 'r':
+            pstVal = ROOK_PST[pstRow][pstCol];
+            // Rook on 7th rank (White row index 1, Black row index 6)
+            if (isWhite && r === 1) score += 15;
+            else if (!isWhite && r === 6) score -= 15;
+            break;
+          case 'q':
+            pstVal = QUEEN_PST[pstRow][pstCol];
+            break;
+        }
+        score += pstVal * sign;
       }
-      score += pstVal * sign;
     }
+  }
+
+  // Calculate game phase
+  const maxEndgameMaterial = 1600;
+  const minEndgameMaterial = 0;
+  let phase = 0;
+  if (nonPawnMaterial <= minEndgameMaterial) {
+    phase = 1;
+  } else if (nonPawnMaterial < maxEndgameMaterial) {
+    phase = (maxEndgameMaterial - nonPawnMaterial) / maxEndgameMaterial;
+  }
+
+  // Evaluate kings using phase
+  if (whiteKingPos) {
+    const middleVal = KING_MIDDLE_PST[whiteKingPos.r][whiteKingPos.c];
+    const endVal = KING_END_PST[whiteKingPos.r][whiteKingPos.c];
+    const pstVal = Math.round((1 - phase) * middleVal + phase * endVal);
+    score += pstVal;
+  }
+  if (blackKingPos) {
+    const middleVal = KING_MIDDLE_PST[blackKingPos.r][blackKingPos.c];
+    const endVal = KING_END_PST[blackKingPos.r][blackKingPos.c];
+    const pstVal = Math.round((1 - phase) * middleVal + phase * endVal);
+    score -= pstVal;
   }
 
   // 3. Pawn structure evaluation
@@ -209,6 +223,56 @@ export function evaluateBoard(chess) {
       }
     }
   }
+
+  // 4. Bishop Pair evaluation
+  if (whiteBishops >= 2) score += 30;
+  if (blackBishops >= 2) score -= 30;
+
+  // 5. Passed Pawns evaluation
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const piece = board[r][c];
+      if (piece && piece.type === 'p') {
+        const isWhite = piece.color === 'w';
+        let isPassed = true;
+        if (isWhite) {
+          for (let row = 0; row < r; row++) {
+            for (let col = Math.max(0, c - 1); col <= Math.min(7, c + 1); col++) {
+              const p = board[row][col];
+              if (p && p.type === 'p' && p.color === 'b') {
+                isPassed = false;
+                break;
+              }
+            }
+            if (!isPassed) break;
+          }
+          if (isPassed) score += 20;
+        } else {
+          for (let row = r + 1; row < 8; row++) {
+            for (let col = Math.max(0, c - 1); col <= Math.min(7, c + 1); col++) {
+              const p = board[row][col];
+              if (p && p.type === 'p' && p.color === 'w') {
+                isPassed = false;
+                break;
+              }
+            }
+            if (!isPassed) break;
+          }
+          if (isPassed) score -= 20;
+        }
+      }
+    }
+  }
+
+  // 6. Tempo evaluation
+  const activeColor = chess.turn();
+  if (activeColor === 'w') score += 10;
+  else score -= 10;
+
+  // 7. Piece Mobility evaluation
+  const movesCount = chess.moves().length;
+  if (activeColor === 'w') score += movesCount;
+  else score -= movesCount;
 
   return score;
 }

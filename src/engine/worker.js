@@ -6,7 +6,7 @@ import { startSearch } from './minimax.js';
 import { tt } from './transposition.js';
 
 self.onmessage = function (e) {
-  const { type, fen, maxDepth, timeLimitMs } = e.data;
+  const { type, fen, maxDepth, timeLimitMs, searchId } = e.data;
 
   if (type === 'SEARCH') {
     try {
@@ -16,6 +16,7 @@ self.onmessage = function (e) {
       const result = startSearch(chess, maxDepth, timeLimitMs, (iterationData) => {
         self.postMessage({
           type: 'ITERATION_COMPLETE',
+          searchId,          // echo back so host can discard stale results
           depth: iterationData.depth,
           bestMove: {
             from: iterationData.bestMove.from,
@@ -25,11 +26,12 @@ self.onmessage = function (e) {
           },
           score: iterationData.score,
           stats: iterationData.stats,
-          timeTaken: iterationData.timeTaken
+          timeTaken: iterationData.timeTaken,
+          pv: iterationData.pv
         });
       });
 
-      // Fallback
+      // Fallback to random legal move if search returned nothing
       let finalMove = result.bestMove;
       if (!finalMove) {
         const legalMoves = chess.moves({ verbose: true });
@@ -41,6 +43,7 @@ self.onmessage = function (e) {
 
       self.postMessage({
         type: 'SEARCH_COMPLETE',
+        searchId,            // echo back
         bestMove: finalMove ? {
           from: finalMove.from,
           to: finalMove.to,
@@ -49,12 +52,14 @@ self.onmessage = function (e) {
         } : null,
         score: result.score,
         stats: result.stats,
-        timeTaken: result.timeTaken
+        timeTaken: result.timeTaken,
+        pv: result.pv
       });
 
     } catch (err) {
       self.postMessage({
         type: 'ERROR',
+        searchId,
         error: err.message
       });
     }

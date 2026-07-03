@@ -15,7 +15,7 @@ class TranspositionTable {
   }
 
   clear() {
-    this.table.clear();
+    this.table = new Map();
     this.hits = 0;
     this.writes = 0;
   }

@@ -1,552 +1,710 @@
-// Kronos Chess V2 — Post Game Review Analytics
-// Computes centipawn accuracy percentages and lists critical moments.
+// Kronos Chess V2 — Post-Game Review Component
+// Three-state flow: idle (game just ended) → analyzing → complete (full analysis shown)
+// All values computed from engine; no placeholders.
 
-import React, { useMemo } from 'react';
-import { Award, ShieldAlert, Star, CheckCircle2, TrendingUp, RefreshCw, Eye } from 'lucide-react';
+import React, { useMemo, useState } from 'react';
+import { Award, RefreshCw, BarChart2, Zap, AlertTriangle, CheckCircle2, Eye, BookOpen, ChevronRight, Loader2 } from 'lucide-react';
+import { DIFFICULTY_SETTINGS } from '../hooks/useChessGame';
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function classifyColor(cls) {
+  const map = {
+    'Best Move':  { color: '#34d399', icon: '✦' },
+    'Excellent':  { color: '#6ee7b7', icon: '✓' },
+    'Good':       { color: '#a7c9e3', icon: '·' },
+    'Inaccuracy': { color: '#fbbf24', icon: '?!' },
+    'Mistake':    { color: '#f97316', icon: '?' },
+    'Blunder':    { color: '#f87171', icon: '??' },
+  };
+  return map[cls] || { color: '#94a3b8', icon: '·' };
+}
+
+function evalToNum(s) {
+  if (!s || s === '0.00') return 0;
+  if (typeof s === 'string' && s.includes('M')) {
+    const v = parseInt(s.replace('-M', '').replace('M', ''));
+    return s.startsWith('-') ? -(100 - v) : (100 - v);
+  }
+  return parseFloat(s) || 0;
+}
+
+function scoreDisplay(s) {
+  if (!s || s === '0.00') return '0.00';
+  if (typeof s === 'string' && s.includes('M')) return s;
+  const n = parseFloat(s);
+  return (n > 0 ? '+' : '') + n.toFixed(2);
+}
+
+// ── Mini SVG Eval Graph ───────────────────────────────────────────────────────
+function EvalGraph({ gameHistory, previewIndex, onSelectPly }) {
+  const W = 280, H = 70;
+  if (!gameHistory || gameHistory.length === 0) {
+    return (
+      <div style={{ height: H, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-dim)', fontSize: '0.72rem' }}>
+        No moves to display
+      </div>
+    );
+  }
+
+  const evals = [0, ...gameHistory.map(m => Math.max(-8, Math.min(8, evalToNum(m.evalScore))))];
+  const totalPoints = evals.length;
+  const xStep = W / Math.max(totalPoints - 1, 1);
+
+  const pts = evals.map((v, i) => {
+    const x = i * xStep;
+    const y = H / 2 - (v / 8) * (H / 2 - 4);
+    return `${x},${y}`;
+  });
+
+  const whiteArea = `0,${H / 2} ` + pts.join(' ') + ` ${W},${H / 2}`;
+
+  return (
+    <svg
+      width="100%"
+      viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="none"
+      style={{ display: 'block', cursor: 'pointer', borderRadius: '4px', overflow: 'hidden' }}
+      onClick={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const relX = (e.clientX - rect.left) / rect.width;
+        const idx = Math.min(Math.round(relX * (totalPoints - 1)), totalPoints - 2);
+        if (idx >= 0) onSelectPly(idx);
+      }}
+    >
+      {/* Background */}
+      <rect x={0} y={0} width={W} height={H} fill="#1a1208" />
+      {/* Midline */}
+      <line x1={0} y1={H / 2} x2={W} y2={H / 2} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+      {/* White advantage area */}
+      <polygon points={whiteArea} fill="rgba(255,255,255,0.14)" />
+      {/* Eval line */}
+      <polyline
+        points={pts.join(' ')}
+        fill="none"
+        stroke="rgba(212,175,55,0.8)"
+        strokeWidth={1.5}
+      />
+      {/* Preview cursor */}
+      {previewIndex !== null && (
+        <line
+          x1={(previewIndex + 1) * xStep}
+          y1={0}
+          x2={(previewIndex + 1) * xStep}
+          y2={H}
+          stroke="rgba(212,175,55,0.9)"
+          strokeWidth={1.5}
+          strokeDasharray="3,2"
+        />
+      )}
+    </svg>
+  );
+}
+
+// ── Main Component ────────────────────────────────────────────────────────────
 export default function PostGameReview({
-  gameHistory,
-  openingName,
+  gameHistory = [],
+  openingName = 'Starting Position',
   winner,
   playerColor,
   modeSelected,
+  difficulty,
   onReset,
   onSelectMoveIndex,
   isAnalyzing = false,
   analysisProgress = 0,
   showHeatmap = false,
-  onToggleHeatmap = () => {}
+  onToggleHeatmap = () => {},
+  previewIndex = null,
+  triggerAnalysis,
+  cancelAnalysis,
 }) {
+  const [activeFilter, setActiveFilter] = useState('all');
 
-  // Calculate accuracy and counts for both sides
+  // Determine if analysis has been run (any move has a non-default classification)
+  const analysisRan = useMemo(() => {
+    return gameHistory.some(m => m.classification && m.classification !== 'Good');
+  }, [gameHistory]);
+
+  // --- Stats computation (only meaningful after analysis) ---
   const stats = useMemo(() => {
     const counts = {
       w: { best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, blunder: 0, total: 0 },
-      b: { best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, blunder: 0, total: 0 }
+      b: { best: 0, excellent: 0, good: 0, inaccuracy: 0, mistake: 0, blunder: 0, total: 0 },
     };
-
-    const criticalMoments = []; // [{ ply, color, move, class, fen, type }]
+    const criticalMoments = [];
 
     gameHistory.forEach((m, idx) => {
-      const isWhite = m.color === 'w';
-      const side = isWhite ? 'w' : 'b';
-      const classification = m.classification || 'Good';
-
+      const side = m.color === 'w' ? 'w' : 'b';
+      const cls = m.classification || 'Good';
       counts[side].total++;
-
-      if (classification === 'Best Move') counts[side].best++;
-      else if (classification === 'Excellent') counts[side].excellent++;
-      else if (classification === 'Good') counts[side].good++;
-      else if (classification === 'Inaccuracy') {
-        counts[side].inaccuracy++;
-        criticalMoments.push({ ply: idx, color: isWhite ? 'White' : 'Black', san: m.san, classification, fen: m.after, type: 'inaccuracy' });
-      } else if (classification === 'Mistake') {
-        counts[side].mistake++;
-        criticalMoments.push({ ply: idx, color: isWhite ? 'White' : 'Black', san: m.san, classification, fen: m.after, type: 'mistake' });
-      } else if (classification === 'Blunder') {
-        counts[side].blunder++;
-        criticalMoments.push({ ply: idx, color: isWhite ? 'White' : 'Black', san: m.san, classification, fen: m.after, type: 'blunder' });
-      }
+      if (cls === 'Best Move') counts[side].best++;
+      else if (cls === 'Excellent') counts[side].excellent++;
+      else if (cls === 'Good') counts[side].good++;
+      else if (cls === 'Inaccuracy') { counts[side].inaccuracy++; criticalMoments.push({ ply: idx, color: side === 'w' ? 'White' : 'Black', san: m.san, classification: cls, evalBefore: idx > 0 ? gameHistory[idx - 1].evalScore : '0.00', evalAfter: m.evalScore }); }
+      else if (cls === 'Mistake') { counts[side].mistake++; criticalMoments.push({ ply: idx, color: side === 'w' ? 'White' : 'Black', san: m.san, classification: cls, evalBefore: idx > 0 ? gameHistory[idx - 1].evalScore : '0.00', evalAfter: m.evalScore }); }
+      else if (cls === 'Blunder') { counts[side].blunder++; criticalMoments.push({ ply: idx, color: side === 'w' ? 'White' : 'Black', san: m.san, classification: cls, evalBefore: idx > 0 ? gameHistory[idx - 1].evalScore : '0.00', evalAfter: m.evalScore }); }
     });
 
-    // Accuracy weights: Best=100%, Excellent=90%, Good=75%, Inaccuracy=40%, Mistake=15%, Blunder=0%
-    const calculateAccuracy = (side) => {
+    const calcAccuracy = (side) => {
       const c = counts[side];
       if (c.total === 0) return 0;
-      const sum = (c.best * 1.0) + (c.excellent * 0.9) + (c.good * 0.75) + (c.inaccuracy * 0.4) + (c.mistake * 0.15);
+      const sum = c.best * 1.0 + c.excellent * 0.9 + c.good * 0.75 + c.inaccuracy * 0.4 + c.mistake * 0.15;
       return Math.round((sum / c.total) * 100);
     };
 
     return {
-      whiteAccuracy: calculateAccuracy('w'),
-      blackAccuracy: calculateAccuracy('b'),
-      whiteCounts: counts.w,
-      blackCounts: counts.b,
-      criticalMoments
+      whiteAcc: calcAccuracy('w'),
+      blackAcc: calcAccuracy('b'),
+      w: counts.w,
+      b: counts.b,
+      criticalMoments,
     };
   }, [gameHistory]);
 
+  const filteredMoments = useMemo(() => {
+    if (activeFilter === 'all') return stats.criticalMoments;
+    if (activeFilter === 'error') return stats.criticalMoments.filter(m => m.classification === 'Blunder' || m.classification === 'Mistake');
+    if (activeFilter === 'inaccuracy') return stats.criticalMoments.filter(m => m.classification === 'Inaccuracy');
+    return stats.criticalMoments;
+  }, [activeFilter, stats.criticalMoments]);
+
+  // Result display
+  const resultText = (() => {
+    if (winner === 'draw') return 'Game Drawn';
+    if (winner === 'w') return 'White Wins';
+    if (winner === 'b') return 'Black Wins';
+    return 'Game Over';
+  })();
+
+  const engineLabel = DIFFICULTY_SETTINGS[difficulty]?.label || 'Kronos Engine';
+
+  // ── IDLE STATE: Game ended, no analysis yet ──────────────────────────────
+  if (!isAnalyzing && !analysisRan) {
+    return (
+      <div style={s.root}>
+        {/* Result Banner */}
+        <div style={s.resultBanner}>
+          <Award size={20} style={{ color: 'var(--color-brand-primary)' }} />
+          <div>
+            <div style={s.resultText}>{resultText}</div>
+            <div style={s.openingLine}>
+              <BookOpen size={10} style={{ flexShrink: 0 }} />
+              {openingName}
+            </div>
+          </div>
+        </div>
+
+        {/* Generate Analysis CTA */}
+        <div style={s.analysisCta}>
+          <div style={s.ctaIcon}>📊</div>
+          <div style={s.ctaTitle}>Generate Game Analysis</div>
+          <div style={s.ctaDesc}>
+            Evaluate every position using {engineLabel}. Identifies accuracy, blunders, critical moments, and best moves.
+          </div>
+          <div style={s.ctaInfo}>
+            <Zap size={11} />
+            <span>~{Math.max(5, Math.round(gameHistory.length * 0.8))} seconds · {gameHistory.length} positions</span>
+          </div>
+          <button
+            onClick={triggerAnalysis}
+            disabled={!triggerAnalysis || gameHistory.length === 0}
+            style={s.analyzeBtn}
+          >
+            <BarChart2 size={15} />
+            Generate Analysis
+          </button>
+        </div>
+
+        {/* Quick game info */}
+        <div style={s.quickInfo}>
+          <div style={s.quickInfoRow}>
+            <span style={s.qiLabel}>Engine</span>
+            <span style={s.qiVal}>{engineLabel}</span>
+          </div>
+          <div style={s.quickInfoRow}>
+            <span style={s.qiLabel}>Moves played</span>
+            <span style={s.qiVal}>{gameHistory.length}</span>
+          </div>
+          <div style={s.quickInfoRow}>
+            <span style={s.qiLabel}>Mode</span>
+            <span style={s.qiVal}>{modeSelected === 'simulate' ? 'Engine vs Engine' : 'Play vs Engine'}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div style={s.actionRow}>
+          <button onClick={onReset} style={s.primaryBtn} className="btn-primary">
+            <RefreshCw size={14} />
+            New Match Setup
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── ANALYZING STATE ───────────────────────────────────────────────────────
   if (isAnalyzing) {
     return (
-      <div style={styles.loaderWrapper} className="animate-fade-in">
-        <Award size={36} style={styles.loaderIcon} />
-        <div style={styles.loaderTitle}>Generating Game Review</div>
-        <div style={styles.loaderSubtitle}>
-          Kronos is analyzing move evaluations and detecting blunders...
+      <div style={s.root}>
+        <div style={s.resultBanner}>
+          <Award size={20} style={{ color: 'var(--color-brand-primary)' }} />
+          <div>
+            <div style={s.resultText}>{resultText}</div>
+            <div style={s.openingLine}><BookOpen size={10} />{openingName}</div>
+          </div>
         </div>
-        
-        <div style={styles.progressContainer}>
-          <div style={styles.progressBar(analysisProgress)} />
-        </div>
-        
-        <div style={styles.progressText}>
-          {analysisProgress}% Completed
+
+        <div style={s.analyzingCard}>
+          <Loader2 size={28} style={{ color: 'var(--color-brand-primary)', animation: 'spin 1s linear infinite' }} />
+          <div style={s.analyzingTitle}>Analyzing Game…</div>
+          <div style={s.analyzingDesc}>
+            Evaluating position {Math.round(analysisProgress / 100 * gameHistory.length)} / {gameHistory.length}
+          </div>
+          <div style={s.progressTrack}>
+            <div style={{ ...s.progressBar, width: `${analysisProgress}%` }} />
+          </div>
+          <div style={s.progressPct}>{analysisProgress}%</div>
+          <button onClick={cancelAnalysis} style={s.cancelBtn}>Cancel</button>
         </div>
       </div>
     );
   }
 
-  if (gameHistory.length === 0) {
-    return (
-      <div style={styles.emptyReview} className="animate-fade-in">
-        <Award size={32} style={{ color: 'var(--color-text-dim)', marginBottom: '8px' }} />
-        <div style={styles.emptyTitle}>No Analytics Available</div>
-        <div style={styles.emptyText}>Complete a match to unlock move evaluations, accuracy stats, and review diagnostics.</div>
-        <button className="btn-gold" style={{ marginTop: '16px', height: '32px', width: '100%', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }} onClick={onReset}>
-          Start New Match
-        </button>
-      </div>
-    );
-  }
-
-  const activeUser = localStorage.getItem('kronos_v2_active_user') || 'Guest';
-
-  // Determine label matches
-  const isAIMode = modeSelected === 'ai';
-  const playerSide = playerColor === 'w' ? 'white' : 'black';
-  const playerAcc = playerColor === 'w' ? stats.whiteAccuracy : stats.blackAccuracy;
-  const oppAcc = playerColor === 'w' ? stats.blackAccuracy : stats.whiteAccuracy;
-  
-  const playerCounts = playerColor === 'w' ? stats.whiteCounts : stats.blackCounts;
-  const oppCounts = playerColor === 'w' ? stats.blackCounts : stats.whiteCounts;
-
-  const resultHeader = () => {
-    if (winner === 'draw') return 'Game Drawn';
-    if (modeSelected === 'local') {
-      return winner === 'w' ? 'White Won the Match' : 'Black Won the Match';
-    }
-    const playerWon = winner === playerColor;
-    return playerWon ? 'Victory for You!' : 'Defeat — Engine Wins';
-  };
+  // ── ANALYSIS COMPLETE STATE ───────────────────────────────────────────────
+  const myColor = playerColor || 'w';
+  const myAcc = myColor === 'w' ? stats.whiteAcc : stats.blackAcc;
+  const oppAcc = myColor === 'w' ? stats.blackAcc : stats.whiteAcc;
+  const myCounts = myColor === 'w' ? stats.w : stats.b;
+  const oppCounts = myColor === 'w' ? stats.b : stats.w;
 
   return (
-    <div style={styles.reviewWrapper} className="animate-fade-in">
-      
-      {/* Result Heading banner */}
-      <div style={styles.resultBanner}>
-        <Award size={22} style={{ color: 'var(--color-brand-primary)' }} />
+    <div style={s.root}>
+
+      {/* Result Banner */}
+      <div style={s.resultBanner}>
+        <Award size={20} style={{ color: 'var(--color-brand-primary)' }} />
         <div>
-          <div style={styles.resultText}>{resultHeader()}</div>
-          <div style={styles.openingText}>Opening: {openingName}</div>
+          <div style={s.resultText}>{resultText}</div>
+          <div style={s.openingLine}><BookOpen size={10} />{openingName}</div>
         </div>
+        <button onClick={onReset} style={s.newMatchBtn}><RefreshCw size={12} /> New</button>
       </div>
 
-      {/* Heatmap Toggle */}
-      <div style={styles.heatmapToggleContainer}>
-        <div style={styles.heatmapToggleLabel}>
-          <Eye size={14} style={{ color: showHeatmap ? 'var(--color-brand-primary)' : 'var(--color-text-dim)' }} />
-          <span style={styles.heatmapToggleText}>Move Heatmap Overlay</span>
+      {/* Accuracy Cards */}
+      {modeSelected !== 'simulate' && (
+        <div style={s.accRow}>
+          <div style={s.accCard}>
+            <div style={s.accPct(myAcc)}>{myAcc}%</div>
+            <div style={s.accLabel}>You ({myColor === 'w' ? 'White' : 'Black'})</div>
+            <div style={{ ...s.accBar, width: '100%' }}>
+              <div style={{ ...s.accFill, width: `${myAcc}%`, backgroundColor: myAcc >= 75 ? '#34d399' : myAcc >= 50 ? '#fbbf24' : '#f87171' }} />
+            </div>
+          </div>
+          <div style={s.accCard}>
+            <div style={s.accPct(oppAcc)}>{oppAcc}%</div>
+            <div style={s.accLabel}>Engine</div>
+            <div style={{ ...s.accBar, width: '100%' }}>
+              <div style={{ ...s.accFill, width: `${oppAcc}%`, backgroundColor: oppAcc >= 75 ? '#34d399' : oppAcc >= 50 ? '#fbbf24' : '#f87171' }} />
+            </div>
+          </div>
         </div>
-        <button
-          onClick={() => onToggleHeatmap(!showHeatmap)}
-          style={{
-            ...styles.toggleBtn,
-            backgroundColor: showHeatmap ? 'var(--color-brand-primary)' : 'rgba(255, 255, 255, 0.08)',
-          }}
-        >
-          <div style={{
-            ...styles.toggleKnob,
-            transform: showHeatmap ? 'translateX(16px)' : 'translateX(0px)',
-          }} />
-        </button>
+      )}
+
+      {/* Evaluation Graph */}
+      <div style={s.graphCard}>
+        <div style={s.cardTitle}>Evaluation Graph</div>
+        <EvalGraph
+          gameHistory={gameHistory}
+          previewIndex={previewIndex}
+          onSelectPly={(idx) => onSelectMoveIndex(idx)}
+        />
       </div>
 
-      {/* Accuracy Comparison row */}
-      <div style={styles.accuracyContainer}>
-        {/* Player column */}
-        <div style={styles.accCol}>
-          <div style={styles.accVal}>{modeSelected === 'local' ? stats.whiteAccuracy : playerAcc}%</div>
-          <div style={styles.accLabel}>{modeSelected === 'local' ? 'White' : activeUser}</div>
-        </div>
-
-        <div style={styles.accDivider}>
-          <TrendingUp size={14} color="var(--color-text-dim)" />
-          <span style={styles.accDividerText}>Accuracy</span>
-        </div>
-
-        {/* Opponent column */}
-        <div style={styles.accCol}>
-          <div style={styles.accVal}>{modeSelected === 'local' ? stats.blackAccuracy : oppAcc}%</div>
-          <div style={styles.accLabel}>{modeSelected === 'local' ? 'Black' : (isAIMode ? 'Kronos' : 'Opponent')}</div>
-        </div>
+      {/* Move Counts */}
+      <div style={s.countsRow}>
+        {[
+          { label: 'Best', key: 'best',      color: '#34d399' },
+          { label: '!',    key: 'excellent',  color: '#6ee7b7' },
+          { label: '?!',   key: 'inaccuracy', color: '#fbbf24' },
+          { label: '?',    key: 'mistake',    color: '#f97316' },
+          { label: '??',   key: 'blunder',    color: '#f87171' },
+        ].map(cat => (
+          <div key={cat.key} style={s.countCell}>
+            <div style={{ ...s.countNum, color: cat.color }}>
+              {modeSelected !== 'simulate' ? myCounts[cat.key] : (stats.w[cat.key] + stats.b[cat.key])}
+            </div>
+            <div style={s.countLabel}>{cat.label}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Accuracy details grid list */}
-      <div style={styles.statsCard} className="panel-card">
-        <div style={styles.statsGridHeader}>
-          <span>Performance Metrics</span>
-          <span>{modeSelected === 'local' ? 'White / Black' : 'You / Engine'}</span>
-        </div>
-
-        <div style={styles.statsList}>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><Star size={11} fill="#d4af37" color="#d4af37" /> Best Moves</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.best} / ${stats.blackCounts.best}` : `${playerCounts.best} / ${oppCounts.best}`}
-            </div>
-          </div>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><CheckCircle2 size={11} color="#48bb78" /> Excellent</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.excellent} / ${stats.blackCounts.excellent}` : `${playerCounts.excellent} / ${oppCounts.excellent}`}
-            </div>
-          </div>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><CheckCircle2 size={11} color="#a0aec0" /> Good</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.good} / ${stats.blackCounts.good}` : `${playerCounts.good} / ${oppCounts.good}`}
-            </div>
-          </div>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><ShieldAlert size={11} color="#ecc94b" /> Inaccuracies</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.inaccuracy} / ${stats.blackCounts.inaccuracy}` : `${playerCounts.inaccuracy} / ${oppCounts.inaccuracy}`}
-            </div>
-          </div>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><ShieldAlert size={11} color="#ed8936" /> Mistakes</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.mistake} / ${stats.blackCounts.mistake}` : `${playerCounts.mistake} / ${oppCounts.mistake}`}
-            </div>
-          </div>
-          <div style={styles.statsRow}>
-            <div style={styles.metricLabel}><ShieldAlert size={11} color="#f56565" /> Blunders</div>
-            <div style={styles.metricVal}>
-              {modeSelected === 'local' ? `${stats.whiteCounts.blunder} / ${stats.blackCounts.blunder}` : `${playerCounts.blunder} / ${oppCounts.blunder}`}
-            </div>
+      {/* Critical Moments */}
+      <div style={s.momentsCard}>
+        <div style={s.momentsTitleRow}>
+          <span style={s.cardTitle}>Critical Moments</span>
+          <div style={s.filterRow}>
+            {[
+              { key: 'all',        label: 'All' },
+              { key: 'error',      label: '?/?' },
+              { key: 'inaccuracy', label: '?!' },
+            ].map(f => (
+              <button
+                key={f.key}
+                onClick={() => setActiveFilter(f.key)}
+                style={{
+                  ...s.filterBtn,
+                  backgroundColor: activeFilter === f.key ? 'rgba(212,175,55,0.15)' : 'transparent',
+                  color: activeFilter === f.key ? 'var(--color-brand-primary)' : 'var(--color-text-dim)',
+                  borderColor: activeFilter === f.key ? 'rgba(212,175,55,0.3)' : 'rgba(255,255,255,0.06)',
+                }}
+              >{f.label}</button>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Critical Moments list */}
-      <div style={styles.criticalCard}>
-        <div style={styles.criticalHeader}>Critical Moments ({stats.criticalMoments.length})</div>
-        <div style={styles.criticalList} className="scroll-panel">
-          {stats.criticalMoments.length > 0 ? (
-            stats.criticalMoments.map((mom, idx) => (
-              <div 
-                key={idx} 
-                onClick={() => onSelectMoveIndex(mom.ply)}
-                style={styles.criticalRow}
-              >
-                <div style={styles.critLeft}>
-                  <span style={styles.critColor}>{mom.color} played</span>
-                  <span style={styles.critMove}>{mom.san}</span>
-                </div>
-                <div style={styles.critRight}>
-                  <span style={styles.critClass(mom.type)}>{mom.classification}</span>
-                  <Eye size={12} style={styles.critEye} />
-                </div>
-              </div>
-            ))
+        <div style={s.momentsList}>
+          {filteredMoments.length === 0 ? (
+            <div style={s.emptyMoments}>
+              <CheckCircle2 size={14} style={{ opacity: 0.4 }} />
+              <span>No {activeFilter === 'all' ? 'critical' : activeFilter} moments found</span>
+            </div>
           ) : (
-            <div style={styles.emptyCritical}>A clean game! No critical blunders or mistakes detected.</div>
+            filteredMoments.slice(0, 8).map((moment, i) => {
+              const cc = classifyColor(moment.classification);
+              return (
+                <button
+                  key={i}
+                  style={{
+                    ...s.momentRow,
+                    borderLeft: `3px solid ${cc.color}`,
+                    backgroundColor: previewIndex === moment.ply ? 'rgba(212,175,55,0.06)' : 'transparent',
+                  }}
+                  onClick={() => onSelectMoveIndex(moment.ply)}
+                >
+                  <span style={{ color: 'var(--color-text-dim)', fontSize: '0.65rem', minWidth: '22px' }}>
+                    {Math.floor(moment.ply / 2) + 1}{moment.ply % 2 === 0 ? '.' : '…'}
+                  </span>
+                  <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--color-text-primary)' }}>
+                    {moment.san}
+                  </span>
+                  <span style={{ ...s.clsBadge, color: cc.color, borderColor: `${cc.color}33` }}>
+                    {cc.icon} {moment.classification}
+                  </span>
+                  <span style={{ marginLeft: 'auto', fontSize: '0.65rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>
+                    {scoreDisplay(moment.evalBefore)} → {scoreDisplay(moment.evalAfter)}
+                  </span>
+                  <ChevronRight size={11} style={{ opacity: 0.3, flexShrink: 0 }} />
+                </button>
+              );
+            })
           )}
         </div>
       </div>
 
-      <button onClick={onReset} style={styles.resetBtn} className="btn-gold">
-        <RefreshCw size={14} /> Start New Match
-      </button>
+      {/* Actions */}
+      <div style={s.actionRow}>
+        <button onClick={onReset} style={s.primaryBtn} className="btn-primary">
+          <RefreshCw size={13} />
+          New Match Setup
+        </button>
+        <button onClick={onToggleHeatmap} style={s.secondaryBtn}>
+          <Eye size={13} />
+          {showHeatmap ? 'Hide Heatmap' : 'Show Heatmap'}
+        </button>
+      </div>
 
     </div>
   );
 }
 
-const styles = {
-  reviewWrapper: {
+// ── Styles ────────────────────────────────────────────────────────────────────
+const s = {
+  root: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '10px',
     height: '100%',
-  },
-  heatmapToggleContainer: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '8px 12px',
-    backgroundColor: 'rgba(212, 175, 55, 0.03)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
-  },
-  heatmapToggleLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  heatmapToggleText: {
-    fontSize: '11px',
-    fontWeight: '700',
-    color: 'var(--color-text-secondary)',
-  },
-  toggleBtn: {
-    width: '36px',
-    height: '20px',
-    borderRadius: '10px',
-    border: 'none',
-    padding: '2px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    transition: 'background-color 0.2s ease',
-  },
-  toggleKnob: {
-    width: '16px',
-    height: '16px',
-    borderRadius: '50%',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-    transition: 'transform 0.2s ease',
+    overflowY: 'auto',
+    padding: '2px 4px 8px 0',
   },
   resultBanner: {
     display: 'flex',
     alignItems: 'center',
     gap: '10px',
-    padding: '12px 14px',
-    backgroundColor: 'rgba(212, 175, 55, 0.05)',
-    border: '1px solid rgba(212, 175, 55, 0.2)',
-    borderRadius: '4px',
+    padding: '10px 12px',
+    backgroundColor: 'rgba(212,175,55,0.06)',
+    border: '1px solid rgba(212,175,55,0.15)',
+    borderRadius: '6px',
+    flexShrink: 0,
   },
   resultText: {
-    fontSize: '13px',
-    fontWeight: '800',
-    color: 'var(--color-brand-primary)',
-  },
-  openingText: {
-    fontSize: '10px',
-    color: 'var(--color-text-secondary)',
-    marginTop: '1px',
-  },
-  accuracyContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    padding: '10px 0',
-  },
-  accCol: {
-    textAlign: 'center',
-  },
-  accVal: {
-    fontFamily: 'var(--font-display)',
-    fontSize: '28px',
-    fontWeight: '800',
-    color: 'var(--color-brand-primary)',
-  },
-  accLabel: {
-    fontSize: '11px',
-    color: 'var(--color-text-secondary)',
-    fontWeight: '600',
-    marginTop: '2px',
-  },
-  accDivider: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '2px',
-  },
-  accDividerText: {
-    fontSize: '9px',
-    color: 'var(--color-text-dim)',
-    textTransform: 'uppercase',
-    fontWeight: '700',
-    letterSpacing: '0.05em',
-  },
-  statsCard: {
-    borderRadius: '6px',
-    overflow: 'hidden',
-  },
-  statsGridHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '8px 12px',
-    backgroundColor: 'var(--color-border-subtle)',
-    fontSize: '10px',
-    fontWeight: '800',
-    color: 'var(--color-text-dim)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    borderBottom: '1px solid var(--color-border-subtle)',
-  },
-  statsList: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: '4px 0',
-  },
-  statsRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: '6px 12px',
-    fontSize: '11px',
-    borderBottom: '1px solid rgba(76, 61, 49, 0.15)',
-  },
-  metricLabel: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    color: 'var(--color-text-secondary)',
-    fontWeight: '600',
-  },
-  metricVal: {
-    fontFamily: 'monospace',
-    fontWeight: '700',
+    fontSize: '0.88rem',
+    fontWeight: 800,
     color: 'var(--color-text-primary)',
   },
-  criticalCard: {
-    backgroundColor: 'rgba(21, 16, 12, 0.4)',
-    border: '1px solid var(--color-border-subtle)',
+  openingLine: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    fontSize: '0.68rem',
+    color: 'var(--color-text-dim)',
+    marginTop: '2px',
+  },
+  newMatchBtn: {
+    marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    fontSize: '0.7rem',
+    fontWeight: 700,
+    color: 'var(--color-text-secondary)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    border: '1px solid rgba(255,255,255,0.08)',
     borderRadius: '4px',
+    padding: '4px 9px',
+    cursor: 'pointer',
+    flexShrink: 0,
+  },
+  // Idle CTA
+  analysisCta: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '8px',
+    backgroundColor: 'rgba(21,16,12,0.6)',
+    border: '1px solid rgba(212,175,55,0.12)',
+    borderRadius: '8px',
+    padding: '20px 16px',
+    textAlign: 'center',
+  },
+  ctaIcon: {
+    fontSize: '1.6rem',
+  },
+  ctaTitle: {
+    fontSize: '0.9rem',
+    fontWeight: 800,
+    color: 'var(--color-text-primary)',
+  },
+  ctaDesc: {
+    fontSize: '0.72rem',
+    color: 'var(--color-text-dim)',
+    lineHeight: 1.5,
+    maxWidth: '260px',
+  },
+  ctaInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    fontSize: '0.68rem',
+    color: 'var(--color-brand-primary)',
+    opacity: 0.8,
+  },
+  analyzeBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '7px',
+    padding: '8px 20px',
+    marginTop: '4px',
+    backgroundColor: 'var(--color-brand-primary)',
+    color: '#1c1410',
+    fontWeight: 800,
+    fontSize: '0.82rem',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    transition: 'opacity 0.15s ease',
+  },
+  quickInfo: {
+    backgroundColor: 'var(--color-bg-base)',
+    borderRadius: '6px',
+    overflow: 'hidden',
+    border: '1px solid rgba(255,255,255,0.04)',
+  },
+  quickInfoRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '7px 12px',
+    borderBottom: '1px solid rgba(255,255,255,0.03)',
+  },
+  qiLabel: { fontSize: '0.72rem', color: 'var(--color-text-dim)' },
+  qiVal:   { fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-secondary)' },
+  // Analyzing state
+  analyzingCard: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '24px 16px',
+    backgroundColor: 'rgba(21,16,12,0.6)',
+    border: '1px solid rgba(212,175,55,0.1)',
+    borderRadius: '8px',
+    textAlign: 'center',
+  },
+  analyzingTitle: { fontSize: '0.9rem', fontWeight: 700, color: 'var(--color-text-primary)' },
+  analyzingDesc:  { fontSize: '0.72rem', color: 'var(--color-text-dim)' },
+  progressTrack: {
+    width: '100%',
+    height: '5px',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: '3px',
+    overflow: 'hidden',
+    marginTop: '6px',
+  },
+  progressBar: {
+    height: '100%',
+    backgroundColor: 'var(--color-brand-primary)',
+    borderRadius: '3px',
+    transition: 'width 0.3s ease',
+  },
+  progressPct: { fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-brand-primary)' },
+  cancelBtn: {
+    marginTop: '4px',
+    fontSize: '0.72rem',
+    color: 'var(--color-text-dim)',
+    backgroundColor: 'transparent',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: '4px',
+    padding: '4px 12px',
+    cursor: 'pointer',
+  },
+  // Analysis complete
+  accRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '8px',
+  },
+  accCard: {
+    backgroundColor: 'rgba(21,16,12,0.5)',
+    border: '1px solid rgba(255,255,255,0.05)',
+    borderRadius: '6px',
+    padding: '10px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '5px',
+  },
+  accPct: (acc) => ({
+    fontSize: '1.3rem',
+    fontWeight: 800,
+    color: acc >= 75 ? '#34d399' : acc >= 50 ? '#fbbf24' : '#f87171',
+    fontFamily: 'monospace',
+  }),
+  accLabel: { fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: 600 },
+  accBar: { height: '3px', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: '2px', overflow: 'hidden' },
+  accFill: { height: '100%', borderRadius: '2px', transition: 'width 0.5s ease' },
+  graphCard: {
+    backgroundColor: 'rgba(21,16,12,0.5)',
+    border: '1px solid rgba(255,255,255,0.05)',
+    borderRadius: '6px',
     padding: '10px 12px',
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    flex: 1,
-    minHeight: '120px',
   },
-  criticalHeader: {
-    fontSize: '10px',
-    fontWeight: '800',
-    color: 'var(--color-text-dim)',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+  cardTitle: { fontSize: '0.67rem', fontWeight: 800, color: 'var(--color-text-dim)', textTransform: 'uppercase', letterSpacing: '0.06em' },
+  countsRow: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(5, 1fr)',
+    gap: '5px',
   },
-  criticalList: {
-    overflowY: 'auto',
+  countCell: {
+    textAlign: 'center',
+    backgroundColor: 'rgba(21,16,12,0.5)',
+    border: '1px solid rgba(255,255,255,0.04)',
+    borderRadius: '5px',
+    padding: '6px 4px',
+  },
+  countNum:   { fontSize: '1rem', fontWeight: 800, fontFamily: 'monospace' },
+  countLabel: { fontSize: '0.6rem', color: 'var(--color-text-dim)', fontWeight: 700, marginTop: '2px' },
+  momentsCard: {
+    backgroundColor: 'rgba(21,16,12,0.4)',
+    border: '1px solid rgba(255,255,255,0.04)',
+    borderRadius: '6px',
+    padding: '10px 12px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: '8px',
+    minHeight: 0,
   },
-  criticalRow: {
+  momentsTitleRow: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '6px 10px',
-    backgroundColor: 'var(--color-bg-base)',
+    justifyContent: 'space-between',
+  },
+  filterRow: { display: 'flex', gap: '4px' },
+  filterBtn: {
+    fontSize: '0.6rem',
+    fontWeight: 700,
+    padding: '2px 7px',
+    borderRadius: '3px',
+    border: '1px solid',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+  momentsList: { display: 'flex', flexDirection: 'column', gap: '3px' },
+  momentRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '7px',
+    padding: '6px 8px',
     borderRadius: '4px',
     cursor: 'pointer',
-    borderLeft: '2px solid transparent',
-    transition: 'all 0.15s ease',
-    ':hover': {
-      borderLeftColor: 'var(--color-brand-primary)',
-      backgroundColor: 'var(--color-bg-elevated)'
-    }
+    border: '3px solid transparent',
+    backgroundColor: 'transparent',
+    width: '100%',
+    textAlign: 'left',
+    transition: 'background-color 0.1s ease',
   },
-  critLeft: {
-    display: 'flex',
-    gap: '6px',
-    fontSize: '11px',
-    alignItems: 'center',
-  },
-  critColor: {
-    color: 'var(--color-text-dim)',
-  },
-  critMove: {
-    fontWeight: '700',
-    color: 'var(--color-text-primary)',
-  },
-  critRight: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-  },
-  critClass: (type) => ({
-    fontSize: '9px',
-    fontWeight: '800',
+  clsBadge: {
+    fontSize: '0.6rem',
+    fontWeight: 700,
     padding: '1px 5px',
     borderRadius: '3px',
-    textTransform: 'uppercase',
-    backgroundColor: type === 'blunder' ? 'rgba(245, 101, 101, 0.08)' : (type === 'mistake' ? 'rgba(237, 137, 54, 0.08)' : 'rgba(236, 201, 75, 0.08)'),
-    color: type === 'blunder' ? '#f56565' : (type === 'mistake' ? '#ed8936' : '#ecc94b'),
-  }),
-  critEye: {
-    color: 'var(--color-text-dim)',
+    border: '1px solid',
+    whiteSpace: 'nowrap',
   },
-  emptyCritical: {
-    fontSize: '11px',
+  emptyMoments: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '0.72rem',
     color: 'var(--color-text-dim)',
-    textAlign: 'center',
-    padding: '20px 0',
+    padding: '10px 0',
+    justifyContent: 'center',
   },
-  resetBtn: {
-    padding: '10px',
-    fontSize: '12px',
-    fontWeight: '700',
+  actionRow: {
+    display: 'flex',
+    gap: '8px',
+    flexShrink: 0,
+    marginTop: 'auto',
+  },
+  primaryBtn: {
+    flex: 1,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     gap: '6px',
-    marginTop: 'auto',
+    padding: '8px',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    borderRadius: '5px',
+    cursor: 'pointer',
+    border: 'none',
   },
-  loaderWrapper: {
+  secondaryBtn: {
+    flex: 1,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
-    padding: '24px',
-    gap: '14px',
-    textAlign: 'center',
-  },
-  loaderIcon: {
-    color: 'var(--color-brand-primary)',
-  },
-  loaderTitle: {
-    fontSize: '18px',
-    fontWeight: '800',
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-display)',
-    letterSpacing: '0.02em',
-  },
-  loaderSubtitle: {
-    fontSize: '12px',
-    color: 'var(--color-text-dim)',
-    maxWidth: '240px',
-    lineHeight: '1.4',
-  },
-  progressContainer: {
-    width: '100%',
-    maxWidth: '200px',
-    height: '6px',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: '3px',
-    overflow: 'hidden',
-    marginTop: '6px',
-    border: '1px solid rgba(212, 175, 55, 0.1)',
-  },
-  progressBar: (pct) => ({
-    width: `${pct}%`,
-    height: '100%',
-    backgroundColor: 'var(--color-brand-primary)',
-    backgroundImage: 'linear-gradient(90deg, #d4af37, #f39c12)',
-    borderRadius: '3px',
-    transition: 'width 0.2s ease-out',
-  }),
-  progressText: {
-    fontSize: '11px',
-    fontWeight: '700',
+    gap: '6px',
+    padding: '8px',
+    fontSize: '0.78rem',
+    fontWeight: 700,
+    borderRadius: '5px',
+    cursor: 'pointer',
+    border: '1px solid rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
     color: 'var(--color-text-secondary)',
-    fontFamily: 'monospace',
   },
-  emptyReview: {
-    padding: '40px 24px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    height: '100%',
-    color: 'var(--color-text-dim)',
-    boxSizing: 'border-box'
-  },
-  emptyTitle: {
-    fontSize: '13px',
-    fontWeight: '700',
-    color: 'var(--color-text-primary)',
-    marginBottom: '4px',
-  },
-  emptyText: {
-    fontSize: '11px',
-    color: 'var(--color-text-dim)',
-    lineHeight: '1.4',
-    maxWidth: '220px',
-  }
 };

@@ -11,10 +11,27 @@ const MVV_LVA_VALUES = [100, 200, 300, 400, 500, 600];
 // Killer moves: 2 moves per depth level
 const killerMoves = Array.from({ length: 64 }, () => [null, null]);
 
+export const historyTable = Array.from({ length: 12 }, () => Array.from({ length: 64 }, () => Array(64).fill(0)));
+
 export function clearKillerMoves() {
   for (let i = 0; i < 64; i++) {
     killerMoves[i][0] = null;
     killerMoves[i][1] = null;
+  }
+  for (let p = 0; p < 12; p++) {
+    for (let f = 0; f < 64; f++) {
+      historyTable[p][f].fill(0);
+    }
+  }
+}
+
+export function storeHistoryScore(move, depth) {
+  const pieceIdx = PIECE_INDICES[move.piece.toLowerCase()] || 0;
+  const colorOffset = move.color === 'w' ? 0 : 6;
+  const fromIdx = typeof move.from === 'number' ? ((move.from >> 4) * 8) + (move.from & 7) : (8 - parseInt(move.from[1])) * 8 + (move.from.charCodeAt(0) - 97);
+  const toIdx = typeof move.to === 'number' ? ((move.to >> 4) * 8) + (move.to & 7) : (8 - parseInt(move.to[1])) * 8 + (move.to.charCodeAt(0) - 97);
+  if (depth < 64) {
+    historyTable[pieceIdx + colorOffset][fromIdx][toIdx] += depth * depth;
   }
 }
 
@@ -68,15 +85,32 @@ function scoreMove(move, pvMove, searchDepth) {
 
   // 5. Castling / Center control or general quiet moves
   let score = 0;
-  const toCol = move.to.charCodeAt(0) - 97;
-  const toRow = parseInt(move.to[1]) - 1;
+
+  // Add history score weighting
+  const pieceIdx = PIECE_INDICES[move.piece.toLowerCase()] || 0;
+  const colorOffset = move.color === 'w' ? 0 : 6;
+  const fromIdx = typeof move.from === 'number' ? ((move.from >> 4) * 8) + (move.from & 7) : (8 - parseInt(move.from[1])) * 8 + (move.from.charCodeAt(0) - 97);
+  const toIdx = typeof move.to === 'number' ? ((move.to >> 4) * 8) + (move.to & 7) : (8 - parseInt(move.to[1])) * 8 + (move.to.charCodeAt(0) - 97);
+  const histScore = historyTable[pieceIdx + colorOffset][fromIdx][toIdx] || 0;
+  if (histScore > 0) {
+    score += Math.min(histScore, 5000); // capped under killer moves
+  }
+
+  let toCol, toRow;
+  if (typeof move.to === 'number') {
+    toCol = move.to & 7;
+    toRow = 7 - (move.to >> 4);
+  } else {
+    toCol = move.to.charCodeAt(0) - 97;
+    toRow = parseInt(move.to[1]) - 1;
+  }
   
   if (toCol >= 2 && toCol <= 5 && toRow >= 2 && toRow <= 5) {
     score += 50;
   }
 
   // Encourage castles
-  if (move.san === 'O-O' || move.san === 'O-O-O') {
+  if (move.san === 'O-O' || move.san === 'O-O-O' || (typeof move.flags === 'number' && (move.flags & 96))) {
     score += 100;
   }
 

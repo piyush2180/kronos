@@ -31,9 +31,9 @@ export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
     alpha = standPat;
   }
 
-  // 2. Generate capture-only moves
-  const moves = chess.moves({ verbose: true });
-  const captures = moves.filter(m => m.captured || m.promotion);
+  // 2. Generate capture-only moves using raw private API
+  const moves = chess._moves ? chess._moves() : chess.moves({ verbose: true });
+  const captures = moves.filter(m => m.captured || (typeof m.flags === 'number' && (m.flags & 16)));
 
   if (captures.length === 0) {
     return standPat;
@@ -44,9 +44,19 @@ export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
 
   // 4. Search captures
   for (const move of captures) {
-    chess.move(move);
+    if (chess._makeMove) {
+      chess._makeMove(move);
+    } else {
+      chess.move(move);
+    }
+
     const score = -quiescenceSearch(chess, -beta, -alpha, stats, isTimeUp);
-    chess.undo();
+
+    if (chess._undoMove) {
+      chess._undoMove();
+    } else {
+      chess.undo();
+    }
 
     if (isTimeUp()) {
       return alpha;

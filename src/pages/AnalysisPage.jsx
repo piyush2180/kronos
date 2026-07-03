@@ -10,7 +10,7 @@ import OpeningExplorer from '../components/OpeningExplorer';
 
 export default function AnalysisPage({ boardTheme, soundEnabled }) {
   const game = useChessGame('kronos_v2_analysis_state', 'analysis');
-  const [previewIndex, setPreviewIndex] = useState(null);
+  const { previewIndex, setPreviewIndex } = game;
   const [showExplorer, setShowExplorer] = useState(false);
   const [evalBarVisible, setEvalBarVisible] = useState(true);
 
@@ -115,6 +115,7 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
           timeControl={game.timeControl}
           makeMove={game.makeMove}
           premove={game.premove}
+          onPremove={game.queuePremove}
           clearPremove={game.clearPremove}
           candidateMoves={game.candidateMoves}
         />

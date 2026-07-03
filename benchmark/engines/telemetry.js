@@ -16,6 +16,7 @@ export class TelemetryCollector {
     this.alphaCutoffs = 0;
     this.firstMoveCutoffs = 0;
     this.totalMovesSearched = 0;
+    this.totalCutoffMovesSearched = 0;
     this.searchTimeMs = 0;
     this.maxDepthReached = 0;
     this.totalDepthReached = 0;
@@ -34,6 +35,7 @@ export class TelemetryCollector {
     this.alphaCutoffs += stats.alphaCutoffs || 0;
     this.firstMoveCutoffs += stats.firstMoveCutoffs || 0;
     this.totalMovesSearched += stats.totalMovesSearched || 0;
+    this.totalCutoffMovesSearched += stats.totalCutoffMovesSearched || 0;
     this.searchTimeMs += timeMs;
     this.totalDepthReached += maxDepth;
     if (maxDepth > this.maxDepthReached) {
@@ -79,6 +81,7 @@ export class TelemetryCollector {
       betaCutoffs: this.betaCutoffs,
       alphaCutoffs: this.alphaCutoffs,
       firstMoveCutoffs: this.firstMoveCutoffs,
+      totalCutoffMovesSearched: this.totalCutoffMovesSearched,
       moveOrderingEfficiency: moveOrderingEfficiency,
       searchTimeMs: this.searchTimeMs,
       avgMoveTimeMs: avgMoveTimeMs,
@@ -92,5 +95,42 @@ export class TelemetryCollector {
         heapUsed: Number((mem.heapUsed / 1024 / 1024).toFixed(2))
       }
     };
+  }
+
+  serialize() {
+    return {
+      nodesSearched: this.nodesSearched,
+      quiescenceNodes: this.quiescenceNodes,
+      transpositionHits: this.transpositionHits,
+      transpositionStores: this.transpositionStores,
+      betaCutoffs: this.betaCutoffs,
+      alphaCutoffs: this.alphaCutoffs,
+      firstMoveCutoffs: this.firstMoveCutoffs,
+      totalMovesSearched: this.totalMovesSearched,
+      totalCutoffMovesSearched: this.totalCutoffMovesSearched,
+      searchTimeMs: this.searchTimeMs,
+      maxDepthReached: this.maxDepthReached,
+      totalDepthReached: this.totalDepthReached,
+      searchCalls: this.searchCalls,
+      branchingFactorSum: this.branchingFactorSum
+    };
+  }
+
+  deserialize(data) {
+    if (!data) return;
+    this.nodesSearched = data.nodesSearched || 0;
+    this.quiescenceNodes = data.quiescenceNodes || 0;
+    this.transpositionHits = data.transpositionHits || 0;
+    this.transpositionStores = data.transpositionStores || 0;
+    this.betaCutoffs = data.betaCutoffs || 0;
+    this.alphaCutoffs = data.alphaCutoffs || 0;
+    this.firstMoveCutoffs = data.firstMoveCutoffs || 0;
+    this.totalMovesSearched = data.totalMovesSearched || 0;
+    this.totalCutoffMovesSearched = data.totalCutoffMovesSearched || 0;
+    this.searchTimeMs = data.searchTimeMs || 0;
+    this.maxDepthReached = data.maxDepthReached || 0;
+    this.totalDepthReached = data.totalDepthReached || 0;
+    this.searchCalls = data.searchCalls || 0;
+    this.branchingFactorSum = data.branchingFactorSum || 0;
   }
 }

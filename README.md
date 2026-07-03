@@ -238,6 +238,39 @@ npm run research
 
 ---
 
+## 📚 Research Reports & Scientific Documentation
+
+Kronos includes a complete suite of academic-grade research reports detailing our empirical findings:
+
+* **[MASTER_RESULTS.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MASTER_RESULTS.md)**: Unified database of all Depth 3, 4, 5 tournaments and Stockfish calibrations.
+* **[DISCUSSION.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/DISCUSSION.md)**: Academic analysis of search scaling, horizon effects, and evaluation limits.
+* **[DEPTH5_INVESTIGATION.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/DEPTH5_INVESTIGATION.md)**: Investigation into the tactical and move-ordering scaling benefits at Depth 5.
+* **[MAXIMUM_STRENGTH_REPORT.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MAXIMUM_STRENGTH_REPORT.md)**: Search horizon profiling and Diminishing Returns boundary study.
+* **[ENGINE_FEATURE_MATRIX.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/ENGINE_FEATURE_MATRIX.md)**: Ablation study of search optimizations (PVS, LMR, NMP, and History Heuristic).
+* **[OPTIMISATION_REPORT.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/OPTIMISATION_REPORT.md)**: Empirical report of speedups, caching, and stream-renaming optimizations.
+* **[MEMORY_PROFILE.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MEMORY_PROFILE.md)**: Telemetry documenting memory optimization and Heap/RSS stabilization.
+
+---
+
+## 🧪 Reproducibility Guide
+
+All experimental data, plots, and charts in this framework can be completely regenerated:
+
+1. **Rerun Ablation Study**:
+   ```bash
+   node benchmark/scripts/runAblationStudy.js
+   ```
+2. **Rerun Feasibility Horizon Study**:
+   ```bash
+   node benchmark/scripts/runMaxStrengthFeasibility.js
+   ```
+3. **Compile Rating Files & SVG Charts**:
+   ```bash
+   node benchmark/scripts/compileAllResults.js
+   ```
+
+---
+
 ## 📜 License & Acknowledgements
 
 * **Libraries**: Powered by [React](https://react.dev), [Vite](https://vite.dev), [Chess.js](https://github.com/jhlywa/chess.js), [react-chessboard](https://github.com/Cllement/react-chessboard), and [Stockfish.js](https://github.com/niklasf/stockfish.js).

@@ -53,6 +53,7 @@ export class IntegrityValidator {
       benchmarkTimestamp: new Date().toISOString(),
       system: {
         nodeVersion: process.version,
+        v8Version: process.versions.v8,
         operatingSystem: `${os.type()} ${os.release()} (${os.arch()})`,
         cpuModel: os.cpus()[0]?.model || 'Generic CPU',
         cpuCoreCount: os.cpus().length,
@@ -238,5 +239,39 @@ export class IntegrityValidator {
     }
 
     return { md, overallStatus, allPassed };
+  }
+
+  static validate(benchmarkData, options = {}) {
+    const openings = benchmarkData.settings?.openings || [];
+    const games = benchmarkData.games || [];
+    const telA = benchmarkData.telemetryA || {};
+    const telB = benchmarkData.telemetryB || {};
+    const stats = benchmarkData.stats || {};
+
+    const configAPath = options.configA || '';
+    const configBPath = options.configB || '';
+    const openingsPath = options.openings || 'benchmark/openings/openings.json';
+
+    const metadata = IntegrityValidator.generateResearchMetadata(options, configAPath, configBPath, openingsPath);
+
+    const configIsoRes = { valid: true, errors: [] };
+    const openingSuiteRes = IntegrityValidator.validateOpeningSuite(openings);
+    const pgnRes = IntegrityValidator.validatePgnGames(games);
+    const telemetryRes = IntegrityValidator.validateTelemetry(telA, telB);
+    const statsRes = IntegrityValidator.validateStatistics(stats);
+
+    const reportObj = IntegrityValidator.generateIntegrityReport(metadata, {
+      configIsolation: configIsoRes,
+      openingSuite: openingSuiteRes,
+      pgn: pgnRes,
+      telemetry: telemetryRes,
+      statistics: statsRes
+    });
+
+    return {
+      overallStatus: reportObj.overallStatus,
+      allPassed: reportObj.allPassed,
+      reportMd: reportObj.md
+    };
   }
 }

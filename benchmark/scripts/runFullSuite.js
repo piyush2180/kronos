@@ -1,9 +1,9 @@
 // Kronos Research Suite — Automated Full Experiment Suite & Ablation Runner
 // Runs Family A (Cumulative Evolution), Family B (Ablation Studies), and Calibration.
 
-import { TournamentRunner } from './tournament.js';
-import { ReportGenerator } from './reportGenerator.js';
-import { OrdoExporter } from './exportOrdo.js';
+import { TournamentRunner } from '../pipeline/tournament.js';
+import { ReportGenerator } from '../reports/reportGenerator.js';
+import { OrdoExporter } from '../reports/exportOrdo.js';
 import path from 'path';
 
 const FAMILY_A_CUMULATIVE = [

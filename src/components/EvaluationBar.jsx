@@ -65,10 +65,10 @@ export default function EvaluationBar({ score, orientation }) {
           backgroundColor: topColor,
         }} />
 
-        {/* White section (bottom) */}
+        {/* Bottom section */}
         <div style={{
           ...styles.section,
-          height: `${bottomColor === '#1c1410' ? topHeight : 100 - topHeight}%`,
+          height: `${100 - topHeight}%`,
           backgroundColor: bottomColor,
         }} />
 
@@ -110,7 +110,7 @@ const styles = {
   },
   section: {
     width: '100%',
-    transition: 'height 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+    transition: 'height 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
   },
   scoreBadge: {
     position: 'absolute',
@@ -126,7 +126,7 @@ const styles = {
     zIndex: 2,
     minWidth: '32px',
     textAlign: 'center',
-    transition: 'top 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
+    transition: 'top 0.45s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.45s cubic-bezier(0.16, 1, 0.3, 1), color 0.45s cubic-bezier(0.16, 1, 0.3, 1)',
     letterSpacing: '0.01em',
   },
 };

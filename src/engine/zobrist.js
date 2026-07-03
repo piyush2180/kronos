@@ -21,18 +21,18 @@ export const COLOR_INDICES = {
 
 // Initialize Zobrist keys table
 // 12 pieces * 64 squares
-const pieceKeys = Array.from({ length: 12 }, () => 
+export const pieceKeys = Array.from({ length: 12 }, () => 
   Array.from({ length: 64 }, () => random64())
 );
 
 // Side to move (Black to move, White is default)
-const sideKey = random64();
+export const sideKey = random64();
 
 // Castling rights (4 bits: WK, WQ, BK, BQ)
-const castlingKeys = Array.from({ length: 16 }, () => random64());
+export const castlingKeys = Array.from({ length: 16 }, () => random64());
 
 // En passant files (8 files)
-const enPassantKeys = Array.from({ length: 8 }, () => random64());
+export const enPassantKeys = Array.from({ length: 8 }, () => random64());
 
 /**
  * Returns the 0-11 index for a piece given its type and color

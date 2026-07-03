@@ -1,7 +1,7 @@
-import { TournamentRunner } from './tournament.js';
-import { PositionBenchmarkRunner } from './positionBenchmark.js';
-import { ReportGenerator } from './reportGenerator.js';
-import { OrdoExporter } from './exportOrdo.js';
+import { TournamentRunner } from '../pipeline/tournament.js';
+import { PositionBenchmarkRunner } from '../positions/positionBenchmark.js';
+import { ReportGenerator } from '../reports/reportGenerator.js';
+import { OrdoExporter } from '../reports/exportOrdo.js';
 import path from 'path';
 
 function parseArgs() {

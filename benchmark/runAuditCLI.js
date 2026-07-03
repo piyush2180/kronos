@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { runFrameworkAudit } from './verifyAudit.js';
+import { runFrameworkAudit } from './scripts/verifyAudit.js';
 
 async function main() {
   const audit = await runFrameworkAudit();
@@ -69,11 +69,14 @@ async function main() {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  // Save reports
   const frameworkReportPath = path.join(outputDir, 'FRAMEWORK_VALIDATION_REPORT.md');
   const legacyReportPath = path.resolve('benchmark/verification_report.md');
+  const rootReportPath = path.resolve('benchmark/docs/verification_report.md');
 
   fs.writeFileSync(frameworkReportPath, md);
   fs.writeFileSync(legacyReportPath, md);
+  fs.writeFileSync(rootReportPath, md);
 
   console.log(`\n==================================================`);
   console.log(`Framework Validation Report generated cleanly:`);

@@ -33,7 +33,8 @@ export default function ControlPanel({
   ecoCode = 'A00',
   onOpenExplorer,
   premoveEnabled = true,
-  setPremoveEnabled = () => {}
+  setPremoveEnabled = () => {},
+  showPV = true,
 }) {
   const [activeTab, setActiveTab] = useState('game'); // 'game' | 'engine' | 'tools'
   const [fenInput, setFenInput] = useState('');
@@ -166,11 +167,11 @@ export default function ControlPanel({
                     onChange={(e) => setDifficulty(e.target.value)}
                     style={styles.selectInput}
                   >
-                    <option value="beginner">Beginner (600 ELO)</option>
-                    <option value="casual">Casual (1000 ELO)</option>
-                    <option value="club">Club (1400 ELO)</option>
-                    <option value="advanced">Advanced (1800 ELO)</option>
-                    <option value="expert">Expert (2200 ELO)</option>
+                    <option value="beginner">Kronos D2</option>
+                    <option value="casual">Kronos D4</option>
+                    <option value="club">Kronos D5</option>
+                    <option value="advanced">⭐ Kronos D6 Flagship</option>
+                    <option value="expert">Kronos D7 Experimental</option>
                   </select>
                 </div>
               )}
@@ -280,67 +281,114 @@ export default function ControlPanel({
         {/* ENGINE TAB */}
         {currentTab === 'engine' && showEngineTab && (
           <div style={styles.tabPane} className="animate-fade-in">
-            {/* Opening details card */}
+
+            {/* Opening card */}
             <div style={styles.openingCard}>
               <div style={styles.openingHeader}>
                 <span style={styles.ecoBadge}>{ecoCode}</span>
-                <span style={styles.openingTitle}>Active Opening</span>
+                <span style={styles.openingTitle}>Opening</span>
               </div>
               <div style={styles.openingNameText}>{openingName}</div>
-              {onOpenExplorer && (
-                <button onClick={onOpenExplorer} style={styles.explorerBtn}>
-                  <span>Opening Book Explorer</span>
-                  <ExternalLink size={11} />
-                </button>
-              )}
             </div>
 
-            {/* Engine Telemetry */}
+            {/* Engine Identity + Status */}
+            <div style={styles.engineIdentityCard}>
+              <div style={styles.engineNameRow}>
+                <span style={styles.engineNameBig}>
+                  {difficulty === 'beginner' ? 'Kronos D2' :
+                   difficulty === 'casual'   ? 'Kronos D4' :
+                   difficulty === 'club'     ? 'Kronos D5' :
+                   difficulty === 'advanced' ? '⭐ Kronos D6 Flagship' :
+                                              '🔬 Kronos D7 Experimental'}
+                </span>
+                <div style={styles.statusPill(isSearching)}>
+                  <span style={styles.statusDot(isSearching)} className={isSearching ? 'active-pulse-dot' : ''} />
+                  <span>{isSearching ? 'SEARCHING' : 'IDLE'}</span>
+                </div>
+              </div>
+              <div style={styles.statusLine}>{thinkingStatus}</div>
+            </div>
+
+            {/* Telemetry Grid */}
             <div style={styles.telemetryCard}>
-              <div style={styles.telemetryHeader}>
-                <span>Engine Telemetry</span>
-                <span style={styles.searchStatusDot(isSearching)} className={isSearching ? 'active-pulse-dot' : ''} title={thinkingStatus} />
+              <div style={styles.telemetryHeader}>Live Search Statistics</div>
+              <div style={styles.telemetryGrid}>
+                <div style={styles.telItem}>
+                  <div style={styles.telVal}>
+                    {engineStats.depth > 0 ? `${engineStats.depth}` : '—'}
+                    <span style={{ fontSize: '0.6rem', opacity: 0.5, marginLeft: '2px' }}>
+                      / {difficulty === 'beginner' ? 2 : difficulty === 'casual' ? 4 : difficulty === 'club' ? 5 : difficulty === 'advanced' ? 6 : 7}
+                    </span>
+                  </div>
+                  <div style={styles.telLbl}>Depth (Ply)</div>
+                </div>
+                <div style={styles.telItem}>
+                  <div style={styles.telVal}>
+                    {engineStats.nodes > 0 ? (engineStats.nodes >= 1000000
+                      ? (engineStats.nodes / 1000000).toFixed(1) + 'M'
+                      : engineStats.nodes >= 1000
+                      ? (engineStats.nodes / 1000).toFixed(0) + 'k'
+                      : engineStats.nodes) : '—'}
+                  </div>
+                  <div style={styles.telLbl}>Nodes</div>
+                </div>
+                <div style={styles.telItem}>
+                  <div style={styles.telVal}>
+                    {engineStats.nps > 0 ? (engineStats.nps >= 1000
+                      ? (engineStats.nps / 1000).toFixed(0) + 'k'
+                      : engineStats.nps) : '—'}
+                  </div>
+                  <div style={styles.telLbl}>NPS</div>
+                </div>
+                <div style={styles.telItem}>
+                  <div style={styles.telVal}>
+                    {engineStats.nodes > 0
+                      ? (engineStats.transpositionHits / engineStats.nodes * 100).toFixed(1) + '%'
+                      : '—'}
+                  </div>
+                  <div style={styles.telLbl}>TT Hit %</div>
+                </div>
               </div>
 
-              {modeSelected === 'ai' && (
-                <div style={styles.telemetryGrid}>
-                  <div style={styles.telItem}>
-                    <div style={styles.telVal}>{engineStats.depth}</div>
-                    <div style={styles.telLbl}>Depth</div>
-                  </div>
-                  <div style={styles.telItem}>
-                    <div style={styles.telVal}>{(engineStats.nodes / 1000).toFixed(1)}k</div>
-                    <div style={styles.telLbl}>Nodes</div>
-                  </div>
-                  <div style={styles.telItem}>
-                    <div style={styles.telVal}>{(engineStats.nps / 1000).toFixed(1)}k</div>
-                    <div style={styles.telLbl}>NPS</div>
-                  </div>
-                  <div style={styles.telItem}>
-                    <div style={styles.telVal}>{engineStats.transpositionHits}</div>
-                    <div style={styles.telLbl}>Cache Hits</div>
-                  </div>
+              {/* Evaluation row */}
+              {candidateMoves[0] && (
+                <div style={styles.evalRow}>
+                  <span style={styles.evalLabel}>Evaluation</span>
+                  <span style={styles.evalValue}>
+                    {candidateMoves[0].score && !candidateMoves[0].score.includes('M')
+                      ? (parseFloat(candidateMoves[0].score) > 0 ? '+' : '') + candidateMoves[0].score
+                      : candidateMoves[0].score || '0.00'}
+                  </span>
                 </div>
               )}
 
-              {modeSelected === 'analysis' && (
-                <div style={styles.candidatesList}>
-                  {candidateMoves.length > 0 ? (
-                    candidateMoves.map((cand) => (
-                      <div key={cand.pvIdx} style={styles.candidateRow}>
-                        <div style={styles.candIndex}>pv{cand.pvIdx}</div>
-                        <div style={styles.candScore}>{cand.score}</div>
-                        <div style={styles.candLine}>{cand.line}...</div>
-                      </div>
-                    ))
-                  ) : (
-                    <div style={styles.emptyTelemetry}>
-                      {isSearching ? 'Stockfish is calculating lines...' : 'Awaiting position changes to analyze...'}
-                    </div>
-                  )}
+              {/* PV line */}
+              {candidateMoves[0]?.line && showPV && (
+                <div style={styles.pvBlock}>
+                  <div style={styles.pvLabel}>Principal Variation</div>
+                  <div style={styles.pvLine}>{candidateMoves[0].line}</div>
                 </div>
               )}
             </div>
+
+            {/* Analysis mode candidate lines */}
+            {modeSelected === 'analysis' && (
+              <div style={styles.candidatesList}>
+                {candidateMoves.length > 0 ? (
+                  candidateMoves.map((cand) => (
+                    <div key={cand.pvIdx} style={styles.candidateRow}>
+                      <div style={styles.candIndex}>pv{cand.pvIdx}</div>
+                      <div style={styles.candScore}>{cand.score}</div>
+                      <div style={styles.candLine}>{cand.line}...</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyTelemetry}>
+                    {isSearching ? 'Stockfish is calculating lines...' : 'Awaiting position changes to analyze...'}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 
@@ -632,6 +680,51 @@ const styles = {
     transition: 'all 0.2s ease',
     marginTop: '2px',
   },
+  // Engine identity card
+  engineIdentityCard: {
+    backgroundColor: 'rgba(21,16,12,0.6)',
+    border: '1px solid rgba(212,175,55,0.15)',
+    borderRadius: '6px',
+    padding: '10px 12px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  engineNameRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  engineNameBig: {
+    fontSize: '0.82rem',
+    fontWeight: 800,
+    color: 'var(--color-brand-primary)',
+  },
+  statusPill: (active) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px',
+    fontSize: '0.58rem',
+    fontWeight: 800,
+    letterSpacing: '0.06em',
+    color: active ? '#ecc94b' : 'var(--color-text-dim)',
+    backgroundColor: active ? 'rgba(236,201,75,0.08)' : 'rgba(255,255,255,0.04)',
+    padding: '2px 7px',
+    borderRadius: '10px',
+    border: `1px solid ${active ? 'rgba(236,201,75,0.2)' : 'rgba(255,255,255,0.06)'}`,
+  }),
+  statusDot: (active) => ({
+    width: '5px',
+    height: '5px',
+    borderRadius: '50%',
+    backgroundColor: active ? '#ecc94b' : '#4a5568',
+    flexShrink: 0,
+  }),
+  statusLine: {
+    fontSize: '0.7rem',
+    color: 'var(--color-text-dim)',
+    fontStyle: 'italic',
+  },
   telemetryCard: {
     backgroundColor: 'rgba(21, 16, 12, 0.4)',
     border: '1px solid var(--color-border-subtle)',
@@ -639,17 +732,14 @@ const styles = {
     padding: '12px 14px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '10px',
   },
   telemetryHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    fontSize: '10px',
+    fontSize: '9px',
     fontWeight: '800',
     color: 'var(--color-text-dim)',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
+    letterSpacing: '0.06em',
   },
   searchStatusDot: (searching) => ({
     width: '6px',
@@ -665,6 +755,9 @@ const styles = {
   },
   telItem: {
     textAlign: 'center',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    padding: '6px 4px',
+    borderRadius: '4px',
   },
   telVal: {
     fontFamily: 'monospace',
@@ -675,8 +768,51 @@ const styles = {
   telLbl: {
     fontSize: '8px',
     color: 'var(--color-text-dim)',
-    marginTop: '2px',
+    marginTop: '3px',
     textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+  },
+  evalRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '5px 8px',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: '4px',
+  },
+  evalLabel: {
+    fontSize: '0.7rem',
+    color: 'var(--color-text-dim)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.04em',
+    fontWeight: 700,
+  },
+  evalValue: {
+    fontFamily: 'monospace',
+    fontSize: '0.82rem',
+    fontWeight: 800,
+    color: 'var(--color-brand-primary)',
+  },
+  pvBlock: {
+    backgroundColor: 'var(--color-bg-base)',
+    padding: '8px 10px',
+    borderRadius: '4px',
+    border: '1px solid var(--color-border-subtle)',
+  },
+  pvLabel: {
+    fontSize: '0.62rem',
+    textTransform: 'uppercase',
+    color: 'var(--color-text-dim)',
+    fontWeight: 700,
+    marginBottom: '4px',
+    letterSpacing: '0.05em',
+  },
+  pvLine: {
+    fontFamily: 'monospace',
+    fontSize: '0.72rem',
+    color: 'var(--color-text-primary)',
+    wordBreak: 'break-all',
+    lineHeight: 1.5,
   },
   emptyTelemetry: {
     fontSize: '11px',
