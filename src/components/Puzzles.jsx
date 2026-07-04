@@ -308,36 +308,36 @@ export default function Puzzles({ boardTheme, onBack }) {
   const orientation = activePuzzle.sideToMove; // 'white' or 'black'
 
   return (
-    <div className="puzzles-wrapper animate-fade-in">
+    <div style={styles.container} className="puzzles-wrapper animate-fade-in">
       
       {/* Header bar */}
-      <div className="puzzle-header">
+      <div style={styles.header} className="puzzle-header">
         <div className="puzzle-hdr-left">
-          <button onClick={onBack} className="btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem' }}>
+          <button onClick={onBack} className="btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.75rem', borderRadius: geometry.radiusInteractive }}>
             <ArrowLeft size={13} /> Lobby
           </button>
           <div>
-            <h2 className="heading-page" style={{ color: 'var(--color-brand-primary)' }}>Tactical Puzzle Trainer</h2>
-            <p className="text-subtitle">Solve real-game tactics step-by-step.</p>
+            <h2 className="heading-page" style={{ color: 'var(--color-brand-primary)', margin: 0 }}>Tactical Puzzle Trainer</h2>
+            <p className="text-subtitle" style={{ margin: '0.1rem 0 0 0' }}>Solve real-game tactics step-by-step.</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <div className="puzzle-stat-box">
+        <div style={{ display: 'flex', gap: spacing.sm }}>
+          <div className="puzzle-stat-box" style={{ borderRadius: geometry.radiusInteractive }}>
             <Trophy size={14} color="var(--color-brand-primary)" />
             <span>Session: {sessionCount} solved</span>
           </div>
-          <div className="puzzle-stat-box">
+          <div className="puzzle-stat-box" style={{ borderRadius: geometry.radiusInteractive }}>
             <Star size={14} color="var(--color-brand-primary)" />
             <span>Total: {solvedIds.length} solved</span>
           </div>
         </div>
       </div>
 
-      <div className="puzzle-main-grid">
+      <div style={styles.splitGrid} className="puzzle-main-grid">
         
         {/* Left column: board & status */}
-        <div className="puzzle-board-col">
+        <div style={styles.boardColumn} className="puzzle-board-col">
           
           {/* Puzzle Info Header */}
           <div className="puzzle-info-bar">
@@ -418,7 +418,7 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }} className="puzzle-sidebar-column">
+        <div style={styles.sidebarColumn} className="puzzle-sidebar-column">
           
           {/* Rating Selection Grid */}
           <div className="panel-card" style={{ padding: spacing.md }}>
@@ -521,7 +521,57 @@ export default function Puzzles({ boardTheme, onBack }) {
 
         </div>
 
-        </div>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing.md,
+    width: '100%',
+    maxWidth: '1600px',
+    margin: '0 auto',
+    padding: `${spacing.lg} ${spacing.xl}`,
+    height: 'calc(100vh - 56px)',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+  },
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderBottom: '1px solid var(--color-border-subtle)',
+    paddingBottom: spacing.sm,
+    flexShrink: 0,
+  },
+  splitGrid: {
+    display: 'grid',
+    gridTemplateColumns: '60% 40%',
+    gap: spacing.xl,
+    flex: 1,
+    minHeight: 0,
+    width: '100%',
+  },
+  boardColumn: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    height: '100%',
+    minHeight: 0,
+    overflowY: 'auto',
+  },
+  sidebarColumn: {
+    height: '100%',
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: spacing.md,
+    overflow: 'hidden',
+  },
+};
+
