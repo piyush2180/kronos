@@ -70,6 +70,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
   const [selectedEngine,  setSelectedEngine]  = useState(defaultDifficulty || 'advanced');
   const [selectedColor,   setSelectedColor]   = useState('w');
   const [selectedTime,    setSelectedTime]    = useState(defaultTimeControl || '10+0');
+  const [rulesLevel,     setRulesLevel]     = useState('casual');
   const [showEvalBar,    setShowEvalBar]    = useState(true);
   const [showPV,         setShowPV]         = useState(true);
   const [premoveEnabled, setPremoveEnabled] = useState(true);
@@ -81,7 +82,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
       ? (Math.random() < 0.5 ? 'w' : 'b')
       : selectedColor;
     onStart(resolvedColor, selectedEngine, selectedTime, {
-      showEvalBar, showPV, premoveEnabled, autoAnalysis, moveHints,
+      showEvalBar, showPV, premoveEnabled, autoAnalysis, moveHints, rulesLevel,
     });
   };
 
@@ -199,6 +200,31 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
                 >
                   <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>{t.label}</span>
                   <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>{t.type}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Match Rules */}
+          <div style={s.section}>
+            <div style={s.sectionLabel}>Match Rules</div>
+            <div style={s.rulesGrid}>
+              {[
+                { value: 'casual',      label: 'Casual (Allow Undo)', symbol: '🔄' },
+                { value: 'competitive', label: 'Competitive (No Undo)', symbol: '🛡️' },
+              ].map(r => (
+                <button
+                  key={r.value}
+                  onClick={() => setRulesLevel(r.value)}
+                  style={{
+                    ...s.rulesChip,
+                    borderColor: rulesLevel === r.value ? 'var(--color-brand-primary)' : 'rgba(52,40,30,0.45)',
+                    backgroundColor: rulesLevel === r.value ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.02)',
+                    color: rulesLevel === r.value ? 'var(--color-brand-primary)' : 'var(--color-text-primary)',
+                  }}
+                >
+                  <span style={{ marginRight: '6px', fontSize: '1rem' }}>{r.symbol}</span>
+                  <span style={{ fontWeight: 600, fontSize: '0.75rem' }}>{r.label}</span>
                 </button>
               ))}
             </div>
@@ -438,6 +464,23 @@ const s = {
     alignItems: 'center',
     gap: '2px',
     padding: '7px 4px',
+    borderRadius: '6px',
+    border: '1px solid',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+
+  /* Rules grid */
+  rulesGrid: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '6px',
+  },
+  rulesChip: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '10px',
     borderRadius: '6px',
     border: '1px solid',
     cursor: 'pointer',

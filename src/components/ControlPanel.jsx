@@ -3,6 +3,7 @@
 
 import React, { useState } from 'react';
 import { Target, Shuffle, Volume2, RefreshCw, Flag, Award, Eye, Clipboard, ArrowLeft, Cpu, Sliders, FileText, ExternalLink, ShieldAlert } from 'lucide-react';
+import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 export default function ControlPanel({
   modeSelected,
@@ -158,68 +159,51 @@ export default function ControlPanel({
         {currentTab === 'game' && (
           <div style={styles.tabPane} className="animate-fade-in">
             {/* Configurations Grid */}
-            <div style={styles.configGrid}>
-              {modeSelected === 'ai' && (
-                <div style={styles.configCol}>
-                  <label style={styles.configLabel}>Engine Strength</label>
-                  <select 
-                    value={difficulty} 
-                    onChange={(e) => setDifficulty(e.target.value)}
-                    style={styles.selectInput}
-                  >
-                    <option value="beginner">Kronos D2</option>
-                    <option value="casual">Kronos D4</option>
-                    <option value="club">Kronos D5</option>
-                    <option value="advanced">⭐ Kronos D6 Flagship</option>
-                    <option value="expert">Kronos D7 Experimental</option>
-                  </select>
-                </div>
-              )}
+            {modeSelected !== 'analysis' && (
+              <div style={styles.configGrid}>
+                {modeSelected === 'ai' && (
+                  <div style={styles.configCol}>
+                    <label style={styles.configLabel}>Engine Strength</label>
+                    <div style={styles.readOnlyField}>
+                      {difficulty === 'beginner' && 'Kronos D2'}
+                      {difficulty === 'casual' && 'Kronos D4'}
+                      {difficulty === 'club' && 'Kronos D5'}
+                      {difficulty === 'advanced' && 'Kronos D6'}
+                      {difficulty === 'expert' && 'Kronos D7'}
+                    </div>
+                  </div>
+                )}
 
-              {modeSelected !== 'analysis' && (
                 <div style={styles.configCol}>
                   <label style={styles.configLabel}>Time Control</label>
-                  <select 
-                    value={timeControl} 
-                    onChange={handleTimeControlChange}
-                    style={styles.selectInput}
-                  >
-                    <option value="casual">Untimed Match</option>
-                    <option value="1+0">Bullet (1m)</option>
-                    <option value="3+0">Blitz (3m)</option>
-                    <option value="5+0">Blitz (5m)</option>
-                    <option value="10+0">Rapid (10m)</option>
-                    <option value="30+0">Classical (30m)</option>
-                  </select>
+                  <div style={styles.readOnlyField}>
+                    {timeControl === 'casual' && 'Untimed Match'}
+                    {timeControl === '1+0' && 'Bullet (1m)'}
+                    {timeControl === '3+0' && 'Blitz (3m)'}
+                    {timeControl === '5+0' && 'Blitz (5m)'}
+                    {timeControl === '10+0' && 'Rapid (10m)'}
+                    {timeControl === '30+0' && 'Classical (30m)'}
+                    {!['casual', '1+0', '3+0', '5+0', '10+0', '30+0'].includes(timeControl) && (timeControl || 'Untimed Match')}
+                  </div>
                 </div>
-              )}
 
-              <div style={styles.configCol}>
-                <label style={styles.configLabel}>Match Rules</label>
-                <select 
-                  value={rulesLevel} 
-                  onChange={(e) => setRulesLevel(e.target.value)}
-                  style={styles.selectInput}
-                >
-                  <option value="casual">Casual (Allows Undo)</option>
-                  <option value="competitive">Competitive (No Undo)</option>
-                </select>
-              </div>
-
-              {modeSelected === 'ai' && (
                 <div style={styles.configCol}>
-                  <label style={styles.configLabel}>Premove System</label>
-                  <select 
-                    value={premoveEnabled ? 'enabled' : 'disabled'} 
-                    onChange={(e) => setPremoveEnabled(e.target.value === 'enabled')}
-                    style={styles.selectInput}
-                  >
-                    <option value="enabled">Premove: Enabled</option>
-                    <option value="disabled">Premove: Disabled</option>
-                  </select>
+                  <label style={styles.configLabel}>Match Rules</label>
+                  <div style={styles.readOnlyField}>
+                    {rulesLevel === 'competitive' ? 'Competitive (No Undo)' : 'Casual (Allows Undo)'}
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {modeSelected === 'ai' && (
+                  <div style={styles.configCol}>
+                    <label style={styles.configLabel}>Premove System</label>
+                    <div style={styles.readOnlyField}>
+                      {premoveEnabled ? 'Premove: Enabled' : 'Premove: Disabled'}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Game Over Announcements */}
             {gameStatus !== 'active' && (
@@ -518,6 +502,19 @@ const styles = {
     fontSize: '11px',
     fontWeight: '600',
     outline: 'none',
+  },
+  readOnlyField: {
+    padding: '8px 10px',
+    backgroundColor: 'var(--color-bg-base)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: geometry.radiusInteractive,
+    color: 'var(--color-text-secondary)',
+    fontSize: '11px',
+    fontWeight: '700',
+    display: 'flex',
+    alignItems: 'center',
+    minHeight: '32px',
+    boxSizing: 'border-box',
   },
   gameResultBanner: {
     display: 'flex',
