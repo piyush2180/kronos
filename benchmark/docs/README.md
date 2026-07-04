@@ -1,35 +1,43 @@
-# Kronos Chess Standalone Benchmarking & Calibration Framework
+# Kronos Benchmarking & Calibration Framework
 
-A research-grade, Node.js-based benchmarking, tournament runner, and calibration framework for Kronos Chess. This framework is completely independent from the browser UI and provides reproducible datasets, SPRT testing, research telemetry, automatic SVG/CSV graph generation, and publication-ready Markdown reports.
+A Node.js-based benchmarking, tournament runner, and calibration framework for Kronos Chess. This framework runs independently from the browser UI to provide reproducible datasets, Sequential Probability Ratio Testing (SPRT), search telemetry, and report generation.
 
 ---
 
 ## Architecture Overview
 
-```
+```text
 benchmark/
-├── runner.js               # CLI runner and main entry point
-├── prng.js                 # Mulberry32 Seeded PRNG for reproducible runs
-├── engineFactory.js        # Factory layer for Kronos variants & UCI engines
-├── configurableEngine.js    # Instrumented Kronos search engine with togglable features
-├── uciAdapter.js           # Generic UCI process adapter for Stockfish, Berserk, Ethereal, etc.
-├── stockfishAdapter.js    # Specialized Stockfish calibration wrapper
-├── tournament.js           # Tournament manager (games, color alternation, opening book)
-├── sprt.js                 # Wald's Sequential Probability Ratio Test engine
-├── positionBenchmark.js    # Standalone tactical/positional search quality benchmark
-├── telemetry.js            # Metric logger (branching factor, cutoffs, TT occupancy, RAM)
-├── stats.js                # Statistical engine (Win/Loss/Draw, Elo diffs, 95% CIs)
-├── graphGenerator.js       # SVG and CSV chart generator
-├── reportGenerator.js      # Generates summary.csv, summary.json, games.pgn, report.md
-├── exportOrdo.js           # Ordo PGN helper export scripts
-├── configs/                # JSON profiles for engine search optimization toggles
-├── openings/               # Standard openings and tactical benchmark positions
-└── output/                 # Destination for generated benchmark batches and reports
+├── configs/                # JSON engine feature profiles (baseline, alphabeta, full_kronos, etc.)
+├── engines/
+│   ├── configurableEngine.js # Configurable search wrapper matching the production engine
+│   ├── engineFactory.js    # Instantiation layer for Kronos variants and UCI engines
+│   ├── prng.js             # Mulberry32 Seeded PRNG for reproducible tournaments
+│   ├── sprt.js             # Wald's Sequential Probability Ratio Test engine
+│   ├── stats.js            # Statistical calculations (Elo, variance, confidence intervals)
+│   ├── telemetry.js        # Search metrics (NPS, branching factor, cutoffs)
+│   └── uciAdapter.js       # UCI process adapter for external engines (Stockfish, etc.)
+├── openings/               # Standard openings for tournament paired suites
+├── output/                 # Destination for generated benchmark reports and PGNs
+├── pipeline/
+│   ├── pipelineManager.js  # Runs full validation tournaments and orchestrates experiments
+│   ├── researchRunner.js   # Single experiment validation runner
+│   └── tournament.js       # Head-to-head match scheduling and color-swapping logic
+├── positions/
+│   ├── positionBenchmark.js # Search quality benchmark on test positions
+│   └── positions.json      # EPD test suite of 100 tactical positions
+├── reports/
+│   ├── exportOrdo.js       # Rating calculator export helper
+│   ├── graphGenerator.js   # SVG and CSV chart exporter
+│   ├── integrityValidator. # PGN structure and legal move validator
+│   └── reportGenerator.js  # Markdown, CSV, and JSON report generator
+└── scripts/
+    └── runner.js           # CLI main entry point
 ```
 
 ---
 
-## 1. Quick Start Commands
+## Quick Start Commands
 
 Run benchmarks via `npm` or `node`:
 
@@ -40,7 +48,7 @@ npm run benchmark -- --games 20 --depth 3 --seed 42
 
 ### Run Tournament with SPRT (Sequential Testing)
 ```bash
-node benchmark/runner.js tournament --sprt --depth 3 --seed 42
+node benchmark/scripts/runner.js tournament --sprt --depth 3 --seed 42
 ```
 
 ### Run Search Quality Position Benchmark
@@ -55,52 +63,39 @@ npm run benchmark:calibrate
 
 ---
 
-## 2. Engine Search Optimization Configurations
+## Engine Configurations
 
-Search optimizations can be independently configured in `benchmark/configs/*.json` files:
+Search optimizations can be configured in `benchmark/configs/*.json`:
 
-- `baseline.json`: Naive minimax without pruning.
-- `alphabeta.json`: Minimax + Alpha-Beta pruning.
+- `baseline.json`: Negamax without pruning or sorting.
+- `alphabeta.json`: Negamax + Alpha-Beta pruning.
 - `move_ordering.json`: Alpha-Beta + MVV-LVA move sorting.
 - `killer_moves.json`: Alpha-Beta + Move Ordering + Killer Moves.
 - `transposition_table.json`: Alpha-Beta + Move Ordering + Killer Moves + Transposition Table.
-- `quiescence.json`: Alpha-Beta + Move Ordering + TT + Quiescence Search horizon extensions.
+- `quiescence.json`: Alpha-Beta + Move Ordering + TT + Quiescence Search.
 - `full_kronos.json`: All optimizations active.
 
 ---
 
-## 3. Stockfish Calibration & Difficulty Ratings
+## Stockfish Calibration
 
-To measure the playing strength of Kronos difficulty levels against Stockfish, Kronos is benchmarked at fixed search depths against Stockfish.
+To measure the playing strength of Kronos difficulty levels, Kronos is benchmarked at fixed search depths against Stockfish.
 
-Estimated rating labels derived from fixed-depth calibration:
-- **Beginner:** ~800 estimated Elo
-- **Casual:** ~1100 estimated Elo
-- **Club:** ~1500 estimated Elo
-- **Advanced:** ~1800 estimated Elo
-- **Expert:** ~2100 estimated Elo
-
----
-
-## 4. Ordo Rating Integration
-
-Ordo is an external rating tool for measuring precise engine ratings from PGN datasets.
-
-After each tournament, the framework outputs Ordo execution helper scripts in `benchmark/output/run_<timestamp>/run_ordo.sh` and `run_ordo.bat`.
-
-To run Ordo externally:
-```bash
-ordo -p benchmark/output/run_<timestamp>/games.pgn -o ordo_ratings.txt
-```
+Estimated ratings:
+- **Beginner**: ~800 Elo
+- **Casual**: ~1100 Elo
+- **Club**: ~1500 Elo
+- **Advanced**: ~1800 Elo
+- **Expert**: ~2100 Elo
 
 ---
 
-## 5. Interpreting Research Telemetry
+## Research Telemetry Metrics
 
-Generated Markdown reports (`report.md`) include deep empirical search statistics:
+Generated Markdown reports (`report.md`) include search statistics:
 
-- **Nodes Per Second (NPS):** Throughput of the search algorithm.
-- **Branching Factor ($b = N^{1/d}$):** Effective tree growth rate per depth ply.
-- **Move Ordering Efficiency (%):** Percentage of beta-cutoffs occurring on the very first evaluated move.
-- **Quiescence Percentage (%):** Proportion of search nodes spent resolving tactical captures at the search horizon.
-- **Transposition Hits:** Coded hash lookups avoiding redundant subtree evaluations.
+- **Branching Factor ($b = N^{1/d}$)**: Tree growth rate per depth ply.
+- **Move Ordering Efficiency (%)**: Percentage of beta-cutoffs occurring on the first move.
+- **Quiescence Nodes (%)**: Percentage of search nodes spent resolving tactical exchanges.
+- **Transposition Hits**: Table lookups avoiding redundant search branches.
+- **Nodes Per Second (NPS)**: Search throughput.

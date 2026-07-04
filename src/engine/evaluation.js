@@ -1,5 +1,4 @@
-// Chess Board Evaluation Function
-// Returns evaluation from White's perspective (positive = White advantage, negative = Black advantage)
+// Board evaluation from White's perspective (positive = White advantage).
 
 export const PIECE_VALUES = {
   p: 100,
@@ -94,8 +93,8 @@ const KING_END_PST = [
 ];
 
 /**
- * Detects the game phase based on the remaining non-pawn material.
- * Returns a value from 0 (opening/middlegame) to 1 (pure endgame).
+ * Evaluates the board position and returns a score in centipawns.
+ * Uses piece-square tables with a game-phase interpolation for the king PST.
  */
 export function evaluateBoard(chess) {
   const board = chess.board();
@@ -122,7 +121,7 @@ export function evaluateBoard(chess) {
       const isWhite = color === 'w';
       const sign = isWhite ? 1 : -1;
 
-      // 1. Material score
+      // Material
       const materialVal = PIECE_VALUES[type];
       score += materialVal * sign;
 
@@ -130,7 +129,7 @@ export function evaluateBoard(chess) {
         nonPawnMaterial += materialVal;
       }
 
-      // 2. Positional (PST) score
+      // Positional (PST)
       const pstRow = isWhite ? r : 7 - r;
       const pstCol = isWhite ? c : 7 - c;
 
@@ -195,7 +194,7 @@ export function evaluateBoard(chess) {
     score -= pstVal;
   }
 
-  // 3. Pawn structure evaluation
+  // Pawn structure penalties
   for (let f = 0; f < 8; f++) {
     // White doubled pawns
     if (whitePawnFiles[f] > 1) {
@@ -224,11 +223,11 @@ export function evaluateBoard(chess) {
     }
   }
 
-  // 4. Bishop Pair evaluation
+  // Bishop pair bonus
   if (whiteBishops >= 2) score += 30;
   if (blackBishops >= 2) score -= 30;
 
-  // 5. Passed Pawns evaluation
+  // Passed pawn bonus
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
       const piece = board[r][c];
@@ -264,12 +263,12 @@ export function evaluateBoard(chess) {
     }
   }
 
-  // 6. Tempo evaluation
+  // Tempo bonus for side to move
   const activeColor = chess.turn();
   if (activeColor === 'w') score += 10;
   else score -= 10;
 
-  // 7. Piece Mobility evaluation
+  // Mobility (rough proxy via legal move count)
   const movesCount = chess.moves().length;
   if (activeColor === 'w') score += movesCount;
   else score -= movesCount;

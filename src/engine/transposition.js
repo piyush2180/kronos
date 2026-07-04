@@ -1,4 +1,4 @@
-// Transposition Table for caching search results
+// Transposition table — caches search results keyed by Zobrist hash.
 
 export const TT_FLAGS = {
   EXACT: 0,
@@ -20,11 +20,7 @@ class TranspositionTable {
     this.writes = 0;
   }
 
-  /**
-   * Look up a position in the transposition table
-   * @param {bigint} key - Zobrist hash key
-   * @returns {object|null} The cached entry or null
-   */
+  /** Look up a cached position. */
   get(key) {
     const entry = this.table.get(key);
     if (entry) {
@@ -34,14 +30,7 @@ class TranspositionTable {
     return null;
   }
 
-  /**
-   * Save a position in the transposition table
-   * @param {bigint} key - Zobrist hash key
-   * @param {number} value - Position evaluation
-   * @param {number} depth - Depth searched
-   * @param {number} flag - EXACT, ALPHA, or BETA
-   * @param {object} bestMove - The best move from this position (in chess.js format)
-   */
+  /** Store a position's evaluation. Evicts the oldest entry when full. */
   set(key, value, depth, flag, bestMove) {
     if (this.table.size >= this.maxSize) {
       const firstKey = this.table.keys().next().value;

@@ -12,7 +12,7 @@ export default function AboutPage({ onBack }) {
         </button>
         <h1 style={styles.title}>About Kronos Chess</h1>
         <p style={styles.subtitle}>
-          Kronos Chess is a premium, high-performance web chess platform designed for training, analysis, and play.
+          Kronos Chess is a web-based chess engine workstation designed for play, analysis, and research.
         </p>
       </div>
 
@@ -25,7 +25,7 @@ export default function AboutPage({ onBack }) {
           </div>
           <h3 style={styles.cardTitle}>Local Minimax Engine</h3>
           <p style={styles.cardText}>
-            Play against a custom local chess engine running in a Web Worker, utilizing alpha-beta pruning, quiescence search, and transposition tables. Designed to deliver a smooth and responsive playing experience right in your browser.
+            Play against a local chess engine running in a Web Worker, featuring alpha-beta search, quiescence search, and transposition tables for off-thread calculation.
           </p>
         </div>
 
@@ -35,7 +35,7 @@ export default function AboutPage({ onBack }) {
           </div>
           <h3 style={styles.cardTitle}>Stockfish Integration</h3>
           <p style={styles.cardText}>
-            Real-time position analysis and evaluation bar powered by a main-thread loaded Stockfish web worker instance. Instantly evaluate lines, find best replies, and review your tactical accuracy after every game.
+            Real-time evaluation bar and position analysis powered by Stockfish. Analyze candidate moves and review game accuracy.
           </p>
         </div>
 
@@ -45,7 +45,7 @@ export default function AboutPage({ onBack }) {
           </div>
           <h3 style={styles.cardTitle}>Lichess Puzzles Database</h3>
           <p style={styles.cardText}>
-            Solve over 4,800+ tactical checkmate and middle-game puzzles curated from the official Lichess puzzles database, completely verified via <code>chess.js</code>. Sorted by rating bands to help sharpen your strategic vision at any level.
+            Tactical checkmate and middle-game puzzles sourced from the Lichess database, verified via <code>chess.js</code>, and sorted by difficulty bands.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function AboutPage({ onBack }) {
           </div>
           <h3 style={styles.cardTitle}>Opening Theory Explorer</h3>
           <p style={styles.cardText}>
-            Access real-time details and master strategies for 500+ standard Chess openings. View typical plans, famous experts, and explore mainline move lists interactively using the built-in mini chessboard preview.
+            Explore opening theory for standard chess lines. View typical plans, explore variation trees, and preview moves interactively.
           </p>
         </div>
       </div>

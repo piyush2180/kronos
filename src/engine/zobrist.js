@@ -1,6 +1,6 @@
-// Zobrist Hashing for Chess Board States using BigInt (64-bit)
+// Zobrist hashing — 64-bit position keys using BigInt.
 
-// Simple PRNG using a seed to make it reproducible
+// Seeded LCG for deterministic key generation
 let seed = 123456789n;
 function random64() {
   // LCG parameters
@@ -8,7 +8,7 @@ function random64() {
   return seed;
 }
 
-// Map chess.js piece representation to 0-11 index
+// Piece type to index (0-5, offset by +6 for black)
 export const PIECE_INDICES = {
   'p': 0, 'n': 1, 'b': 2, 'r': 3, 'q': 4, 'k': 5, // White
   'P': 0, 'N': 1, 'B': 2, 'R': 3, 'Q': 4, 'K': 5  // Black (we differentiate color separately)
@@ -19,8 +19,7 @@ export const COLOR_INDICES = {
   'b': 1
 };
 
-// Initialize Zobrist keys table
-// 12 pieces * 64 squares
+// Zobrist key tables: 12 pieces × 64 squares
 export const pieceKeys = Array.from({ length: 12 }, () => 
   Array.from({ length: 64 }, () => random64())
 );
@@ -34,18 +33,13 @@ export const castlingKeys = Array.from({ length: 16 }, () => random64());
 // En passant files (8 files)
 export const enPassantKeys = Array.from({ length: 8 }, () => random64());
 
-/**
- * Returns the 0-11 index for a piece given its type and color
- */
+/** Returns the piece index (0-11) for Zobrist table lookup. */
 function getPieceIndex(type, color) {
   const base = PIECE_INDICES[type];
   return color === 'w' ? base : base + 6;
 }
 
-/**
- * Generates the full 64-bit Zobrist key for the current board state.
- * @param {import('chess.js').Chess} chess - The chess.js instance
- */
+/** Computes a full Zobrist key from the current board state. */
 export function getZobristKey(chess) {
   let hash = 0n;
 

@@ -1,7 +1,14 @@
 {
-  "name": "chess",
-  "private": true,
-  "version": "0.0.0",
+  "name": "kronos-chess",
+  "version": "1.0.0",
+  "description": "A high-performance JavaScript chess engine and empirical benchmarking framework.",
+  "author": "Piyush",
+  "license": "MIT",
+  "homepage": "https://github.com/piyush2180/kronos-chess",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/piyush2180/kronos-chess.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

@@ -62,7 +62,7 @@ This generates `main.pdf`.
 
 1. All bibliographical references reside inside [references.bib](references.bib).
 2. Use verified, canonical BibTeX items only. Do not fabricate citations.
-3. Cite references in your sections using the standard standard cite command:
+3. Cite references in your sections using the standard cite command:
    ```latex
    \cite{knuth1975analysis}
    ```

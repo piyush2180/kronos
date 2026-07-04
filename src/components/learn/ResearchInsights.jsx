@@ -7,26 +7,26 @@ export default function ResearchInsights() {
     {
       title: 'Late Move Reductions (LMR) & Search Space Compression',
       icon: Zap,
-      whyItWorks: 'LMR operates on the premise that moves sorted late in the node list (quiet quiet lines) are highly unlikely to be the best move. By searching them at a reduced depth (e.g. depth - 2), we avoid full-ply sub-tree evaluations. If a reduced move scores above alpha, it is immediately re-searched at full depth. Under our benchmarks, LMR reduced nodes searched by up to 80% with zero degradation in tactical decision quality.',
-      impact: 'High speedup, substantial Elo gains (+180 Elo).'
+      whyItWorks: 'LMR operates on the premise that moves sorted late in the node list (quiet lines) are unlikely to be the best move. Searching these moves at a reduced depth avoids full-ply subtree evaluations. If a reduced move scores above alpha, it is re-searched at full depth. In our benchmarks, LMR reduced searched nodes by up to 80% with minimal degradation in tactical decision quality.',
+      impact: 'Reduces node count, substantial Elo gains (+180 Elo).'
     },
     {
       title: 'Null Move Pruning (NMP) & Domination Cutoffs',
       icon: Lightbulb,
-      whyItWorks: 'NMP gives the opponent a free turn (a "null move") during evaluation. If they pass their turn and we are still able to secure a score above beta, our position is so overwhelmingly strong that the opponent is forced to play a different move earlier. We can prune the entire node subtree. NMP speeds up middle-games but must be disabled in endgames to avoid Zugzwang blunders.',
+      whyItWorks: 'NMP executes a null move, passing the turn to the opponent. If the search still returns a score above beta, the position is strong enough that the opponent would have avoided this branch earlier, allowing us to prune the subtree. NMP improves midgame pruning efficiency but must be disabled in endgames to prevent Zugzwang blunders.',
       impact: 'Midgame pruning efficiency, solid Elo gains (+70 Elo).'
     },
     {
       title: 'Quiescence Search & Horizon Stability',
       icon: ShieldCheck,
-      whyItWorks: 'Static evaluations only score a snapshot of the board. If search stops in the middle of a queen trade, a static eval might falsely claim a +9 advantage because it doesn\'t see the opponent capturing back on the next ply (the Horizon Effect). Quiescence search extends the evaluation on capture and check lines until the board position becomes peaceful ("quiet"). under SPRT tournaments, this stabilization yielded massive rating gains (+95 Elo).',
-      impact: 'Eliminates horizon blunder spikes, vital stability.'
+      whyItWorks: 'Static evaluation is a snapshot and can fail during exchanges, leading to the horizon effect. Quiescence search extends the evaluation along capture and check lines until the position stabilizes, ensuring the search doesn’t stop mid-exchange.',
+      impact: 'Reduces horizon blunder spikes, vital stability.'
     },
     {
       title: 'Garbage Collection Mitigation in Managed Runtimes',
       icon: Settings,
-      whyItWorks: 'In standard JS development, temporary object instantiations (like cloning board configurations or coordinates) are common. However, inside recursive search paths visiting millions of nodes, this generates severe heap bloat, triggering V8 GC sweeps that freeze execution threads. Kronos mitigates this by applying direct in-place board state mutations, pre-allocated lookup buffers, and size-bounded transposition caches to achieve GC-neutral searches.',
-      impact: 'Flattened heap allocations, eliminates engine lag stutters.'
+      whyItWorks: 'Creating temporary objects (like cloning board configurations) is common in JS but causes heavy heap allocation when run millions of times in a search loop. This triggers V8 garbage collection sweeps that block the execution thread. Kronos uses in-place mutations, pre-allocated lookup buffers, and size-bounded transposition tables to achieve GC-neutral searches.',
+      impact: 'Stabilizes heap allocations, eliminates engine lag stutters.'
     }
   ];
 

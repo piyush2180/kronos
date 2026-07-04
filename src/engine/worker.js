@@ -1,5 +1,4 @@
-// Chess AI Web Worker
-// Performs deep minimax search in a background thread to prevent UI freezing.
+// Web Worker entry point for background chess search.
 
 import { Chess } from 'chess.js';
 import { startSearch } from './minimax.js';

@@ -1,4 +1,4 @@
-// Minimax Search with Alpha-Beta Pruning, Iterative Deepening, and Transposition Tables
+// Negamax search with alpha-beta, PVS, LMR, NMP, and iterative deepening.
 
 import { Chess } from 'chess.js';
 import { evaluateBoard } from './evaluation.js';
@@ -185,9 +185,7 @@ function getNextZobristKey(chess, currentKey, move, prevEpFile, prevCastlingInde
   return { newKey, newEpFile, newCastling };
 }
 
-/**
- * Minimax algorithm with Alpha-Beta pruning (Negamax formulation)
- */
+/** Negamax search with alpha-beta pruning. */
 function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activeCastlingIndex) {
   searchStats.nodesSearched++;
 
@@ -215,12 +213,12 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
     if (bRights.q) activeCastlingIndex |= 8;
   }
 
-  // 1. Check for draws or repetitions
+  // Draws / repetitions
   if (ply > 0 && (chess.isDraw() || chess.isThreefoldRepetition() || chess.isInsufficientMaterial())) {
     return 0;
   }
 
-  // 2. Mate/Stalemate check
+  // Terminal positions
   if (chess.isGameOver()) {
     if (chess.isCheckmate()) {
       return -MATE_SCORE + ply; // Favor faster checkmate
@@ -228,12 +226,12 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
     return 0;
   }
 
-  // 3. Quiescence search at depth 0
+  // Leaf node — hand off to quiescence search
   if (depth <= 0) {
     return quiescenceSearch(chess, alpha, beta, searchStats, isTimeUp);
   }
 
-  // 4. Transposition Table lookup (no board clones or FEN generation!)
+  // TT probe (uses incremental Zobrist key, no FEN or board clones)
   const ttEntry = SEARCH_OPTIONS.tt ? tt.get(zobristKey) : null;
   let ttMove = null;
 
@@ -277,7 +275,7 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
     }
   }
 
-  // 5. Generate and order moves using raw private API
+  // Move generation and ordering
   const moves = chess._moves();
   if (moves.length === 0) {
     if (chess.inCheck()) {
@@ -295,7 +293,7 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
   let bestScore = -INFINITY;
   let moveIndex = 0;
 
-  // 6. Search moves
+  // Main search loop
   for (const move of moves) {
     const { newKey, newEpFile, newCastling } = getNextZobristKey(chess, zobristKey, move, activeEpFile, activeCastlingIndex);
 
@@ -357,7 +355,7 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
     }
   }
 
-  // 7. Store results in Transposition Table
+  // Store in TT
   const flag = alpha > oldAlpha ? TT_FLAGS.EXACT : TT_FLAGS.ALPHA;
   let scoreToStore = alpha;
   if (scoreToStore > MATE_SCORE - 100) scoreToStore += ply;
@@ -481,7 +479,8 @@ export function startSearch(chess, maxDepth, timeLimitMs, onIterationComplete) {
 }
 
 /**
- * Minimal chess.js wrapper/clone to avoid dependency import issues inside Worker
+ * Thin wrapper around chess.js to expose private _moves/_makeMove/_undoMove
+ * methods through a consistent interface for the search tree.
  */
 class ChessInstanceClone {
   constructor(chess) {

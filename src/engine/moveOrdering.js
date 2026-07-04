@@ -1,5 +1,4 @@
-// Move Ordering for Alpha-Beta Pruning
-// Orders moves to maximize search pruning (alpha-beta cutoffs)
+// Move ordering for alpha-beta search. Higher-scoring moves are searched first.
 
 import { PIECE_INDICES } from './zobrist.js';
 
@@ -48,12 +47,7 @@ function isSameMove(m1, m2) {
   return m1.from === m2.from && m1.to === m2.to && m1.promotion === m2.promotion;
 }
 
-/**
- * Score a single move for sorting. Higher score = search first.
- * @param {object} move - chess.js move object
- * @param {object|null} pvMove - The best move from the transposition table or PV
- * @param {number} searchDepth - The current depth in minimax
- */
+/** Score a move for sorting. Higher = searched first. */
 function scoreMove(move, pvMove, searchDepth) {
   // 1. Principal Variation / Transposition Table move is absolute priority
   if (pvMove && isSameMove(move, pvMove)) {
@@ -117,12 +111,7 @@ function scoreMove(move, pvMove, searchDepth) {
   return score;
 }
 
-/**
- * Sorts an array of moves in place
- * @param {object[]} moves - Legal moves array
- * @param {object|null} pvMove - Best move from TT
- * @param {number} depth - Search depth
- */
+/** Sort moves in-place by their assigned scores. */
 export function orderMoves(moves, pvMove, depth) {
   return moves.sort((a, b) => scoreMove(b, pvMove, depth) - scoreMove(a, pvMove, depth));
 }

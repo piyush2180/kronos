@@ -1,17 +1,10 @@
-// Quiescence Search
-// Searches capture-only sequences to ensure static evaluation is stable (no hanging pieces)
+// Quiescence search — extends the search along capture sequences at leaf nodes
+// to avoid evaluating positions in the middle of tactical exchanges.
 
 import { evaluateBoard } from './evaluation.js';
 import { orderMoves } from './moveOrdering.js';
 
-/**
- * Quiescence search loop
- * @param {import('chess.js').Chess} chess - The chess.js instance
- * @param {number} alpha - Lower bound
- * @param {number} beta - Upper bound
- * @param {object} stats - Search performance statistics tracking node counts
- * @param {function} isTimeUp - Check if time limit exceeded
- */
+/** Search only capture moves until the position is quiet. */
 export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
   stats.quiescenceNodes++;
 
@@ -19,7 +12,7 @@ export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
     return alpha;
   }
 
-  // 1. Stand Pat: static evaluation serves as the lower bound
+  // Stand pat: if static eval beats beta, prune this branch
   const turn = chess.turn();
   const isWhite = turn === 'w';
   const standPat = evaluateBoard(chess) * (isWhite ? 1 : -1);
@@ -31,7 +24,7 @@ export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
     alpha = standPat;
   }
 
-  // 2. Generate capture-only moves using raw private API
+  // Generate capture-only moves
   const moves = chess._moves ? chess._moves() : chess.moves({ verbose: true });
   const captures = moves.filter(m => m.captured || (typeof m.flags === 'number' && (m.flags & 16)));
 
@@ -39,10 +32,10 @@ export function quiescenceSearch(chess, alpha, beta, stats, isTimeUp) {
     return standPat;
   }
 
-  // 3. Order the captures (MVV-LVA)
+  // Order captures (MVV-LVA)
   orderMoves(captures, null, 0);
 
-  // 4. Search captures
+  // Search each capture
   for (const move of captures) {
     if (chess._makeMove) {
       chess._makeMove(move);
