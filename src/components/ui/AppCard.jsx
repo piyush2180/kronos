@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors } from '../../theme/designTokens';
+import { colors, spacing, geometry } from '../../theme/designTokens';
 
 export default function AppCard({ children, variant = 'primary', style = {}, className = '', onClick }) {
   const getVariantStyles = () => {
@@ -8,23 +8,23 @@ export default function AppCard({ children, variant = 'primary', style = {}, cla
         return {
           backgroundColor: colors.bgSurface,
           border: `1px solid ${colors.borderSubtle}`,
-          borderRadius: '6px',
-          padding: '1rem',
+          borderRadius: geometry.radiusCard,
+          padding: spacing.lg,
         };
       case 'flat':
         return {
           backgroundColor: colors.bgBase,
           border: '1px solid transparent',
-          borderRadius: '6px',
-          padding: '0.75rem 1rem',
+          borderRadius: geometry.radiusCard,
+          padding: `${spacing.md} ${spacing.lg}`,
         };
       case 'primary':
       default:
         return {
           backgroundColor: colors.bgSurface,
           border: `1px solid ${colors.borderSubtle}`,
-          borderRadius: '8px',
-          padding: '1.25rem',
+          borderRadius: geometry.radiusCard,
+          padding: spacing.xl,
           boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
         };
     }

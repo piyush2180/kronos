@@ -8,6 +8,7 @@ import ControlPanel from '../components/ControlPanel';
 import MoveHistory from '../components/MoveHistory';
 import PostGameReview from '../components/PostGameReview';
 import { PlayCircle, Users } from 'lucide-react';
+import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 // ── Lobby Setup Screen ────────────────────────────────────────────────────────
 function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
@@ -43,7 +44,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
         <div style={lobby.configPanel} className="card-primary">
           <div style={lobby.configHeader}>
             <div>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#d4af37', textTransform: 'capitalize' }}>Local multiplayer match setup</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: colors.goldAccent, textTransform: 'capitalize' }}>Local multiplayer match setup</span>
               <h2 style={{ fontSize: '1.35rem', fontWeight: '700', color: 'var(--color-text-primary)', margin: '0.1rem 0' }}>Pass & Play Configuration</h2>
             </div>
           </div>
@@ -54,12 +55,12 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
               <div style={lobby.sectionLabel}>Matchup Overview</div>
               <div style={lobby.playersRow}>
                 <div style={lobby.playerChip}>
-                  <span style={{ fontSize: '1.2rem', color: '#f0e8d0' }}>♔</span>
+                  <span style={{ fontSize: '1.2rem', color: colors.textPrimary }}>♔</span>
                   <span style={{ fontWeight: '600', fontSize: '0.8rem' }}>Player 1 (White)</span>
                 </div>
                 <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--color-text-dim)' }}>vs</span>
                 <div style={lobby.playerChip}>
-                  <span style={{ fontSize: '1.2rem', color: '#9e8a7a' }}>♚</span>
+                  <span style={{ fontSize: '1.2rem', color: colors.textSecondary }}>♚</span>
                   <span style={{ fontWeight: '600', fontSize: '0.8rem' }}>Player 2 (Black)</span>
                 </div>
               </div>
@@ -75,8 +76,8 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
                     onClick={() => setSelectedTime(t.value)}
                     style={{
                       ...lobby.chipBtn,
-                      backgroundColor: selectedTime === t.value ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-base)',
-                      borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'rgba(52, 40, 30, 0.4)',
+                      backgroundColor: selectedTime === t.value ? 'rgba(200, 159, 61, 0.15)' : 'var(--color-bg-base)',
+                      borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)',
                       color: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
                     }}
                   >
@@ -88,7 +89,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             </div>
 
             {/* Match Rules & Specs */}
-            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: '0.75rem', borderRadius: '6px', fontSize: '0.75rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: `${spacing.sm} ${spacing.md}`, borderRadius: geometry.radiusInteractive, fontSize: '0.75rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
               <span style={{ fontWeight: '600', color: 'var(--color-text-secondary)' }}>Match rules</span>
               <span>Two players sharing one device • Board auto-flips orientation after each completed turn</span>
             </div>
@@ -96,7 +97,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
 
           {/* Start Button Fixed at Bottom */}
           <div style={lobby.fixedFooter}>
-            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '0.9rem' }}>
+            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: spacing.md, fontSize: '0.9rem', borderRadius: geometry.radiusInteractive }}>
               <PlayCircle size={16} />
               <span>Start Game</span>
             </button>
@@ -331,26 +332,26 @@ const lobby = {
     flexDirection: 'column',
     height: '100%',
     boxSizing: 'border-box',
-    padding: '1.25rem',
-    gap: '1.25rem',
+    padding: spacing.xl,
+    gap: spacing.xl,
     overflow: 'hidden'
   },
   configHeader: {
-    paddingBottom: '0.75rem',
-    borderBottom: '1px solid rgba(52, 40, 30, 0.4)'
+    paddingBottom: spacing.sm,
+    borderBottom: '1px solid var(--color-border-subtle)'
   },
   scrollBody: {
     flex: 1,
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.25rem',
+    gap: spacing.xl,
     paddingRight: '0.2rem'
   },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.5rem'
+    gap: spacing.xs
   },
   sectionLabel: {
     fontSize: '0.7rem',
@@ -361,28 +362,28 @@ const lobby = {
   playersRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.6rem'
+    gap: spacing.sm
   },
   playerChip: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.5rem',
-    padding: '0.6rem 0.85rem',
+    gap: spacing.sm,
+    padding: `${spacing.sm} ${spacing.md}`,
     backgroundColor: 'var(--color-bg-base)',
-    border: '1px solid rgba(52, 40, 30, 0.4)',
-    borderRadius: '6px',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: geometry.radiusCard,
     flex: 1
   },
   chipRow: {
     display: 'flex',
     flexWrap: 'wrap',
-    gap: '0.4rem'
+    gap: spacing.xs
   },
   chipBtn: {
-    padding: '0.4rem 0.75rem',
+    padding: `${spacing.xs} ${spacing.md}`,
     fontSize: '0.78rem',
     fontWeight: '600',
-    borderRadius: '4px',
+    borderRadius: geometry.radiusInteractive,
     border: '1px solid',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
@@ -390,8 +391,8 @@ const lobby = {
     alignItems: 'center'
   },
   fixedFooter: {
-    paddingTop: '0.75rem',
-    borderTop: '1px solid rgba(52, 40, 30, 0.4)',
+    paddingTop: spacing.md,
+    borderTop: '1px solid var(--color-border-subtle)',
     marginTop: 'auto'
   }
 };
@@ -400,13 +401,13 @@ const lobby = {
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '58% 42%',
-    gap: '1.5rem',
+    gridTemplateColumns: '60% 40%',
+    gap: spacing.xl,
     height: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: '1.25rem 1.5rem',
+    padding: `${spacing.lg} ${spacing.xl}`,
     boxSizing: 'border-box'
   },
   boardColumn: {
@@ -426,7 +427,7 @@ const styles = {
   sidebarWrapper: {
     flex: 1,
     minHeight: 0,
-    padding: '14px',
+    padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
@@ -438,7 +439,7 @@ const styles = {
   historyDivider: {
     height: '1px',
     backgroundColor: 'var(--color-border-subtle)',
-    margin: '10px 0',
+    margin: `${spacing.md} 0`,
     flexShrink: 0
   },
   historySection: {

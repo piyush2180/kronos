@@ -3,6 +3,7 @@ import {
   Activity, Archive, TrendingUp, Target, ShieldCheck, 
   BookOpen, Play, FileText, ArrowLeft 
 } from 'lucide-react';
+import { colors, spacing, geometry, typography } from '../../theme/designTokens';
 
 export default function ResearchSidebar({ activeView, setActiveView, onExit, isTablet = false }) {
   const coreItems = [
@@ -20,9 +21,9 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
   ];
 
   const renderNavGroup = (title, items) => (
-    <div style={{ marginBottom: '1.25rem' }}>
+    <div style={{ marginBottom: spacing.xl }}>
       {!isTablet && (
-        <div style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-text-dim)', padding: '0 0.85rem 0.4rem 0.85rem', textTransform: 'capitalize' }}>
+        <div style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-text-dim)', padding: `0 ${spacing.lg} ${spacing.xs} ${spacing.lg}`, textTransform: 'capitalize' }}>
           {title}
         </div>
       )}
@@ -37,13 +38,13 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: isTablet ? 'center' : 'flex-start',
-                gap: isTablet ? '0' : '0.75rem',
-                padding: isTablet ? '0.6rem 0' : '0.55rem 0.85rem',
-                borderRadius: '4px',
-                backgroundColor: isActive ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
+                gap: isTablet ? '0' : spacing.md,
+                padding: isTablet ? `${spacing.sm} 0` : `${spacing.sm} ${spacing.lg}`,
+                borderRadius: geometry.radiusInteractive,
+                backgroundColor: isActive ? 'rgba(200, 159, 61, 0.08)' : 'transparent',
                 color: isActive ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
                 border: 'none',
-                borderLeft: !isTablet && isActive ? '3px solid #d4af37' : '3px solid transparent',
+                borderLeft: !isTablet && isActive ? `3px solid ${colors.goldAccent}` : '3px solid transparent',
                 fontSize: '0.825rem',
                 fontWeight: isActive ? 600 : 400,
                 cursor: 'pointer',
@@ -54,7 +55,7 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
               onClick={() => setActiveView(item.id)}
               title={isTablet ? item.label : ''}
             >
-              <Icon size={16} color={isActive ? '#d4af37' : '#7a6a5f'} />
+              <Icon size={16} color={isActive ? colors.goldAccent : '#7a6a5f'} />
               {!isTablet && <span>{item.label}</span>}
             </button>
           );
@@ -67,7 +68,7 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
     <aside style={{
       ...styles.sidebar,
       width: isTablet ? '64px' : '240px',
-      padding: isTablet ? '1rem 0.25rem' : '1.25rem 0.5rem'
+      padding: isTablet ? `${spacing.lg} ${spacing.xs}` : `${spacing.xl} ${spacing.sm}`
     }}>
       <div>
         {!isTablet && (
@@ -88,7 +89,7 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
           style={{
             ...styles.exitBtn,
             justifyContent: isTablet ? 'center' : 'flex-start',
-            padding: isTablet ? '0.55rem 0' : '0.55rem 0.75rem'
+            padding: isTablet ? `${spacing.sm} 0` : `${spacing.sm} ${spacing.md}`
           }} 
           onClick={onExit}
           title={isTablet ? "Exit workstation" : ""}
@@ -104,46 +105,46 @@ export default function ResearchSidebar({ activeView, setActiveView, onExit, isT
 const styles = {
   sidebar: {
     width: '240px',
-    backgroundColor: 'var(--color-bg-surface, #1e1712)',
-    borderRight: '1px solid rgba(52, 40, 30, 0.5)',
+    backgroundColor: colors.bgSurface,
+    borderRight: `1px solid ${colors.borderSubtle}`,
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
-    padding: '1.25rem 0.5rem',
+    padding: `${spacing.xl} ${spacing.sm}`,
     userSelect: 'none'
   },
   brandSection: {
-    padding: '0 0.85rem 1.25rem 0.85rem',
-    marginBottom: '1rem',
-    borderBottom: '1px solid rgba(52, 40, 30, 0.4)'
+    padding: `0 ${spacing.lg} ${spacing.xl} ${spacing.lg}`,
+    marginBottom: spacing.lg,
+    borderBottom: `1px solid ${colors.borderSubtle}`
   },
   brandTag: {
     fontSize: '0.68rem',
     fontWeight: 600,
-    color: '#d4af37'
+    color: colors.goldAccent
   },
   brandTitle: {
     fontSize: '1.1rem',
     fontWeight: 700,
-    color: 'var(--color-text-primary, #fffff0)',
+    color: colors.textPrimary,
     margin: '0.2rem 0 0 0'
   },
   footerSection: {
-    paddingTop: '0.75rem',
-    paddingLeft: '0.25rem',
-    paddingRight: '0.25rem',
-    borderTop: '1px solid rgba(52, 40, 30, 0.4)'
+    paddingTop: spacing.md,
+    paddingLeft: spacing.xs,
+    paddingRight: spacing.xs,
+    borderTop: `1px solid ${colors.borderSubtle}`
   },
   exitBtn: {
     width: '100%',
     display: 'flex',
     alignItems: 'center',
-    gap: '0.6rem',
+    gap: spacing.sm,
     backgroundColor: 'transparent',
     color: 'var(--color-text-secondary)',
     border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
-    padding: '0.55rem 0.75rem',
+    borderRadius: geometry.radiusInteractive,
+    padding: `${spacing.sm} ${spacing.md}`,
     fontSize: '0.8rem',
     fontWeight: 500,
     cursor: 'pointer',

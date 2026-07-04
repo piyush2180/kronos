@@ -1,5 +1,3 @@
-// Kronos Chess V2 — Play vs Engine Page
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useChessGame } from '../hooks/useChessGame';
 import ChessBoard from '../components/ChessBoard';
@@ -7,6 +5,7 @@ import ControlPanel from '../components/ControlPanel';
 import MoveHistory from '../components/MoveHistory';
 import PostGameReview from '../components/PostGameReview';
 import MatchSetupPage from '../components/MatchSetupPage';
+import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function PlayPage({ username, boardTheme, soundEnabled }) {
@@ -233,13 +232,13 @@ export default function PlayPage({ username, boardTheme, soundEnabled }) {
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '58% 42%',
-    gap: '1.5rem',
+    gridTemplateColumns: '60% 40%',
+    gap: spacing.xl,
     height: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: '1.25rem 1.5rem',
+    padding: `${spacing.lg} ${spacing.xl}`,
     boxSizing: 'border-box',
   },
   boardColumn: {
@@ -259,7 +258,7 @@ const styles = {
   sidebarWrapper: {
     flex: 1,
     minHeight: 0,
-    padding: '14px',
+    padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
@@ -269,7 +268,7 @@ const styles = {
   historyDivider: {
     height: '1px',
     backgroundColor: 'var(--color-border-subtle)',
-    margin: '10px 0',
+    margin: `${spacing.md} 0`,
     flexShrink: 0,
   },
   historySection: {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors } from '../../theme/designTokens';
+import { colors, spacing, geometry } from '../../theme/designTokens';
 
 export default function Badge({ children, variant = 'info', style = {} }) {
   const getVariantStyles = () => {
@@ -43,9 +43,9 @@ export default function Badge({ children, variant = 'info', style = {} }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.3rem',
-        padding: '0.2rem 0.55rem',
-        borderRadius: '4px',
+        gap: spacing.xs,
+        padding: `${spacing.xs} ${spacing.sm}`,
+        borderRadius: geometry.radiusBadge,
         fontSize: '0.7rem',
         fontWeight: 600,
         ...getVariantStyles(),

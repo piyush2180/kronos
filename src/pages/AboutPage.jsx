@@ -1,5 +1,6 @@
 import React from 'react';
 import { Target, Eye, Lightbulb, BookOpen, ChevronLeft } from 'lucide-react';
+import { colors, spacing, geometry } from '../theme/designTokens';
 
 export default function AboutPage({ onBack }) {
   return (
@@ -19,8 +20,8 @@ export default function AboutPage({ onBack }) {
 
       <div style={styles.grid}>
         <div style={styles.card} className="panel-card">
-          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(212,175,55,0.08)', borderColor: 'rgba(212,175,55,0.2)' }}>
-            <Target size={24} color="#d4af37" />
+          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(200, 159, 61, 0.08)', borderColor: 'rgba(200, 159, 61, 0.2)' }}>
+            <Target size={24} color={colors.goldAccent} />
           </div>
           <h3 style={styles.cardTitle}>Local Minimax Engine</h3>
           <p style={styles.cardText}>
@@ -29,8 +30,8 @@ export default function AboutPage({ onBack }) {
         </div>
 
         <div style={styles.card} className="panel-card">
-          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(90,159,212,0.08)', borderColor: 'rgba(90,159,212,0.2)' }}>
-            <Eye size={24} color="#5a9fd4" />
+          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(75, 175, 122, 0.08)', borderColor: 'rgba(75, 175, 122, 0.2)' }}>
+            <Eye size={24} color={colors.success} />
           </div>
           <h3 style={styles.cardTitle}>Stockfish Integration</h3>
           <p style={styles.cardText}>
@@ -39,8 +40,8 @@ export default function AboutPage({ onBack }) {
         </div>
 
         <div style={styles.card} className="panel-card">
-          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(246,173,85,0.08)', borderColor: 'rgba(246,173,85,0.2)' }}>
-            <Lightbulb size={24} color="#f6ad55" />
+          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(201, 138, 57, 0.08)', borderColor: 'rgba(201, 138, 57, 0.2)' }}>
+            <Lightbulb size={24} color={colors.warning} />
           </div>
           <h3 style={styles.cardTitle}>Lichess Puzzles Database</h3>
           <p style={styles.cardText}>
@@ -49,8 +50,8 @@ export default function AboutPage({ onBack }) {
         </div>
 
         <div style={styles.card} className="panel-card">
-          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(252,129,129,0.08)', borderColor: 'rgba(252,129,129,0.2)' }}>
-            <BookOpen size={24} color="#fc8181" />
+          <div style={{ ...styles.iconContainer, backgroundColor: 'rgba(196, 93, 93, 0.08)', borderColor: 'rgba(196, 93, 93, 0.2)' }}>
+            <BookOpen size={24} color={colors.danger} />
           </div>
           <h3 style={styles.cardTitle}>Opening Theory Explorer</h3>
           <p style={styles.cardText}>
@@ -66,27 +67,27 @@ const styles = {
   container: {
     maxWidth: '900px',
     margin: '0 auto',
-    padding: '32px 24px',
+    padding: `${spacing.xxl} ${spacing.xl}`,
     display: 'flex',
     flexDirection: 'column',
-    gap: '24px',
+    gap: spacing.xl,
   },
   header: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    gap: '12px',
+    gap: spacing.md,
   },
   backBtn: {
     display: 'flex',
     alignItems: 'center',
-    gap: '6px',
-    padding: '6px 12px',
+    gap: spacing.xs,
+    padding: `${spacing.sm} ${spacing.md}`,
     fontSize: '12px',
     fontWeight: '700',
     backgroundColor: 'var(--color-bg-elevated)',
     border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
+    borderRadius: geometry.radiusInteractive,
     color: 'var(--color-text-secondary)',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
@@ -97,7 +98,7 @@ const styles = {
     color: 'var(--color-brand-primary)',
     fontFamily: 'var(--font-display)',
     letterSpacing: '0.02em',
-    marginTop: '8px',
+    marginTop: spacing.sm,
   },
   subtitle: {
     fontSize: '14px',
@@ -113,16 +114,16 @@ const styles = {
   grid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-    gap: '20px',
-    marginTop: '8px',
+    gap: spacing.xl,
+    marginTop: spacing.sm,
   },
   card: {
-    padding: '24px',
-    borderRadius: '8px',
+    padding: spacing.xl,
+    borderRadius: geometry.radiusCard,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    gap: '12px',
+    gap: spacing.md,
     backgroundColor: 'rgba(21, 16, 12, 0.25)',
     border: '1px solid var(--color-border-subtle)',
     boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
@@ -130,7 +131,7 @@ const styles = {
   iconContainer: {
     width: '44px',
     height: '44px',
-    borderRadius: '8px',
+    borderRadius: geometry.radiusCard,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

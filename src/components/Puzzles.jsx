@@ -9,6 +9,7 @@ import {
   ArrowLeft, Trophy, Star, Filter, RotateCcw, Lightbulb, CheckCircle2, ChevronRight, Play, Eye
 } from 'lucide-react';
 import { playChessSound } from '../utils/sound';
+import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 const BOARD_THEME_COLORS = {
   walnut: { dark: '#b58863', light: '#f0d9b5' },
@@ -373,7 +374,7 @@ export default function Puzzles({ boardTheme, onBack }) {
 
           {/* Status Displays */}
           {status !== 'idle' && (
-            <div style={{ width: '100%', maxWidth: '520px', padding: '8px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: '600', border: '1px solid', backgroundColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(72, 187, 120, 0.08)', borderColor: status === 'wrong' ? 'rgba(239, 68, 68, 0.25)' : 'rgba(72, 187, 120, 0.25)', color: status === 'wrong' ? '#fc8181' : '#68d391' }}>
+            <div style={{ width: '100%', maxWidth: '520px', padding: `${spacing.sm} ${spacing.md}`, borderRadius: geometry.radiusInteractive, fontSize: '0.8rem', fontWeight: '600', border: '1px solid', backgroundColor: status === 'wrong' ? 'rgba(196, 93, 93, 0.08)' : 'rgba(75, 175, 122, 0.08)', borderColor: status === 'wrong' ? 'rgba(196, 93, 93, 0.25)' : 'rgba(75, 175, 122, 0.25)', color: status === 'wrong' ? colors.danger : colors.success }}>
               {status === 'correct_partial' && 'Correct move! Keep calculating...'}
               {status === 'correct_complete' && 'Brilliant! Tactics solved successfully!'}
               {status === 'wrong' && 'Incorrect. Review the position and try again.'}
@@ -382,20 +383,20 @@ export default function Puzzles({ boardTheme, onBack }) {
           )}
 
           {showHintMsg && (
-            <div style={{ width: '100%', maxWidth: '520px', padding: '8px 12px', backgroundColor: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.15)', borderRadius: '4px', fontSize: '0.8rem', color: 'var(--color-brand-primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '100%', maxWidth: '520px', padding: `${spacing.sm} ${spacing.md}`, backgroundColor: 'rgba(200, 159, 61, 0.05)', border: '1px solid rgba(200, 159, 61, 0.15)', borderRadius: geometry.radiusInteractive, fontSize: '0.8rem', color: 'var(--color-brand-primary)', display: 'flex', alignItems: 'center', gap: spacing.sm }}>
               <Lightbulb size={14} />
               <span>{activePuzzle.hint}</span>
             </div>
           )}
 
           {/* Actions Row */}
-          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', gap: '6px' }}>
-            <button onClick={handleReset} style={{ flex: 1, height: '34px' }} className="btn-secondary">
+          <div style={{ width: '100%', maxWidth: '520px', display: 'flex', gap: spacing.xs }}>
+            <button onClick={handleReset} style={{ flex: 1, height: '34px', borderRadius: geometry.radiusInteractive }} className="btn-secondary">
               <RotateCcw size={12} /> Reset
             </button>
             <button 
               onClick={handleHint} 
-              style={{ flex: 1, height: '34px' }} 
+              style={{ flex: 1, height: '34px', borderRadius: geometry.radiusInteractive }} 
               className="btn-secondary"
               disabled={hintsUsed >= 2 || status === 'revealed' || status === 'correct_complete'}
             >
@@ -403,13 +404,13 @@ export default function Puzzles({ boardTheme, onBack }) {
             </button>
             <button 
               onClick={handleReveal} 
-              style={{ flex: 1, height: '34px' }} 
+              style={{ flex: 1, height: '34px', borderRadius: geometry.radiusInteractive }} 
               className="btn-secondary"
               disabled={status === 'revealed' || status === 'correct_complete'}
             >
               <Eye size={12} /> Solution
             </button>
-            <button onClick={handleNext} style={{ flex: 1.5, height: '34px' }} className="btn-primary">
+            <button onClick={handleNext} style={{ flex: 1.5, height: '34px', borderRadius: geometry.radiusInteractive }} className="btn-primary">
               Next <ChevronRight size={13} />
             </button>
           </div>
@@ -417,11 +418,11 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }} className="puzzle-sidebar-column">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }} className="puzzle-sidebar-column">
           
           {/* Rating Selection Grid */}
-          <div className="panel-card" style={{ padding: '12px' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Trophy size={11} /> Select Rating Band</div>
+          <div className="panel-card" style={{ padding: spacing.md }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs, display: 'flex', alignItems: 'center', gap: '5px' }}><Trophy size={11} /> Select Rating Band</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
               {RATING_BANDS.map(band => (
                 <button
@@ -432,9 +433,9 @@ export default function Puzzles({ boardTheme, onBack }) {
                     fontSize: '0.72rem',
                     fontWeight: '600',
                     border: '1px solid',
-                    borderRadius: '4px',
+                    borderRadius: geometry.radiusInteractive,
                     cursor: 'pointer',
-                    backgroundColor: selectedRange === band.label ? 'rgba(212, 175, 55, 0.12)' : 'var(--color-bg-base)',
+                    backgroundColor: selectedRange === band.label ? 'rgba(200, 159, 61, 0.12)' : 'var(--color-bg-base)',
                     borderColor: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
                     color: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
                   }}
@@ -446,13 +447,13 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Theme Dropdown */}
-          <div className="panel-card" style={{ padding: '12px' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Filter size={11} /> Filter by Theme</div>
+          <div className="panel-card" style={{ padding: spacing.md }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs, display: 'flex', alignItems: 'center', gap: '5px' }}><Filter size={11} /> Filter by Theme</div>
             <select
               value={selectedTheme}
               onChange={(e) => setSelectedTheme(e.target.value)}
               className="select-field"
-              style={{ width: '100%' }}
+              style={{ width: '100%', borderRadius: geometry.radiusInteractive }}
             >
               {availableThemes.map(theme => (
                 <option key={theme} value={theme}>{theme}</option>
@@ -461,8 +462,8 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Puzzle List Bank */}
-          <div className="panel-card" style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', padding: '12px' }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Puzzle Bank ({filteredPuzzles.length})</div>
+          <div className="panel-card" style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', padding: spacing.md }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs }}>Puzzle Bank ({filteredPuzzles.length})</div>
             <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px' }} className="scroll-panel">
               {paginatedPuzzles.map((p, idx) => {
                 const isSolved = solvedIds.includes(p.id);
@@ -476,11 +477,12 @@ export default function Puzzles({ boardTheme, onBack }) {
                     style={{
                       backgroundColor: isCurrent ? 'var(--color-bg-elevated)' : 'transparent',
                       borderLeft: isCurrent ? '3px solid var(--color-brand-primary)' : '3px solid transparent',
-                      color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
+                      color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                      borderRadius: geometry.radiusInteractive
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
-                      {isSolved ? <CheckCircle2 size={13} color="#48bb78" /> : <Play size={10} color="var(--color-text-dim)" />}
+                      {isSolved ? <CheckCircle2 size={13} color={colors.success} /> : <Play size={10} color="var(--color-text-dim)" />}
                       <span style={{ fontSize: '0.78rem', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Puzzle #{p.id}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '6px' }}>

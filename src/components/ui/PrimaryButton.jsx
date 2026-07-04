@@ -1,5 +1,5 @@
 import React from 'react';
-import { colors } from '../../theme/designTokens';
+import { colors, spacing, geometry, typography } from '../../theme/designTokens';
 
 export default function PrimaryButton({ children, onClick, style = {}, className = '', disabled = false }) {
   return (
@@ -9,16 +9,16 @@ export default function PrimaryButton({ children, onClick, style = {}, className
       className={`btn-primary ${className}`}
       style={{
         backgroundColor: colors.goldAccent,
-        color: '#15100c',
+        color: colors.bgBase,
         border: 'none',
-        borderRadius: '5px',
-        padding: '0.55rem 1rem',
-        fontSize: '0.825rem',
+        borderRadius: geometry.radiusInteractive,
+        padding: `${spacing.sm} ${spacing.lg}`,
+        fontSize: typography.caption,
         fontWeight: 600,
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'inline-flex',
         alignItems: 'center',
-        gap: '0.4rem',
+        gap: spacing.xs,
         opacity: disabled ? 0.6 : 1,
         transition: 'all 0.18s ease',
         ...style,

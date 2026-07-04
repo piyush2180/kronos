@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Plus } from 'lucide-react';
 import EmptyState from './EmptyState';
+import { colors, spacing, geometry, typography } from '../../theme/designTokens';
 
-const SUCCESS_COLOR = '#34d399';
-const INFO_COLOR = '#60a5fa';
+const SUCCESS_COLOR = colors.success;
+const INFO_COLOR = colors.goldAccent;
 
 export default function DashboardView({ experiments = [], onNavigate, onInspect }) {
   if (experiments.length === 0) {
@@ -16,36 +17,36 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
   const branchingFactor = latest.telemetryA?.branchingFactor || 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }} className="animate-fade-in">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xl }} className="animate-fade-in">
       {/* 1. Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: spacing.sm }}>
         <div>
-          <span style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-brand-primary)', textTransform: 'capitalize' }}>Kronos engine lab</span>
+          <span style={{ fontSize: '0.68rem', fontWeight: '600', color: colors.goldAccent, textTransform: 'capitalize' }}>Kronos engine lab</span>
           <h2 className="heading-page" style={{ margin: '0.2rem 0' }}>Research dashboard</h2>
           <p className="text-subtitle">Empirical research telemetry and active engine calibration metrics.</p>
         </div>
-        <button className="btn-primary" onClick={() => onNavigate('runner')}>
+        <button className="btn-primary" onClick={() => onNavigate('runner')} style={{ borderRadius: geometry.radiusInteractive }}>
           <Plus size={15} />
           <span>New benchmark</span>
         </button>
       </div>
 
       {/* 2. Engineering Status Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', backgroundColor: 'var(--color-bg-surface)', padding: '0.5rem 1rem', borderRadius: '6px', fontSize: '0.78rem', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: 'var(--color-bg-elevated)' }}>
-          <span style={{ color: 'var(--color-text-dim)' }}>Branch</span>
-          <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{latest.repositoryBranch || 'main'}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, backgroundColor: colors.bgSurface, padding: `${spacing.sm} ${spacing.lg}`, borderRadius: geometry.radiusInteractive, fontSize: '0.78rem', flexWrap: 'wrap', border: `1px solid ${colors.borderSubtle}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+          <span style={{ color: colors.textMuted }}>Branch</span>
+          <span style={{ fontWeight: '600', color: colors.textPrimary }}>{latest.repositoryBranch || 'main'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: 'var(--color-bg-elevated)' }}>
-          <span style={{ color: 'var(--color-text-dim)' }}>Commit</span>
-          <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{latest.gitCommitHash ? latest.gitCommitHash.substring(0, 7) : 'HEAD'}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+          <span style={{ color: colors.textMuted }}>Commit</span>
+          <span style={{ fontWeight: '600', color: colors.textPrimary }}>{latest.gitCommitHash ? latest.gitCommitHash.substring(0, 7) : 'HEAD'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: 'var(--color-bg-elevated)' }}>
-          <span style={{ color: 'var(--color-text-dim)' }}>Datasets</span>
-          <span style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{experiments.length} Loaded</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+          <span style={{ color: colors.textMuted }}>Datasets</span>
+          <span style={{ fontWeight: '600', color: colors.textPrimary }}>{experiments.length} Loaded</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.2rem 0.5rem', borderRadius: '4px', backgroundColor: 'rgba(52, 211, 153, 0.08)', border: '1px solid rgba(52, 211, 153, 0.2)' }}>
-          <span style={{ color: 'var(--color-text-dim)' }}>Integrity</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(75, 175, 122, 0.08)', border: `1px solid rgba(75, 175, 122, 0.2)` }}>
+          <span style={{ color: colors.textMuted }}>Integrity</span>
           <span style={{ color: SUCCESS_COLOR, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             <ShieldCheck size={13} /> {latest.certification || 'Verified'}
           </span>
@@ -53,40 +54,40 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
       </div>
 
       {/* 3. Live Telemetry Stream */}
-      <div className="card-secondary" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div className="card-secondary" style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, padding: spacing.lg, borderRadius: geometry.radiusCard, border: `1px solid ${colors.borderSubtle}` }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
             <span className="active-pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: SUCCESS_COLOR, boxShadow: `0 0 8px ${SUCCESS_COLOR}`, display: 'inline-block' }} />
-            <span style={{ fontSize: '0.78rem', fontWeight: '600', color: 'var(--color-text-primary)' }}>Empirical engine telemetry monitor</span>
+            <span style={{ fontSize: '0.78rem', fontWeight: '600', color: colors.textPrimary }}>Empirical engine telemetry monitor</span>
           </div>
-          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-dim)' }}>Latest dataset: {latest.name}</span>
+          <span style={{ fontSize: '0.72rem', color: colors.textMuted }}>Latest dataset: {latest.name}</span>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>Branching factor</span>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: spacing.lg }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
+            <span style={{ fontSize: '0.7rem', color: colors.textMuted }}>Branching factor</span>
             <span style={{ fontSize: '1.15rem', fontWeight: '700', color: INFO_COLOR }}>{branchingFactor}</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>Nodes evaluated</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
+            <span style={{ fontSize: '0.7rem', color: colors.textMuted }}>Nodes evaluated</span>
             <span style={{ fontSize: '1.15rem', fontWeight: '700', color: SUCCESS_COLOR }}>{nodes.toLocaleString()}</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>NPS (Nodes/Sec)</span>
-            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: 'var(--color-text-primary)' }}>{nps.toLocaleString()}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
+            <span style={{ fontSize: '0.7rem', color: colors.textMuted }}>NPS (Nodes/Sec)</span>
+            <span style={{ fontSize: '1.15rem', fontWeight: '700', color: colors.textPrimary }}>{nps.toLocaleString()}</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-dim)' }}>Active tournament</span>
-            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: 'var(--color-brand-primary)' }}>{latest.engineA} vs {latest.engineB}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
+            <span style={{ fontSize: '0.7rem', color: colors.textMuted }}>Active tournament</span>
+            <span style={{ fontSize: '0.9rem', fontWeight: '600', color: colors.goldAccent }}>{latest.engineA} vs {latest.engineB}</span>
           </div>
         </div>
       </div>
 
       {/* 4. Recent Experiments Section */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.md }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 className="heading-section">Recent experiment packages</h3>
@@ -97,7 +98,7 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
           </button>
         </div>
 
-        <div className="card-primary" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="card-primary" style={{ padding: 0, overflow: 'hidden', borderRadius: geometry.radiusCard, border: `1px solid ${colors.borderSubtle}` }}>
           <table className="table-research">
             <thead>
               <tr>

@@ -7,6 +7,7 @@ import ChessBoard from '../components/ChessBoard';
 import ControlPanel from '../components/ControlPanel';
 import MoveHistory from '../components/MoveHistory';
 import OpeningExplorer from '../components/OpeningExplorer';
+import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 export default function AnalysisPage({ boardTheme, soundEnabled }) {
   const game = useChessGame('kronos_v2_analysis_state', 'analysis');
@@ -187,13 +188,13 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '70% 30%',
-    gap: '12px',
+    gridTemplateColumns: '60% 40%',
+    gap: spacing.xl,
     height: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: '12px 16px',
+    padding: `${spacing.lg} ${spacing.xl}`,
     position: 'relative',
     boxSizing: 'border-box',
   },
@@ -215,7 +216,7 @@ const styles = {
   sidebarWrapper: {
     flex: 1,
     minHeight: 0,
-    padding: '14px',
+    padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
     overflow: 'hidden',
@@ -228,7 +229,7 @@ const styles = {
   historyDivider: {
     height: '1px',
     backgroundColor: 'var(--color-border-subtle)',
-    margin: '10px 0',
+    margin: `${spacing.md} 0`,
     flexShrink: 0,
   },
   historySection: {

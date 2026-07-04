@@ -1,12 +1,13 @@
 import React from 'react';
 import { ShieldCheck, Cpu, ArrowRight, Lock, Terminal, CheckCircle2 } from 'lucide-react';
+import { colors, spacing, geometry, typography } from '../../theme/designTokens';
 
 export default function AccessScreen({ onEnter }) {
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.card} className="panel-card">
         <div style={styles.headerBadge}>
-          <Lock size={14} color="#d4af37" />
+          <Lock size={14} color={colors.goldAccent} />
           <span>RESTRICTED ACCESS WORKSPACE</span>
         </div>
         
@@ -39,7 +40,7 @@ export default function AccessScreen({ onEnter }) {
         </div>
 
         <div style={styles.disclaimerBox}>
-          <Terminal size={14} color="#a67c52" />
+          <Terminal size={14} color={colors.textSecondary} />
           <span>This workstation contains telemetry tools, SPRT verification routines, and raw empirical dataset inspectors.</span>
         </div>
 
@@ -60,16 +61,16 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '2rem',
-    backgroundColor: 'var(--color-bg-base, #120e0a)'
+    padding: spacing.xxl,
+    backgroundColor: colors.bgBase
   },
   card: {
     width: '100%',
     maxWidth: '540px',
-    backgroundColor: 'var(--color-bg-surface, #221a14)',
-    border: '1px solid var(--color-border-default, #4c3d31)',
-    borderRadius: '12px',
-    padding: '2.5rem',
+    backgroundColor: colors.bgSurface,
+    border: `1px solid ${colors.borderDefault}`,
+    borderRadius: geometry.radiusCard,
+    padding: spacing.xl,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -79,60 +80,60 @@ const styles = {
   headerBadge: {
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '0.4rem',
-    backgroundColor: 'rgba(212, 175, 55, 0.1)',
-    color: '#d4af37',
-    border: '1px solid rgba(212, 175, 55, 0.3)',
+    gap: spacing.xs,
+    backgroundColor: 'rgba(200, 159, 61, 0.1)',
+    color: colors.goldAccent,
+    border: '1px solid rgba(200, 159, 61, 0.3)',
     borderRadius: '20px',
     padding: '0.3rem 0.8rem',
     fontSize: '0.7rem',
     fontWeight: 700,
     letterSpacing: '0.05em',
-    marginBottom: '1.5rem'
+    marginBottom: spacing.xl
   },
   title: {
-    fontSize: '2rem',
+    fontSize: typography.titlePage,
     fontWeight: 800,
-    color: 'var(--color-text-primary, #fffff0)',
+    color: colors.textPrimary,
     margin: '0 0 0.5rem 0'
   },
   subtitle: {
-    fontSize: '0.9rem',
-    color: 'var(--color-text-secondary, #bdaea4)',
+    fontSize: typography.body,
+    color: colors.textSecondary,
     lineHeight: 1.5,
-    marginBottom: '2rem'
+    marginBottom: spacing.xl
   },
   statusGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
-    gap: '1rem',
+    gap: spacing.lg,
     width: '100%',
-    marginBottom: '1.5rem'
+    marginBottom: spacing.xl
   },
   statusItem: {
-    backgroundColor: 'var(--color-bg-base, #15100c)',
-    border: '1px solid var(--color-border-subtle, #34281e)',
-    borderRadius: '8px',
-    padding: '0.85rem',
+    backgroundColor: colors.bgBase,
+    border: `1px solid ${colors.borderSubtle}`,
+    borderRadius: geometry.radiusCard,
+    padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start'
   },
   statusLabel: {
     fontSize: '0.7rem',
-    color: 'var(--color-text-dim, #7a6a5f)',
+    color: colors.textMuted,
     fontWeight: 600,
     marginBottom: '0.25rem'
   },
   statusValue: {
     fontSize: '0.85rem',
     fontWeight: 700,
-    color: 'var(--color-text-primary, #fffff0)'
+    color: colors.textPrimary
   },
   statusValueSuccess: {
     fontSize: '0.85rem',
     fontWeight: 700,
-    color: '#34D399',
+    color: colors.success,
     display: 'flex',
     alignItems: 'center',
     gap: '0.3rem'
@@ -140,30 +141,30 @@ const styles = {
   disclaimerBox: {
     display: 'flex',
     alignItems: 'center',
-    gap: '0.6rem',
-    backgroundColor: 'rgba(166, 124, 82, 0.08)',
-    border: '1px solid rgba(166, 124, 82, 0.2)',
-    borderRadius: '6px',
-    padding: '0.75rem 1rem',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(141, 131, 122, 0.08)',
+    border: '1px solid rgba(141, 131, 122, 0.2)',
+    borderRadius: geometry.radiusInteractive,
+    padding: `${spacing.md} ${spacing.lg}`,
     fontSize: '0.75rem',
-    color: 'var(--color-text-secondary, #bdaea4)',
+    color: colors.textSecondary,
     textAlign: 'left',
-    marginBottom: '2rem'
+    marginBottom: spacing.xl
   },
   enterBtn: {
     width: '100%',
-    backgroundColor: 'var(--color-brand-primary, #d4af37)',
-    color: '#15100c',
+    backgroundColor: colors.goldAccent,
+    color: colors.bgBase,
     border: 'none',
-    borderRadius: '8px',
-    padding: '0.9rem',
-    fontSize: '0.9rem',
+    borderRadius: geometry.radiusInteractive,
+    padding: spacing.md,
+    fontSize: typography.body,
     fontWeight: 700,
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '0.5rem',
+    gap: spacing.sm,
     transition: 'all 0.2s ease'
   }
 };

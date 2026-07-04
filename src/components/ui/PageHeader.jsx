@@ -1,16 +1,16 @@
 import React from 'react';
-import { colors } from '../../theme/designTokens';
+import { colors, spacing, typography } from '../../theme/designTokens';
 
 export default function PageHeader({ title, subtitle, actions, category, style = {} }) {
   return (
     <div
       style={{
         display: 'flex',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         alignItems: 'flex-start',
         borderBottom: `1px solid ${colors.borderSubtle}`,
-        paddingBottom: '0.85rem',
-        marginBottom: '1.25rem',
+        paddingBottom: spacing.lg,
+        marginBottom: spacing.xl,
         width: '100%',
         ...style,
       }}
@@ -31,7 +31,7 @@ export default function PageHeader({ title, subtitle, actions, category, style =
         )}
       </div>
       {actions && (
-        <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: spacing.sm, alignItems: 'center' }}>
           {actions}
         </div>
       )}
