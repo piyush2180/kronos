@@ -2,12 +2,13 @@
 \centering
 \caption[Memory Telemetry Profile across Configurations]{Memory telemetry profile across experimental runs. Max TT Size represents the peak active transposition table entry utilization during matches, rather than the static 500,000 entry memory allocation ceiling.}
 \label{tab:memory_profile}
+\begin{minipage}{\textwidth}
 \begin{tabularx}{\textwidth}{Xrrrr}
 \toprule
 \textbf{Experimental Run} & \textbf{RSS (MB)} & \textbf{Heap Total (MB)} & \textbf{Heap Used (MB)} & \textbf{Max TT Size} \\
 \midrule
 \multicolumn{5}{l}{\textit{Unoptimized / Early Configurations}} \\
-test\_det\_run         & 73.86  & 44.26  & 19.48   & -- \\
+test\_det\_run\footnote{Deterministic validation run used to verify search correctness prior to optimization; no transposition table was active.}         & 73.86  & 44.26  & 19.48   & -- \\
 EXP-3-Killer           & 119.66 & 61.76  & 31.06   & -- \\
 EXP-5-TT               & 2,739.87 & 1,410.77 & 1,354.82 & 199,999 \\
 EXP-6-Iterative        & 3,403.27 & 3,344.53 & 3,261.80 & 199,999 \\
@@ -18,6 +19,7 @@ EXP-6-Iterative        & 3,403.27 & 3,344.53 & 3,261.80 & 199,999 \\
 \textbf{CALIB-D6-SF3}  & \textbf{124.20}  & \textbf{65.51}   & \textbf{32.85}   & \textbf{5,611} \\
 \bottomrule
 \end{tabularx}
+\end{minipage}
 \end{table}
 
 

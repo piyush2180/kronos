@@ -260,7 +260,7 @@ function minimax(chess, depth, ply, alpha, beta, zobristKey, activeEpFile, activ
   }
 
   // Null Move Pruning (NMP)
-  if (SEARCH_OPTIONS.nmp && depth >= 3 && !chess.inCheck() && ply > 0 && hasNonPawnPieces(chess)) {
+  if (SEARCH_OPTIONS.nmp && depth >= 5 && !chess.inCheck() && ply > 0 && hasNonPawnPieces(chess)) {
     // Toggle turn directly on the chess.js instance (preserving history stack)
     chess.chess._turn = chess.chess._turn === 'w' ? 'b' : 'w';
     const prevEp = chess.chess._epSquare;

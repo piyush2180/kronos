@@ -12,7 +12,7 @@ $checkpoint \leftarrow \text{LoadCheckpoint()}$\;
 }
 \While{$N < M$}{
     $fen \leftarrow F[N / 2]$\;
-    \If{$N \pmod 2 == 0$}{
+    \If{$N \bmod 2 == 0$}{
         $result \leftarrow \text{PlayGame}(\text{Config A as White}, \text{Config B as Black}, fen)$\;
     }
     \Else{

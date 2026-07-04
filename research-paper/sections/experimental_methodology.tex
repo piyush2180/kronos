@@ -6,7 +6,9 @@ This chapter details the experimental design, benchmarking framework, and statis
 \section{Automated Tournament Scheduler}
 The benchmarking suite runs tournaments using a Node.js script managed by our \texttt{TournamentRunner}. The scheduler supports paired opening match execution. For each match, the engine variants play two games using a shared opening FEN: once with Engine A playing White, and once with Engine A playing Black. This paired arrangement isolates playing strength evaluations from opening book advantages (such as the standard first-move advantage of White). 
 
-To accelerate tournament execution, the framework supports parallel worker threads. However, this concurrency represents a systems-level trade-off. Although the host hardware has 12 logical processors, each V8 engine process is memory-intensive. To prevent physical memory exhaustion, we imposed a hard limit of three concurrent worker threads. Running more than three instances of the search core concurrently results in V8 heap paging, causing RSS to exceed physical memory bounds and introducing garbage collection (GC) sweeps that distort search speedup measurements. Capping concurrency at three workers (referred to as Cap 3) ensures that all active processes run entirely in active physical memory, preserving CPU cache locality and maintaining measurement stability.
+To accelerate tournament execution, the framework supports parallel worker threads. However, this concurrency represents a systems-level trade-off. Although the host hardware has 12 logical processors, each V8 engine process exhibits significant untracked memory growth outside the managed heap. The measured peak RSS for a single Depth~6 tournament worker is 1,713\,MB (Table~\ref{tab:memory_profile}), despite V8 reporting only 445\,MB of active heap usage---a 3.5$\times$ ratio. This gap is attributable to V8 JIT-compiled code segments, external array buffers, \texttt{chess.js} internal string and object allocations that escape V8 heap accounting, and Node.js worker thread overhead. Critically, this untracked RSS growth is cumulative over tournament execution (hundreds of games) and does not release predictably.
+
+While the nominal aggregate RSS of three workers (approximately 5.1\,GB) appears well within the 16\,GB physical memory budget, empirical testing revealed that launching a fourth concurrent worker triggered V8 heap paging and GC sweep distortion. We attribute this to the cumulative untracked memory growth compounding across workers: at four workers, the combined untracked allocations (JIT caches, external buffers, and OS-level per-thread overhead) exceeded available physical memory after sustained tournament execution, despite V8's managed heap remaining within bounds. Capping concurrency at three workers (referred to as Cap~3) was the empirically determined threshold that prevented measurement distortion across full tournament runs.
 
 
 \input{algorithms/tournament_scheduler}
@@ -21,11 +23,7 @@ To ensure that engine matches reflect correct chess logic, the runner monitors g
 \input{figures/validation_pipeline}
 
 \section{Statistical Heuristics and Formulas}
-We compute tournament ratings and confidence intervals using the Bradley-Terry logistic model. The probability $P_A$ that player A defeats player B is defined in terms of their respective ratings $R_A$ and $R_B$:
-
-\input{equations/win_probability}
-
-The expected score $E_A$ and rating updates are computed using standard formulas:
+We compute tournament ratings and confidence intervals using the Bradley-Terry logistic model. The expected score $E_A$ (representing the probability of player A defeating player B, plus half the probability of a draw) and the rating updates are computed using standard formulas:
 
 \input{equations/elo_computation}
 
@@ -60,7 +58,7 @@ To ensure clarity and consistency in our evaluation, we define the primary quant
     \item \textbf{Node Reduction (\%):} The percentage of search tree size compression achieved by enabling a search heuristic, defined as $(N_{\text{disabled}} - N_{\text{baseline}}) / N_{\text{disabled}} \times 100\%$, where $N_{\text{disabled}}$ is the number of visited nodes with the heuristic deactivated, and $N_{\text{baseline}}$ is the number of visited nodes with the heuristic active.
     \item \textbf{Speedup:} The ratio of search execution speed (based on time elapsed per search) of a disabled variant compared to the active baseline variant ($T_{\text{disabled}} / T_{\text{baseline}}$).
     \item \textbf{Effective Branching Factor (EBF):} The geometric mean number of branches expanded per ply, calculated as $b = N^{1/d}$ for search nodes $N$ at depth $d$.
-    \item \textbf{External Calibration Offset (Elo):} The measured playing strength difference obtained by benchmarking the final Kronos engine (Depth 6) against fixed-depth reference configurations of Stockfish 18.
+    \item \textbf{Relative Depth-Limited Matchup Differential (Elo):} The measured playing strength difference obtained by benchmarking the final Kronos engine (Depth 6) against fixed-depth reference configurations of Stockfish 18. These differentials reflect performance against crippled Stockfish configurations and should not be mapped to FIDE or CCRL rating scales.
 \end{itemize}
 
 \section{Checkpointing and Memory Profiling}
