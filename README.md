@@ -1,277 +1,207 @@
-# <img src="src/assets/vite.svg" width="30" height="30" valign="middle" /> Kronos Chess & Empirical Research Laboratory
+# Kronos Chess & Empirical Research Laboratory
 
-[![React Version](https://img.shields.io/badge/React-19.2.7-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
-[![Vite Tooling](https://img.shields.io/badge/Vite-8.1.0-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev)
-[![Chess.js](https://img.shields.io/badge/Chess.js-1.4.0-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jhlywa/chess.js)
-[![Stockfish](https://img.shields.io/badge/Stockfish.js-10.0-E15E2C?style=for-the-badge&logo=github&logoColor=white)](https://github.com/niklasf/stockfish.js)
-[![Node Benchmark](https://img.shields.io/badge/Node.js-Benchmark_Suite-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
-[![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen?style=for-the-badge)](https://github.com/piyush2180/kronos)
+[![JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](#)
+[![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](#)
+[![Vite](https://img.shields.io/badge/Build-Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white)](#)
+[![Node.js](https://img.shields.io/badge/Runtime-Node.js_18+-339933?style=flat-square&logo=node.js&logoColor=white)](#)
+[![Web Workers](https://img.shields.io/badge/Concurrency-Web_Workers-0052CC?style=flat-square)](#)
+[![Chess Engine](https://img.shields.io/badge/System-Chess_Engine-black?style=flat-square)](#)
+[![Research Pipeline](https://img.shields.io/badge/Framework-Research_Pipeline-red?style=flat-square)](#)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](#)
 
-**Kronos Chess** is a desktop-first chess web application and empirical research laboratory. It bridges the gap between clean web applications and computational chess systems, providing both a player workspace and an automated engine research framework.
-
----
-
-## 📖 Table of Contents
-
-* [System Architecture Overview](#system-architecture-overview)
-* [Key Platform Features](#key-platform-features)
-* [Custom Chess Engine Architecture](#custom-chess-engine-architecture)
-* [Empirical Research & Benchmarking Framework](#empirical-research--benchmarking-framework)
-* [Research Laboratory UI Workstation](#research-laboratory-ui-workstation)
-* [Automated Research Pipeline Manager](#automated-research-pipeline-manager)
-* [CLI Command Reference](#cli-command-reference)
-* [Repository Folder Structure](#repository-folder-structure)
-* [Installation & Local Setup](#installation--local-setup)
+Kronos is a modular, high-fidelity JavaScript chess engine and empirical benchmarking framework designed to evaluate classical alpha-beta search behaviors, heuristics, and memory dynamics inside managed, garbage-collected runtimes.
 
 ---
 
-## 🏗️ System Architecture Overview
+## What is Kronos?
 
-Kronos is built as a complete, three-pillar ecosystem:
+Kronos is a modern chess engine and benchmarking platform built to investigate how low-latency search algorithms behave inside dynamic, garbage-collected environments like V8. Historically, game-tree search modules have been written in systems languages like C++ or Rust to avoid runtime overhead. Kronos serves as a testbed for performance engineering techniques (such as object pooling, bitwise state replication, and transposition table structures) required to achieve GC-neutral searches in standard web contexts.
+
+The system is composed of an interactive React UI client, a background search engine isolated in multi-threaded Web Workers, and a headless Node.js benchmarking framework. The desktop workstation features a complete player interface, game analysis tools, and a Research Lab dashboard for executing engine tournaments, analyzing depth scaling, and calibrating performance relative to Stockfish reference models.
+
+Additionally, Kronos includes an educational Learn Portal containing interactive algorithm simulations and progressive curricula detailing chess programming theory. The codebase is designed for researchers, systems engineers, and students looking for a fully documented, open-source chess engine workstation.
+
+---
+
+## Features
+
+### 🧠 Chess Engine
+* **Search Core**: Negamax implementation with Alpha-Beta pruning, Principal Variation Search (PVS), and Iterative Deepening.
+* **Pruning & Reductions**: Late Move Reductions (LMR), Null Move Pruning (NMP), and Quiescence Search extensions to combat the horizon effect.
+* **Heuristics & Tables**: MVV-LVA move ordering, history heuristic weights, killer move slots, and a size-bounded Transposition Table (TT) indexed using 64-bit Zobrist key hashing.
+
+### 🔬 Research Framework
+* **Orchestrator**: Automated research pipeline manager for overnight multi-family experiment execution.
+* **SPRT Validation**: Head-to-head tournaments using Sequential Probability Ratio Testing (SPRT) to accept or reject engine optimization hypotheses.
+* **Calibration**: External calibration mapping Kronos playing strength to depth-limited Stockfish reference profiles.
+* **Telemetry**: Node throughput count, NPS (Nodes Per Second), branching factor analytics, and automatic SVG chart rendering.
+
+### 💻 User Workstation Interface
+* **Play & Practice**: Play against various engine difficulties (Kronos D2 through D7) with selectable time controls.
+* **Research Lab**: Run matches, calibrate ratings, compare live experiment stats side-by-side, and inspect dataset manifests.
+* **Puzzle Trainer**: Solve tactical position puzzles sourced from real games with step-by-step move validation.
+* **Learn Portal**: Study progressive roadmaps from basic chess coordinates to advanced minimax search structures.
+
+---
+
+## Architecture
+
+The system utilizes an isolated worker architecture to separate heavy search calculations from interface rendering thread pools:
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                           KRONOS ECOSYSTEM                              │
-├───────────────────────────┬─────────────────────────┬───────────────────┤
-│    1. CHESS PLATFORM      │   2. CUSTOM ENGINE      │ 3. RESEARCH LAB   │
-│  • Play vs AI             │  • Minimax / Negamax    │ • Pipeline Mgr    │
-│  • Analysis Board         │  • Alpha-Beta Pruning   │ • SPRT Analytics  │
-│  • Tactical Puzzles       │  • Iterative Deepening  │ • Stockfish Calib │
-│  • Position Editor        │  • Move Ordering        │ • Ablation Suite  │
-│  • Opening Explorer       │  • Zobrist & TT         │ • Experiment Comp │
-│  • Custom Board Themes    │  • Quiescence Search    │ • Reproducibility │
-└───────────────────────────┴─────────────────────────┴───────────────────┘
-```
-
----
-
-## ⚙️ Custom Chess Engine Architecture
-
-The **Kronos Engine** is a custom chess solver implemented in JavaScript and executed on dedicated background Web Worker threads.
-
-### Search Flow & Execution Graph
-
-```mermaid
-graph TD
-    Start[Start Search] --> ID[Iterative Deepening Loop]
-    ID --> Depth[Set Target Depth d = 1..Max]
-    Depth --> Negamax[Negamax with Alpha-Beta]
-    Negamax --> Zobrist[Calculate Zobrist Key]
-    Zobrist --> TTHit{Transposition Table Hit?}
-    
-    TTHit -- Yes & Depth >= d --> TTUse[Retrieve Value & Trigger Cutoff]
-    TTHit -- No --> Generate[Generate Legal Moves]
-    
-    Generate --> Order[Order Moves: TT-Move / MVV-LVA / Killer Moves]
-    Order --> Loop[Loop Through Ordered Moves]
-    
-    Loop --> Make[Make Move]
-    Make --> Recurse[Recursive Search Depth d-1]
-    Recurse --> Undo[Undo Move]
-    
-    Undo --> AlphaBeta{Score >= Beta?}
-    AlphaBeta -- Yes --> BetaCut[Beta Cutoff: Record Killer Move & Store TT Beta]
-    AlphaBeta -- No --> Next[Update Alpha & Continue]
-    
-    BetaCut --> IDDone{Time Exceeded / Target Depth Met?}
-    Next --> Loop
-    
-    Loop -- All Moves Searched --> StoreTT[Store Value in Transposition Table as EXACT/ALPHA]
-    StoreTT --> IDDone
-    
-    IDDone -- Yes --> End[Abort Search & Return Best Move]
-    IDDone -- No --> ID
-```
-
-### Core Search Optimizations
-
-* **Negamax Formulation**: Evaluates search trees from the perspective of the active player.
-* **Alpha-Beta Pruning**: Efficiently eliminates unpromising subtree branches.
-* **Iterative Deepening**: Progressively increases search depth (Depths 1..N), ensuring instant move retrieval upon timeout.
-* **Move Ordering (MVV-LVA & Killer Moves)**: Prioritizes Transposition Table best moves, followed by Most Valuable Victim – Least Valuable Aggressor captures and Killer Moves.
-* **Zobrist Hashing**: Maps board positions to 64-bit keys using precomputed pseudo-random arrays.
-* **Transposition Tables (TT)**: Caches evaluated positions to prevent redundant processing.
-* **Quiescence Search**: Resolves the horizon effect by extending search lines through tactical capture sequences.
-
----
-
-## 🔬 Empirical Research & Benchmarking Framework
-
-Kronos includes a headless Node.js benchmarking framework capable of generating publishable experimental data.
-
-### Research Design Principles
-* **Data Integrity**: Every displayed value originates from actual engine execution (no simulated or hardcoded Elo ratings).
-* **Reproducibility Metadata**: Every experiment package logs `Experiment ID`, `Timestamp`, `Git Commit Hash`, `Config Checksum`, `Random Seed`, `Engine Revision`, `Depth`, `Games`, `Opening Suite Hash`, `Machine Specs`, and `Node Version`.
-* **Multi-Family Experiment Architectures**:
-  * **Family A (Cumulative Evolution)**: Tests incremental engine strength progression (`Baseline` → `AlphaBeta` → `MoveOrdering` → `Killer` → `TranspositionTable` → `Quiescence` → `Full Kronos`).
-  * **Family B (Ablation Isolation)**: Measures feature importance by testing `Full Kronos` against modified engine configs with individual search features disabled (`No AlphaBeta`, `No TT`, `No Quiescence`, `No Killer`, `No MoveOrdering`).
-  * **Family C (Opening Robustness Suite)**: Validates optimization consistency across distinct opening structures (Italian Game, Sicilian Defense, French Defense, Queen's Gambit, and Random FENs).
-
----
-
-## 📊 Research Laboratory UI Workstation
-
-The web interface includes an engineering workstation (`ResearchLabPage.jsx`) for visualizing and inspecting experiments:
-
-* **Research Dashboard**: Displays a thin engineering status bar and live telemetry metrics stream (CPU utilization, NPS, total nodes evaluated, active game count, and current opening line).
-* **Stockfish Calibration Pipeline**: Maps engine difficulty levels against Stockfish fixed-depth benchmarks (Depths 1–5), computing win/draw/loss rates and 95% confidence intervals. Displays "Calibration Pending" for unverified levels.
-* **Search Optimization Timeline**: Matches engine versions against telemetry logs to chart performance gains across search evolution stages.
-* **Search Validation & Tactical Solution Suite**: Evaluates static tactical and positional puzzles, tracking move solution accuracy and solution latencies.
-* **Research Archive Index**: Manages JSON and PGN experiment summaries with single-click import and export tools.
-* **Side-by-Side Experiment Delta Comparator**: Interactive comparison tool allowing researchers to select any two experiments (`EXP001` vs `EXP002`) and inspect side-by-side metric tables (Tournament Games, Score %, Elo Diff, NPS Throughput, Branching Factor, and Nodes Searched).
-
----
-
-## 🤖 Automated Research Pipeline Manager
-
-The Research Pipeline Manager (`benchmark/pipelineManager.js`) provides automated experiment orchestration for overnight research runs with zero manual intervention.
-
-### Automated Execution Sequence (`npm run research`)
-
-```
-npm run research
-       │
-       ▼
-1. Benchmark Suite (Family A & Family B)
-       │
-       ▼
-2. Stockfish Calibration Pipeline Matrix
-       │
-       ▼
-3. Position Validation Suite
-       │
-       ▼
-4. Dataset Integrity & Metadata Verification
-       │
-       ▼
-5. Statistical Analysis & SPRT Computation
-       │
-       ▼
-6. Telemetry SVG Chart Generation
-       │
-       ▼
-7. Dynamic Index Registration (index.json)
-       │
-       ▼
-8. Research Archive & Manifest Export (experiment_manifest.json & summary.md)
-       │
-       ▼
-"Research Pipeline Completed Successfully"
-```
-
-### Pipeline Resilience & Failure Recovery
-* **Persistent Queue Tracking (`queue_state.json`)**: Tracks execution states (`QUEUED`, `RUNNING`, `COMPLETED`, `FAILED`).
-* **Crash Recovery**: If the system is interrupted, re-launching `npm run research` automatically reads `queue_state.json` and resumes from the last unfinished experiment without repeating completed matches.
-* **Dynamic Indexing (`index.json`)**: Completed experiments automatically register into `benchmark/output/index.json`. The web UI dynamically loads this index via `BenchmarkDataService` without requiring code compilation or bundling.
-
----
-
-## 💻 CLI Command Reference
-
-| Command | Purpose |
-| :--- | :--- |
-| `npm run dev` | Launch interactive development server (`http://localhost:5174`) |
-| `npm run build` | Compile production web application assets |
-| `npm run research` | Execute automated 9-stage research pipeline suite |
-| `npm run research -- --robustness` | Execute research pipeline with optional opening robustness suite |
-| `npm run benchmark:suite` | Run multi-family tournament benchmark suite |
-| `npm run benchmark:calibrate` | Run Stockfish fixed-depth calibration matrix |
-| `npm run benchmark:positions` | Run tactical position benchmark suite |
-
----
-
-## 📂 Repository Folder Structure
-
-```text
-kronos-chess/
-├── benchmark/                  # Node.js Headless Benchmarking & Research Suite
-│   ├── configs/                # Engine tournament & ablation configuration JSONs
-│   ├── openings/               # Standard openings and tactical FEN test sets
-│   ├── output/                 # Archived experiment packages, index.json, & reports
-│   ├── engineFactory.js        # Engine instantiation & worker pool factory
-│   ├── graphGenerator.js       # SVG telemetry chart generation utilities
-│   ├── integrityValidator.js   # Reproducibility metadata & verification rules
-│   ├── pipelineManager.js      # Automated Research Pipeline Manager (npm run research)
-│   ├── positionBenchmark.js    # Tactical puzzle suite evaluator
-│   ├── reportGenerator.js      # Markdown & JSON experiment package generator
-│   └── tournament.js           # Engine vs Engine tournament runner with SPRT
-├── src/                        # Core Application Code
-│   ├── components/             # UI Components
-│   │   └── research/           # Research Laboratory Workstation Components
-│   │       ├── DashboardView.jsx        # Telemetry monitor & engineering status bar
-│   │       ├── EngineCalibration.jsx    # Stockfish calibration pipeline view
-│   │       ├── ExperimentComparison.jsx # Side-by-side experiment delta comparator
-│   │       ├── OptimizationTimeline.jsx # Algorithm evolution stage tracker
-│   │       ├── ResearchArchive.jsx      # Experiment package archive & JSON import/export
-│   │       └── SearchValidationSuite.jsx# Tactical solution verification suite
-│   ├── engine/                 # Custom Minimax Search Engine (Web Worker)
-│   ├── services/               # Data Services (BenchmarkDataService.js)
-│   ├── hooks/                  # Game state hooks (useChessGame.js)
-│   └── pages/                  # Main Workstation Pages (ResearchLabPage.jsx, etc.)
-├── package.json                # Scripts & project dependencies
-└── README.md                   # Repository documentation
+┌─────────────────────────────────────────────────────────────┐
+│                       REACT VIEW LAYER                      │
+│   • Renders chessboard, evaluation bar, opening explorer    │
+│   • Receives user events, dispatches moves to hook          │
+└──────────────┬──────────────────────────────▲───────────────┘
+               │                              │
+               │ PostMessage (Move / FEN)     │ Telemetry (Nodes / PV / Depth)
+               ▼                              │
+┌─────────────────────────────────────────────┴───────────────┐
+│                    WEB WORKER SEARCH ENGINE                 │
+│   • Offloads minimax calculations from main execution loop  │
+│   • Manages search time boundaries & depth iterations       │
+├─────────────────────────────────────────────────────────────┤
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │                 MINIMAX SEARCH CORE                 │   │
+│   │   • Evaluates move trees via Negamax formulation    │   │
+│   │   • Prioritizes captures using MVV-LVA move order   │   │
+│   └──────────┬──────────────────────────────▲───────────┘   │
+│              │ Zobrist Key Hash             │ Cache Hit / Node Eval
+│              ▼                              │
+│   ┌─────────────────────────────────────────┴───────────┐   │
+│   │             TRANSPOSITION TABLE CACHE               │   │
+│   │   • Holds 64-bit indexed evaluated board states      │   │
+│   │   • Provides O(1) lookups to prune duplicate paths  │   │
+│   └─────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Installation & Local Setup
+## Repository Structure
 
-### 1. Prerequisites
-Ensure **Node.js** (v18 or higher) is installed on your machine.
+* [**src/**](file:///c:/Users/Piyush/OneDrive/Desktop/chess/src) — Contains the React client views, state hooks, theme configurations, and background engine workers.
+* [**benchmark/**](file:///c:/Users/Piyush/OneDrive/Desktop/chess/benchmark) — Headless Node.js benchmarking framework, automated pipeline managers, tournaments, and openings.
+* [**research-paper/**](file:///c:/Users/Piyush/OneDrive/Desktop/chess/research-paper) — Source LaTeX files and section drafts for the Kronos systems engineering research paper.
+* [**scripts/**](file:///c:/Users/Piyush/OneDrive/Desktop/chess/scripts) — Utility scripts for compilation, dataset verification, and repository cleanup.
+* [**public/**](file:///c:/Users/Piyush/OneDrive/Desktop/chess/public) — Static web assets, favicon resources, and database puzzle sets.
 
-### 2. Clone Repository & Install Dependencies
+---
+
+## Technology Stack
+
+* **Frontend Framework**: React 19, Lucide React (Icons), Vanilla CSS
+* **Build System & Tooling**: Vite 8, Rolldown (Minification), Oxlint (Linting)
+* **Chess System Engine**: Chess.js (Move generation & validation), React-Chessboard (Render)
+* **Web Threads Concurrency**: HTML5 Web Workers (Background search isolation)
+* **Benchmark Engine**: Node.js (Headless runner), Stockfish.js (Calibration reference models)
+* **Visual Data Graphs**: D3-style SVG rendering scripts
+
+---
+
+## Research Contributions
+
+Kronos concentrates on systems engineering methods applied to dynamic runtimes:
+* **Garbage-Collector Neutrality**: Demonstrates how in-place board mutations, pre-allocated transposition caches, and avoiding object instantiations inside the recursive search path can eliminate garbage collector latency stutters.
+* **Reproducible Testbeds**: Every benchmark logs hardware specs, configuration checksums, and random seeds to guarantee reproducibility of experimental tournament datasets.
+* **Ablation Isolation Framework**: Isolates algorithm contributions by executing tournaments against sibling configurations with individual search features disabled.
+
+---
+
+## Experimental Highlights
+
+* **Heap Stabilization**: Transitioning to size-bounded transposition tables bounded heap usage to a flat memory layout, preventing V8 GC sweeps during deep search.
+* **SPRT Quiescence Search Validation**: Under SPRT testing, Quiescence Search demonstrated statistically significant playing strength gains (LLR > 18.8), validating its effectiveness at fighting the horizon effect.
+* **Pruning Ablation**: Ablation runs verified that Late Move Reductions (LMR) contributes the highest search space reduction (compressing nodes by up to 80% with minimal tactical degradation).
+
+---
+
+## Screenshots
+
+<div align="center">
+  <h3>Workstation Dashboard</h3>
+  <img src="src/assets/screenshots/dashboard.png" width="800" alt="Workstation Dashboard" />
+  <br /><br />
+  <h3>Play vs Engine Setup</h3>
+  <img src="src/assets/screenshots/play.png" width="800" alt="Play vs Engine Setup" />
+  <br /><br />
+  <h3>Analysis Board</h3>
+  <img src="src/assets/screenshots/analysis.png" width="800" alt="Analysis Board" />
+  <br /><br />
+  <h3>Research Laboratory Dashboard</h3>
+  <img src="src/assets/screenshots/research.png" width="800" alt="Research Laboratory" />
+  <br /><br />
+  <h3>Engine Calibration Panel</h3>
+  <img src="src/assets/screenshots/calibration.png" width="800" alt="Engine Calibration Panel" />
+  <br /><br />
+  <h3>Learn Portal</h3>
+  <img src="src/assets/screenshots/learn.png" width="800" alt="Learn Portal" />
+  <br /><br />
+  <h3>Tactical Puzzle Trainer</h3>
+  <img src="src/assets/screenshots/puzzles.png" width="800" alt="Puzzle Trainer" />
+</div>
+
+---
+
+## Quick Start
+
+### 1. Installation
+Install the project dependencies locally:
 ```bash
-git clone https://github.com/piyush2180/kronos.git
-cd kronos
 npm install
 ```
 
-### 3. Start Development Application
+### 2. Start Workstation Dev Server
+Launch Vite's hot-reload server locally on `http://localhost:5173/`:
 ```bash
 npm run dev
 ```
 
-### 4. Launch Automated Research Suite
+### 3. Build Production Bundle
+Build and minify the application assets:
+```bash
+npm run build
+```
+
+### 4. Execute Headless Benchmarks
+Run the automated multi-family tournament suite:
+```bash
+npm run benchmark:suite
+```
+
+### 5. Start Full Research Pipeline
+Orchestrate the 9-stage research pipeline suite (tournaments, Stockfish calibration, and puzzle validation):
 ```bash
 npm run research
 ```
 
 ---
 
-## 📚 Research Reports & Scientific Documentation
+## Documentation Directory
 
-Kronos includes a complete suite of academic-grade research reports detailing our empirical findings:
-
-* **[MASTER_RESULTS.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MASTER_RESULTS.md)**: Unified database of all Depth 3, 4, 5 tournaments and Stockfish calibrations.
-* **[DISCUSSION.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/DISCUSSION.md)**: Academic analysis of search scaling, horizon effects, and evaluation limits.
-* **[DEPTH5_INVESTIGATION.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/DEPTH5_INVESTIGATION.md)**: Investigation into the tactical and move-ordering scaling benefits at Depth 5.
-* **[MAXIMUM_STRENGTH_REPORT.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MAXIMUM_STRENGTH_REPORT.md)**: Search horizon profiling and Diminishing Returns boundary study.
-* **[ENGINE_FEATURE_MATRIX.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/ENGINE_FEATURE_MATRIX.md)**: Ablation study of search optimizations (PVS, LMR, NMP, and History Heuristic).
-* **[OPTIMISATION_REPORT.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/OPTIMISATION_REPORT.md)**: Empirical report of speedups, caching, and stream-renaming optimizations.
-* **[MEMORY_PROFILE.md](file:///C:/Users/Piyush/OneDrive/Desktop/chess/MEMORY_PROFILE.md)**: Telemetry documenting memory optimization and Heap/RSS stabilization.
+* **Research Paper Draft**: LaTeX sections reside in [research-paper/](file:///c:/Users/Piyush/OneDrive/Desktop/chess/research-paper)
+* **Master Experiment Log**: Detailed data matrices are stored in [MASTER_RESULTS.md](file:///c:/Users/Piyush/OneDrive/Desktop/chess/MASTER_RESULTS.md)
+* **Telemetry Profiles**: Memory performance telemetry can be found in [MEMORY_PROFILE.md](file:///c:/Users/Piyush/OneDrive/Desktop/chess/MEMORY_PROFILE.md)
+* **Feature Ablation Study**: Ablation test data is archived in [ENGINE_FEATURE_MATRIX.md](file:///c:/Users/Piyush/OneDrive/Desktop/chess/ENGINE_FEATURE_MATRIX.md)
 
 ---
 
-## 🧪 Reproducibility Guide
+## Future Work
 
-All experimental data, plots, and charts in this framework can be completely regenerated:
-
-1. **Rerun Ablation Study**:
-   ```bash
-   node benchmark/scripts/runAblationStudy.js
-   ```
-2. **Rerun Feasibility Horizon Study**:
-   ```bash
-   node benchmark/scripts/runMaxStrengthFeasibility.js
-   ```
-3. **Compile Rating Files & SVG Charts**:
-   ```bash
-   node benchmark/scripts/compileAllResults.js
-   ```
+* **NNUE Evaluation**: Replace Piece-Square Tables (PST) with efficiently updateable neural network evaluations.
+* **WebAssembly Core**: Re-compile search and bitboard calculation routines to WebAssembly (Wasm) targets to boost NPS.
+* **Syzygy Tablebases**: Integrate 5-piece endgame tablebase lookups inside the transposition table.
+* **SIMD & GPU Traversal**: Parallelize broad node trees utilizing hardware SIMD instructions and GPU search buffers.
 
 ---
 
-## 📜 License & Acknowledgements
+## Contributing
 
-* **Libraries**: Powered by [React](https://react.dev), [Vite](https://vite.dev), [Chess.js](https://github.com/jhlywa/chess.js), [react-chessboard](https://github.com/Cllement/react-chessboard), and [Stockfish.js](https://github.com/niklasf/stockfish.js).
-* **Disclaimer**: *Kronos Chess is an independent educational and empirical research project.*
+We welcome contributions to the Kronos research suite. Please ensure that any optimization patches include automated tournament validation run data with a minimum of 200 games against the baseline branch to verify Elo changes.
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

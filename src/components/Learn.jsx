@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import LearnSidebar from './learn/LearnSidebar';
 import ChessFundamentals from './learn/ChessFundamentals';
 import EngineFundamentals from './learn/EngineFundamentals';
+import EngineAdvanced from './learn/EngineAdvanced';
+import ResearchInsights from './learn/ResearchInsights';
 import EngineArchitecture from './learn/EngineArchitecture';
-import ResearchMethodology from './learn/ResearchMethodology';
-import OptimizationTimeline from './learn/OptimizationTimeline';
 import InteractiveDemos from './learn/InteractiveDemos';
+import BenchmarkExplorer from './learn/BenchmarkExplorer';
 import ResearchDocs from './learn/ResearchDocs';
 import AlgorithmTable from './learn/AlgorithmTable';
 import { FileCode, ShieldCheck, Cpu, Play } from 'lucide-react';
 import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 export default function Learn() {
-  const [activeSection, setActiveSection] = useState('engine-fundamentals');
+  const [activeSection, setActiveSection] = useState('chess-fundamentals');
   const [inspectedSourceFile, setInspectedSourceFile] = useState('src/engine/minimax.js');
 
   const handleSelectSource = (filePath) => {
@@ -29,18 +30,20 @@ export default function Learn() {
         return <ChessFundamentals />;
       case 'engine-fundamentals':
         return <EngineFundamentals onSelectSource={handleSelectSource} />;
+      case 'engine-advanced':
+        return <EngineAdvanced onSelectSource={handleSelectSource} />;
+      case 'research-insights':
+        return <ResearchInsights />;
       case 'engine-architecture':
         return <EngineArchitecture onSelectSource={handleSelectSource} />;
-      case 'research-methodology':
-        return <ResearchMethodology onSelectSource={handleSelectSource} />;
-      case 'optimization-timeline':
-        return <OptimizationTimeline onSelectSource={handleSelectSource} />;
       case 'interactive-demos':
         return <InteractiveDemos />;
+      case 'benchmark-explorer':
+        return <BenchmarkExplorer />;
       case 'research-docs':
         return <ResearchDocs onSelectSource={handleSelectSource} />;
       default:
-        return <EngineFundamentals onSelectSource={handleSelectSource} />;
+        return <ChessFundamentals />;
     }
   };
 
