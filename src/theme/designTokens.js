@@ -36,9 +36,9 @@ export const spacing = {
 };
 
 export const geometry = {
-  radiusBadge: '4px',
-  radiusInteractive: '6px',
-  radiusCard: '8px',
+  radiusBadge: '6px',
+  radiusInteractive: '16px',
+  radiusCard: '16px',
   borderWidth: '1px',
 };
 

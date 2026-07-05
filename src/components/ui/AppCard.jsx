@@ -6,14 +6,16 @@ export default function AppCard({ children, variant = 'primary', style = {}, cla
     switch (variant) {
       case 'secondary':
         return {
-          backgroundColor: colors.bgSurface,
-          border: `1px solid ${colors.borderSubtle}`,
+          backgroundColor: 'rgba(33, 26, 21, 0.6)',
+          border: '1px solid rgba(255, 255, 255, 0.03)',
           borderRadius: geometry.radiusCard,
           padding: spacing.lg,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.25)',
+          backdropFilter: 'blur(8px)',
         };
       case 'flat':
         return {
-          backgroundColor: colors.bgBase,
+          backgroundColor: 'transparent',
           border: '1px solid transparent',
           borderRadius: geometry.radiusCard,
           padding: `${spacing.md} ${spacing.lg}`,
@@ -22,10 +24,10 @@ export default function AppCard({ children, variant = 'primary', style = {}, cla
       default:
         return {
           backgroundColor: colors.bgSurface,
-          border: `1px solid ${colors.borderSubtle}`,
+          border: '1px solid rgba(255, 255, 255, 0.03)',
           borderRadius: geometry.radiusCard,
           padding: spacing.xl,
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.35)',
         };
     }
   };

@@ -8,19 +8,21 @@ export default function SecondaryButton({ children, onClick, style = {}, classNa
       disabled={disabled}
       className={`btn-secondary ${className}`}
       style={{
-        backgroundColor: colors.bgSurface,
+        backgroundColor: 'rgba(255, 255, 255, 0.02)',
         color: colors.textPrimary,
-        border: `1px solid ${colors.borderDefault}`,
+        border: '1px solid rgba(255, 255, 255, 0.05)',
+        height: '48px',
         borderRadius: geometry.radiusInteractive,
-        padding: `${spacing.sm} ${spacing.lg}`,
-        fontSize: typography.caption,
-        fontWeight: 500,
+        padding: '0 24px',
+        fontSize: '14px',
+        fontWeight: 600,
         cursor: disabled ? 'not-allowed' : 'pointer',
         display: 'inline-flex',
         alignItems: 'center',
-        gap: spacing.xs,
-        opacity: disabled ? 0.6 : 1,
-        transition: 'all 0.18s ease',
+        justifyContent: 'center',
+        gap: spacing.sm,
+        opacity: disabled ? 0.55 : 1,
+        transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
         ...style,
       }}
     >

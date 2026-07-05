@@ -338,15 +338,22 @@ export default function ChessBoard({
   const renderHUD = (side) => {
     const isPlayerSide = side === boardOrientation;
 
-    let displayName = 'Local Opponent';
+    let displayName = 'Player';
+    let displayRating = '';
+    
     if (modeSelected === 'ai') {
-      displayName = isPlayerSide
-        ? (localStorage.getItem('kronos_v2_active_user') || 'Guest')
-        : 'Kronos';
-    } else if (modeSelected === 'analysis') {
-      displayName = isPlayerSide ? 'Analysis' : 'Stockfish';
+      if (isPlayerSide) {
+        displayName = localStorage.getItem('kronos_v2_active_user') || 'Guest';
+        displayRating = ' (1500 Elo)';
+      } else {
+        displayName = 'Kronos';
+        const depthVal = difficulty === 'beginner' ? 2 : difficulty === 'casual' ? 4 : difficulty === 'club' ? 5 : difficulty === 'advanced' ? 6 : 7;
+        displayRating = ` (${depthVal}-ply)`;
+      }
     } else if (modeSelected === 'local') {
       displayName = side === 'white' ? 'White Player' : 'Black Player';
+    } else if (modeSelected === 'analysis') {
+      displayName = isPlayerSide ? 'Player' : 'Stockfish';
     } else if (modeSelected === 'simulate') {
       displayName = side === 'white' ? 'Kronos (White)' : 'Kronos (Black)';
     }
@@ -365,7 +372,10 @@ export default function ChessBoard({
       <div style={styles.hudWrapper}>
         <div style={styles.hudLeft}>
           <div style={styles.avatarCircle}>{displayName[0].toUpperCase()}</div>
-          <div style={styles.hudName}>{displayName}</div>
+          <div>
+            <span style={styles.hudName}>{displayName}</span>
+            <span style={styles.hudRating}>{displayRating}</span>
+          </div>
           <div style={styles.capturedContainer}>
             {capturedList.map((p, idx) => (
               <span key={idx} style={styles.capturedPiece}>
@@ -382,7 +392,7 @@ export default function ChessBoard({
           <div style={{
             ...styles.timerBox,
             backgroundColor: isLowTime ? '#4a1111' : 'var(--color-bg-surface)',
-            borderColor:     isLowTime ? '#9b2c2c' : 'var(--color-border-default)',
+            borderColor:     isLowTime ? '#9b2c2c' : 'rgba(255, 255, 255, 0.05)',
             color:           isLowTime ? '#f56565' : 'var(--color-text-primary)'
           }}>
             {formatTime(clockTime)}
@@ -415,60 +425,60 @@ const styles = {
   boardHUDWrapper: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px',
+    gap: '12px',
     width: '100%',
-    maxWidth: 'min(70vh, 680px)',
+    maxWidth: 'min(82vh, 760px)',
   },
   hudWrapper: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '6px 12px',
-    backgroundColor: 'rgba(27, 18, 12, 0.4)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
-    height: '42px',
-    minHeight: '42px',
+    padding: '4px 8px',
+    height: '44px',
+    minHeight: '44px',
   },
   hudLeft: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '12px',
     minWidth: 0,
     overflow: 'hidden',
   },
   avatarCircle: {
-    width: '24px',
-    height: '24px',
+    width: '28px',
+    height: '28px',
     borderRadius: '50%',
-    backgroundColor: 'var(--color-bg-elevated)',
-    border: '1px solid var(--color-border-bright)',
+    backgroundColor: 'var(--color-bg-surface)',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '11px',
+    fontSize: '12px',
     fontWeight: '800',
     color: 'var(--color-brand-primary)',
     flexShrink: 0,
+    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
   },
   hudName: {
-    fontSize: '12px',
+    fontSize: '14px',
     fontWeight: '700',
     color: 'var(--color-text-primary)',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    maxWidth: '120px',
-    flexShrink: 1,
+  },
+  hudRating: {
+    fontSize: '12px',
+    color: 'var(--color-text-dim)',
+    marginLeft: '4px',
+    fontWeight: '500',
   },
   capturedContainer: {
     display: 'flex',
     alignItems: 'center',
     gap: '1px',
-    fontSize: '15px',
+    fontSize: '16px',
     color: 'var(--color-text-secondary)',
     overflow: 'hidden',
     flexShrink: 1,
+    marginLeft: '4px',
   },
   capturedPiece: {
     lineHeight: 1,
@@ -478,24 +488,25 @@ const styles = {
     fontSize: '10px',
     fontWeight: '800',
     color: 'var(--color-brand-bronze)',
-    marginLeft: '4px',
+    marginLeft: '6px',
     flexShrink: 0,
   },
   timerBox: {
-    padding: '4px 10px',
-    borderRadius: '4px',
-    border: '1px solid',
-    fontFamily: 'monospace',
-    fontSize: '14px',
+    padding: '6px 14px',
+    borderRadius: '8px',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    fontFamily: 'SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace',
+    fontSize: '15px',
     fontWeight: '700',
     textAlign: 'center',
-    minWidth: '60px',
+    minWidth: '72px',
     flexShrink: 0,
-    transition: 'all 0.3s ease',
+    transition: 'all 0.15s ease',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
   },
   boardRow: {
     display: 'flex',
-    gap: '8px',
+    gap: '12px',
     alignItems: 'stretch',
     width: '100%',
     aspectRatio: '1',
@@ -503,10 +514,8 @@ const styles = {
   boardContainer: {
     flex: 1,
     minWidth: 0,
-    border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
+    border: 'none',
     overflow: 'hidden',
-    backgroundColor: '#1b120c',
-    padding: '2px',
+    backgroundColor: '#171311',
   }
 };

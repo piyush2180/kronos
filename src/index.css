@@ -316,48 +316,59 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Typography Hierarchy */
 .heading-page {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 3rem; /* 48px */
+  font-weight: 800;
   color: var(--color-text-primary);
-  line-height: 1.2;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 .heading-section {
-  font-size: 1.15rem;
+  font-size: 1.75rem; /* 28px */
   font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+}
+.heading-card {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 500;
   color: var(--color-text-primary);
 }
 .text-subtitle {
-  font-size: 0.825rem;
+  font-size: 1rem; /* 16px */
   color: var(--color-text-secondary);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 .text-dim {
   color: var(--color-text-dim);
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
 }
 .text-mono {
   font-family: monospace;
-  font-size: 0.8rem;
+  font-size: 0.8125rem;
 }
 
-/* Card System — Developer Tool Aesthetics (Reduced Box Borders) */
+/* Card System — Developer Tool Aesthetics (Subtle Borders & Shadows) */
 .card-primary {
   background-color: var(--color-bg-surface);
-  border: 1px solid rgba(76, 61, 49, 0.35);
-  border-radius: 8px;
-  padding: 1.25rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 .card-secondary {
-  background-color: #1a140f;
-  border: 1px solid rgba(52, 40, 30, 0.4);
-  border-radius: 6px;
-  padding: 1rem;
+  background-color: rgba(33, 26, 21, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 .card-flat {
-  background-color: var(--color-bg-base);
+  background-color: transparent;
   border: 1px solid transparent;
-  border-radius: 6px;
+  border-radius: 16px;
   padding: 0.75rem 1rem;
 }
 
@@ -366,90 +377,114 @@ h1, h2, h3, h4, h5, h6 {
   background-color: var(--color-brand-primary);
   color: #15100c;
   border: none;
-  border-radius: 5px;
-  padding: 0.55rem 1rem;
-  font-size: 0.825rem;
+  border-radius: 16px;
+  height: 48px;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(200, 159, 61, 0.25);
+  background-color: var(--color-brand-hover);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-secondary {
+  background-color: rgba(255, 255, 255, 0.02);
+  color: var(--color-text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  height: 48px;
+  padding: 0 24px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: all 0.18s ease;
-}
-.btn-primary:hover {
-  background-color: var(--color-brand-hover);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: var(--color-bg-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-default);
-  border-radius: 5px;
-  padding: 0.55rem 1rem;
-  font-size: 0.825rem;
-  font-weight: 500;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.18s ease;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-secondary:hover {
-  border-color: var(--color-brand-primary);
-  color: var(--color-brand-primary);
-  background-color: rgba(212, 175, 55, 0.04);
+  transform: translateY(-1px);
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.btn-secondary:active {
+  transform: translateY(1px);
 }
 
 .btn-ghost {
   background-color: transparent;
   color: var(--color-text-secondary);
   border: 1px solid transparent;
-  border-radius: 5px;
-  padding: 0.45rem 0.75rem;
-  font-size: 0.8rem;
+  border-radius: 16px;
+  padding: 0.5rem 1rem;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  transition: all 0.18s ease;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn-ghost:hover {
   color: var(--color-brand-primary);
-  background-color: rgba(212, 175, 55, 0.05);
+  background-color: rgba(255, 255, 255, 0.03);
 }
 
 .btn-danger {
   background-color: #EF4444;
   color: #FFFFFF;
   border: none;
-  border-radius: 5px;
-  padding: 0.55rem 1rem;
-  font-size: 0.825rem;
-  font-weight: 600;
+  border-radius: 16px;
+  height: 48px;
+  padding: 0 24px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: all 0.18s ease;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
 }
 .btn-danger:hover {
   background-color: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.25);
+}
+.btn-danger:active {
+  transform: translateY(1px);
 }
 
-/* Form System */
+/* Form System with Bottom Glow Focus */
 .select-field, .input-field {
-  background-color: var(--color-bg-base);
+  background-color: var(--color-bg-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: 5px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.825rem;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 14px;
   outline: none;
-  transition: border-color 0.18s ease;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .select-field:focus, .input-field:focus {
   border-color: var(--color-brand-primary);
+  box-shadow: 0 0 0 1px var(--color-brand-primary), 0 4px 20px rgba(200, 159, 61, 0.08);
 }
 
 /* Table System */
@@ -810,11 +845,39 @@ textarea:focus-visible,
 
 /* Navigation hover transitions */
 .nav-link-hoverable {
-  transition: all 0.2s ease !important;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  color: var(--color-text-secondary) !important;
+  font-weight: 500;
+  font-size: 14px !important;
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
+  padding: 8px 4px !important;
+  margin: 0 8px !important;
 }
 .nav-link-hoverable:hover {
-  background-color: rgba(212, 175, 55, 0.05) !important;
+  color: var(--color-text-primary) !important;
+}
+.nav-link-hoverable::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-brand-primary);
+  transform: scaleX(0);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(200, 159, 61, 0.6);
+}
+.nav-link-active {
   color: var(--color-brand-primary) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 12px rgba(200, 159, 61, 0.35);
+}
+.nav-link-active::after {
+  transform: scaleX(1);
 }
 
 /* Tab slide-in transitions */
@@ -848,6 +911,39 @@ textarea:focus-visible,
 }
 .active-pulse-dot {
   animation: statusPulse 1.6s infinite ease-in-out !important;
+}
+
+/* Redesign Premium Dashboard hovers */
+.stat-card-premium:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.mode-item-hoverable {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.mode-item-hoverable:hover {
+  background-color: rgba(255, 255, 255, 0.015) !important;
+  padding-left: 16px !important;
+}
+
+.mode-item-hoverable:hover .mode-title {
+  color: var(--color-brand-primary) !important;
+}
+
+.mode-item-hoverable .mode-ctaCol svg {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mode-item-hoverable:hover .mode-ctaCol {
+  color: var(--color-brand-primary) !important;
+}
+
+.mode-item-hoverable:hover .mode-ctaCol svg {
+  transform: translateX(4px);
 }
 
 

@@ -163,6 +163,11 @@ export default function App() {
       {/* HEADER NAVIGATION */}
       <header style={styles.header}>
         <div onClick={() => navigate('/')} style={{ ...styles.logoRow, cursor: 'pointer' }}>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '22px', height: '22px' }}>
+            <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+            <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+            <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+          </svg>
           <div style={styles.logoText}>KRONOS CHESS</div>
         </div>
 
@@ -172,50 +177,50 @@ export default function App() {
             <nav style={styles.nav}>
               <button 
                 onClick={() => navigate('/')}
-                style={styles.navLink(activeTab === 'dashboard')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'dashboard' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Dashboard
               </button>
               <button 
                 onClick={() => navigate('/play')}
-                style={styles.navLink(activeTab === 'play')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'play' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Play Engine
               </button>
               <button 
                 onClick={() => navigate('/local')}
-                style={styles.navLink(activeTab === 'local')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'local' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Pass & Play
               </button>
               <button 
                 onClick={() => navigate('/analysis')}
-                style={styles.navLink(activeTab === 'analysis')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'analysis' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Analysis
               </button>
               <button 
                 onClick={() => navigate('/puzzles')}
-                style={styles.navLink(activeTab === 'puzzles')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'puzzles' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Puzzles
               </button>
               <button 
                 onClick={() => navigate('/learn')}
-                style={styles.navLink(activeTab === 'learn')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'learn' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Learn
               </button>
               <button 
                 onClick={() => navigate('/research')}
-                style={styles.navLink(activeTab === 'research')}
-                className="nav-link-hoverable"
+                className={`nav-link-hoverable ${activeTab === 'research' ? 'nav-link-active' : ''}`}
+                style={styles.navLink}
               >
                 Benchmark Workspace
               </button>
@@ -579,23 +584,15 @@ const styles = {
   },
   nav: {
     display: 'flex',
-    gap: '4px',
+    gap: '24px',
     height: '100%',
     alignItems: 'center',
   },
-  navLink: (active) => ({
-    padding: '8px 16px',
-    fontSize: '12px',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    color: active ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+  navLink: {
     backgroundColor: 'transparent',
     border: 'none',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    borderRadius: '4px',
-  }),
+  },
   headerControls: {
     display: 'flex',
     alignItems: 'center',

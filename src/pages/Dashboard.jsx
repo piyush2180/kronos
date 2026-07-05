@@ -1,164 +1,165 @@
 import React from 'react';
-import { Target, Shuffle, Eye, Lightbulb, Edit, BookOpen, ArrowRight, Cpu, PlayCircle, Swords } from 'lucide-react';
-import { colors, spacing, geometry, typography } from '../theme/designTokens';
+import { Target, Shuffle, Eye, Lightbulb, Edit, BookOpen, ArrowRight, Cpu, PlayCircle, Swords, ShieldCheck } from 'lucide-react';
+import { colors, spacing, geometry } from '../theme/designTokens';
 
 const CARDS = [
   {
     title: 'Play vs Engine',
-    desc: 'Challenge Kronos at any strength — from D2 (rapid moves) up to the flagship D6 and experimental D7.',
+    desc: 'Challenge Kronos at any strength — from D2 up to flagship D6 and D7 levels.',
     icon: Target,
     route: '/play',
     accent: colors.goldAccent,
-    badge: 'SOLO',
+    badge: 'Solo Match',
     cta: 'Start Playing',
   },
   {
     title: 'Pass & Play',
-    desc: 'Two-player local match on a single device. Board auto-flips every turn. Pick your time control and play.',
+    desc: 'Two-player local match on a single device with auto-flipping board rules.',
     icon: Shuffle,
     route: '/local',
     accent: colors.textSecondary,
-    badge: 'LOCAL',
+    badge: 'Local Match',
     cta: 'Start Match',
   },
   {
     title: 'Analysis Board',
-    desc: 'Explore any position with Stockfish, import PGNs, study opening lines, and review engine evaluations.',
+    desc: 'Explore positions with Stockfish evaluations, PGN imports, and opening theory lines.',
     icon: Eye,
     route: '/analysis',
     accent: colors.success,
-    badge: 'ENGINE',
+    badge: 'Engine Analysis',
     cta: 'Open Board',
   },
   {
     title: 'Position Editor',
-    desc: 'Build custom board positions using a drag-and-drop piece editor. Launch directly into any mode.',
+    desc: 'Build custom board FEN layouts using a drag-and-drop piece editor canvas.',
     icon: Edit,
     route: '/editor',
     accent: colors.warning,
-    badge: 'TOOL',
+    badge: 'Board Editor',
     cta: 'Open Editor',
   },
   {
     title: 'Puzzle Trainer',
-    desc: 'Sharpen your tactics with 30 verified puzzles — forks, pins, discovered attacks, back-rank mates and more.',
+    desc: 'Train tactics with verified checkmate, middlegame, and positional puzzle banks.',
     icon: Lightbulb,
     route: '/puzzles',
     accent: colors.goldAccent,
-    badge: 'TRAIN',
+    badge: 'Tactical Trainer',
     cta: 'Train Now',
   },
   {
     title: 'Learn Chess',
-    desc: 'Study openings, endgames, tactical motifs, and how Kronos evaluates positions under the hood.',
+    desc: 'Study opening theories, endgames, tactical motifs, and search engine internals.',
     icon: BookOpen,
     route: '/learn',
     accent: colors.danger,
-    badge: 'LEARN',
+    badge: 'Knowledge Hub',
     cta: 'Start Learning',
   },
   {
     title: 'Benchmark Workspace',
-    desc: 'Run automated engine tournaments, calibrate search parameters, and compare depth scaling profiles.',
+    desc: 'Run automated engine tournaments, calibrate search depth, and trace telemetry.',
     icon: Cpu,
     route: '/research',
     accent: colors.textSecondary,
-    badge: 'BENCHMARK',
+    badge: 'Maintainer Suite',
     cta: 'Open Workspace',
   },
 ];
 
 export default function Dashboard({ username, navigate }) {
+  const stats = [
+    { label: 'Environment', value: 'Local Host', icon: Cpu, accent: colors.goldAccent },
+    { label: 'Developer Access', value: username || 'Guest', icon: Target, accent: colors.success },
+    { label: 'Diagnostics', value: 'Connected', icon: ShieldCheck, accent: colors.warning },
+    { label: 'Engine Version', value: 'Kronos D6', icon: PlayCircle, accent: colors.danger },
+  ];
+
   return (
     <div style={styles.page} className="animate-fade-in">
 
-      {/* ── Hero Banner ──────────────────────────────────────────────────── */}
-      <div style={styles.hero} className="dashboard-welcome-banner">
+      {/* ── Hero Section (Borderless) ────────────────────────────────────── */}
+      <div style={styles.hero}>
         <div style={styles.heroLeft}>
-          <div style={styles.heroBadge}>Kronos Chess Suite</div>
-          <h1 style={styles.heroTitle}>
+          
+          {/* Pawn logo above header */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '40px', height: '40px', marginBottom: '12px' }}>
+            <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+            <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+            <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+          </svg>
+
+          <h1 className="heading-page" style={{ marginBottom: '12px' }}>
             Welcome back,<br />
             <span style={{ color: 'var(--color-brand-primary)' }}>{username || 'Grandmaster'}</span>
           </h1>
-          <p style={styles.heroSub}>
-            A chess engine and local match benchmarking platform. Select a mode below to start.
+          <p className="text-subtitle" style={{ maxWidth: '520px', marginBottom: '16px' }}>
+            Kronos Chess is a clean, developer-focused chess workstation and local engine benchmarking platform.
           </p>
           <div style={styles.heroActions}>
             <button
               onClick={() => navigate('/play')}
-              style={styles.heroPlayBtn}
               className="btn-primary"
             >
               <PlayCircle size={18} />
-              Start Playing
-            </button>
-            <button
-              onClick={() => navigate('/local')}
-              style={styles.heroSecondaryBtn}
-            >
-              <Swords size={16} />
-              Pass & Play
+              <span>Start Match</span>
             </button>
             <button
               onClick={() => navigate('/analysis')}
-              style={styles.heroSecondaryBtn}
+              className="btn-secondary"
             >
               <Eye size={16} />
-              Analysis Board
+              <span>Analysis Board</span>
             </button>
           </div>
         </div>
+      </div>
 
-        <div style={styles.heroRight}>
-          <div style={styles.engineStatGrid}>
-            {[
-              { label: 'Configurations', value: 'D2 – D7' },
-              { label: 'Flagship Depth', value: '6-ply' },
-              { label: 'Search', value: 'PVS + LMR' },
-              { label: 'Estimated Elo', value: '~1485' },
-            ].map(stat => (
-              <div key={stat.label} style={styles.statCell}>
-                <div style={styles.statVal}>{stat.value}</div>
-                <div style={styles.statLbl}>{stat.label}</div>
-              </div>
-            ))}
+      {/* ── Four Telemetry Stats Cards ───────────────────────────────────── */}
+      <div style={styles.statsRow}>
+        {stats.map((stat, idx) => (
+          <div key={idx} style={styles.statCard} className="stat-card-premium">
+            <div style={styles.statHeader}>
+              <span style={styles.statLabel}>{stat.label}</span>
+              <stat.icon size={16} color={stat.accent} />
+            </div>
+            <div style={styles.statValue}>{stat.value}</div>
           </div>
+        ))}
+      </div>
+
+      {/* ── Mode Selection List (Borderless) ────────────────────────────── */}
+      <div style={{ marginTop: '24px' }}>
+        <div style={styles.sectionLabel}>Workstation Modes</div>
+        
+        <div style={styles.modeList}>
+          {CARDS.map((card, idx) => (
+            <div
+              key={idx}
+              onClick={() => navigate(card.route)}
+              style={styles.modeItem}
+              className="mode-item-hoverable"
+            >
+              <div style={styles.modeIconBox}>
+                <card.icon size={20} color="var(--color-brand-primary)" />
+              </div>
+              <div style={styles.modeTextCol}>
+                <div style={styles.modeTitleRow}>
+                  <span style={styles.modeTitle}>{card.title}</span>
+                  <span style={styles.modeBadge}>{card.badge}</span>
+                </div>
+                <div style={styles.modeDesc}>{card.desc}</div>
+              </div>
+              <div style={styles.modeCtaCol}>
+                <span style={styles.modeCta}>{card.cta}</span>
+                <ArrowRight size={14} />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ── Mode Card Grid ────────────────────────────────────────────────── */}
-      <div style={styles.sectionLabel}>All Modes</div>
-      <div style={styles.cardGrid} className="dashboard-card-grid">
-        {CARDS.map((card, idx) => (
-          <button
-            key={idx}
-            style={styles.card}
-            onClick={() => navigate(card.route)}
-            className="dashboard-card"
-          >
-            <div style={{ ...styles.cardIconRow, '--card-accent': card.accent }}>
-              <div style={{ ...styles.iconBox, backgroundColor: `${card.accent}18`, border: `1px solid ${card.accent}30` }}>
-                <card.icon size={24} color={card.accent} />
-              </div>
-              <span style={{ ...styles.cardBadge, backgroundColor: `${card.accent}18`, color: card.accent, border: `1px solid ${card.accent}30` }}>
-                {card.badge}
-              </span>
-            </div>
-
-            <div style={styles.cardBody}>
-              <h3 style={styles.cardTitle}>{card.title}</h3>
-              <p style={styles.cardDesc}>{card.desc}</p>
-            </div>
-
-            <div style={styles.cardFooter}>
-              <span style={styles.cardCta}>{card.cta}</span>
-              <ArrowRight size={13} style={styles.cardArrow} />
-            </div>
-
-            <div style={{ ...styles.accentBar, backgroundColor: card.accent }} />
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -168,215 +169,142 @@ const styles = {
     width: '100%',
     maxWidth: '1200px',
     margin: '0 auto',
-    padding: spacing.xl,
+    padding: '48px 24px',
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.xl,
+    gap: '36px',
+    boxSizing: 'border-box'
   },
-  // Hero
   hero: {
     display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: `${spacing.xl} ${spacing.xxl}`,
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: geometry.radiusCard,
-    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-    backgroundImage: 'linear-gradient(135deg, rgba(212,175,55,0.07) 0%, transparent 60%)',
-    flexWrap: 'wrap',
-    gap: spacing.xl,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: spacing.md,
   },
   heroLeft: {
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.md,
-    flex: '1 1 300px',
-  },
-  heroBadge: {
-    display: 'inline-flex',
-    alignSelf: 'flex-start',
-    fontSize: '0.62rem',
-    fontWeight: 800,
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    color: 'var(--color-brand-primary)',
-    backgroundColor: 'rgba(212,175,55,0.08)',
-    border: '1px solid rgba(212,175,55,0.2)',
-    padding: '3px 9px',
-    borderRadius: geometry.radiusBadge,
-  },
-  heroTitle: {
-    fontSize: '28px',
-    fontWeight: 800,
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-display)',
-    letterSpacing: '-0.02em',
-    lineHeight: 1.2,
-    margin: 0,
-  },
-  heroSub: {
-    fontSize: '13px',
-    color: 'var(--color-text-secondary)',
-    lineHeight: 1.6,
-    margin: 0,
-    maxWidth: '420px',
+    alignItems: 'flex-start',
   },
   heroActions: {
     display: 'flex',
-    gap: spacing.sm,
-    flexWrap: 'wrap',
-    marginTop: '4px',
+    gap: '12px',
+    marginTop: '12px',
   },
-  heroPlayBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: `${spacing.sm} ${spacing.xl}`,
-    fontSize: '0.85rem',
-    fontWeight: 800,
-    borderRadius: geometry.radiusInteractive,
-    cursor: 'pointer',
-    border: 'none',
-  },
-  heroSecondaryBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '7px',
-    padding: `${spacing.sm} ${spacing.lg}`,
-    fontSize: '0.82rem',
-    fontWeight: 700,
-    borderRadius: geometry.radiusInteractive,
-    cursor: 'pointer',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    color: 'var(--color-text-secondary)',
-    transition: 'all 0.15s ease',
-  },
-  heroRight: {
-    flex: '0 0 auto',
-  },
-  engineStatGrid: {
+  // Statistics Row
+  statsRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: spacing.sm,
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '16px',
+    width: '100%',
   },
-  statCell: {
-    textAlign: 'center',
-    backgroundColor: 'rgba(255,255,255,0.03)',
-    border: '1px solid rgba(255,255,255,0.05)',
-    borderRadius: geometry.radiusCard,
-    padding: `${spacing.md} ${spacing.lg}`,
-    minWidth: '100px',
+  statCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+    borderRadius: '16px',
+    padding: '20px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
+    transition: 'all 0.15s cubic-bezier(0.16, 1, 0.3, 1)',
+    cursor: 'default'
   },
-  statVal: {
-    fontSize: '1rem',
-    fontWeight: 800,
-    color: 'var(--color-brand-primary)',
-    fontFamily: 'monospace',
+  statHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%'
   },
-  statLbl: {
-    fontSize: '0.62rem',
+  statLabel: {
+    fontSize: '13px',
     color: 'var(--color-text-dim)',
+    fontWeight: '600',
     textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    marginTop: '4px',
-    fontWeight: 700,
+    letterSpacing: '0.04em'
+  },
+  statValue: {
+    fontSize: '20px',
+    fontWeight: '700',
+    color: 'var(--color-text-primary)'
   },
   // Section label
   sectionLabel: {
-    fontSize: '0.67rem',
-    fontWeight: 800,
+    fontSize: '13px',
+    fontWeight: '700',
     color: 'var(--color-text-dim)',
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
+    marginBottom: '16px'
   },
-  // Cards
-  cardGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
-    gap: spacing.lg,
-  },
-  card: {
-    position: 'relative',
+  // Mode selection list
+  modeList: {
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.md,
-    padding: spacing.xl,
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: geometry.radiusCard,
-    cursor: 'pointer',
-    textAlign: 'left',
-    overflow: 'hidden',
-    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+    gap: '0px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.04)'
   },
-  cardIconRow: {
+  modeItem: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    padding: '20px 8px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+    gap: '16px'
   },
-  iconBox: {
-    width: '44px',
-    height: '44px',
-    borderRadius: geometry.radiusCard,
+  modeIconBox: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '10px',
+    backgroundColor: 'rgba(200, 159, 61, 0.06)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
+    flexShrink: 0
   },
-  cardBadge: {
-    fontSize: '8px',
-    fontWeight: 800,
-    letterSpacing: '0.08em',
-    padding: '3px 6px',
-    borderRadius: geometry.radiusBadge,
-    fontFamily: 'monospace',
-  },
-  cardBody: {
+  modeTextCol: {
+    flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px',
-    flex: 1,
+    gap: '4px',
+    textAlign: 'left'
   },
-  cardTitle: {
-    fontSize: '14px',
-    fontWeight: 800,
-    color: 'var(--color-text-primary)',
-    fontFamily: 'var(--font-display)',
-    letterSpacing: '-0.01em',
-    margin: 0,
-  },
-  cardDesc: {
-    fontSize: '12px',
-    color: 'var(--color-text-secondary)',
-    lineHeight: 1.55,
-    margin: 0,
-  },
-  cardFooter: {
+  modeTitleRow: {
     display: 'flex',
     alignItems: 'center',
-    gap: '5px',
-    marginTop: '2px',
+    gap: '10px'
   },
-  cardCta: {
-    fontSize: '11px',
-    fontWeight: 700,
-    color: 'var(--color-text-dim)',
+  modeTitle: {
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'var(--color-text-primary)'
+  },
+  modeBadge: {
+    fontSize: '10px',
+    fontWeight: '700',
+    color: 'var(--color-brand-primary)',
+    backgroundColor: 'rgba(200, 159, 61, 0.08)',
+    padding: '2px 6px',
+    borderRadius: '4px',
     textTransform: 'uppercase',
-    letterSpacing: '0.06em',
+    letterSpacing: '0.04em'
   },
-  cardArrow: {
+  modeDesc: {
+    fontSize: '13px',
+    color: 'var(--color-text-secondary)',
+    lineHeight: 1.4
+  },
+  modeCtaCol: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
     color: 'var(--color-text-dim)',
-    transition: 'transform 0.2s ease',
+    fontSize: '13px',
+    fontWeight: '600',
+    transition: 'color 0.15s ease'
   },
-  accentBar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '2px',
-    opacity: 0.6,
-  },
+  modeCta: {
+    display: 'inline-block'
+  }
 };

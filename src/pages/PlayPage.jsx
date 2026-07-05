@@ -155,7 +155,7 @@ export default function PlayPage({ username, boardTheme, soundEnabled }) {
 
       {/* Right: Sidebar */}
       <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
-        <div style={styles.sidebarWrapper} className="panel-card sidebar-card-wrapper">
+        <div style={styles.sidebarWrapper} className="sidebar-card-wrapper">
           {reviewTabActive ? (
             <PostGameReview
               gameHistory={game.gameHistory}

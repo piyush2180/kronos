@@ -1,10 +1,10 @@
 // Kronos Chess V2 — Match Setup Page
-// Full-screen pre-game configuration. The "Start Match" button is always visible at the bottom.
+// Full-screen pre-game configuration lobby. Centers chessboard preview and displays options cleanly.
 
 import React, { useState } from 'react';
-import { PlayCircle } from 'lucide-react';
+import { PlayCircle, Target, Swords, Cpu, Volume2, Shield } from 'lucide-react';
 import ChessBoard from './ChessBoard';
-import { DIFFICULTY_SETTINGS } from '../hooks/useChessGame';
+import Toggle from './ui/Toggle';
 
 const ENGINE_CONFIGS = [
   {
@@ -87,7 +87,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
   return (
     <div style={s.root} className="animate-fade-in">
 
-      {/* ── Left: Board Preview ───────────────────────────────────────────── */}
+      {/* ── Left: Board Preview (Vertically Centered, No details under board) ── */}
       <div style={s.boardCol}>
         <div style={s.boardWrap}>
           <ChessBoard
@@ -101,25 +101,12 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
             makeMove={() => {}}
           />
         </div>
-
-        {/* Engine spec card — shown below board */}
-        <div style={{ ...s.engineSpecCard, border: '1px solid var(--color-border-subtle)', boxShadow: 'none', backgroundColor: 'transparent' }}>
-          <div style={s.engineSpecRow}>
-            <div>
-              <div style={s.engineSpecName}>{selectedConfig.label}</div>
-              <div style={s.engineSpecDesc}>{selectedConfig.description}</div>
-            </div>
-          </div>
-          <div style={s.tagRow}>
-            {selectedConfig.tags.map(t => <span key={t} style={s.tag}>{t}</span>)}
-          </div>
-        </div>
       </div>
 
       {/* ── Right: Configuration Panel ────────────────────────────────────── */}
-      <div style={{ ...s.configCol, boxShadow: 'none', borderColor: 'var(--color-border-subtle)' }}>
+      <div style={s.configCol}>
 
-        {/* Header — always visible */}
+        {/* Header */}
         <div style={s.panelHeader}>
           <div style={s.panelBadge}>Benchmark Suite Setup</div>
           <h2 style={s.panelTitle}>Match Settings</h2>
@@ -128,9 +115,23 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
         {/* Scrollable options */}
         <div style={s.scrollBody}>
 
-          {/* Engine */}
+          {/* Engine Spec status card at the top */}
+          <div style={s.engineSpecCard}>
+            <div style={s.engineSpecHeader}>
+              <Cpu size={16} color="var(--color-brand-primary)" />
+              <span style={s.engineSpecName}>{selectedConfig.label} Profile</span>
+            </div>
+            <p style={s.engineSpecDesc}>{selectedConfig.description}</p>
+            <div style={s.tagRow}>
+              {selectedConfig.tags.map(t => (
+                <span key={t} style={s.tag}>{t}</span>
+              ))}
+            </div>
+          </div>
+
+          {/* Engine Version Selection */}
           <div style={s.section}>
-            <div style={s.sectionLabel}>Search Configuration (Engine Version)</div>
+            <div style={s.sectionLabel}>Engine Version</div>
             <div className="segmented-control">
               {ENGINE_CONFIGS.map(cfg => (
                 <button
@@ -145,7 +146,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
             </div>
           </div>
 
-          {/* Color */}
+          {/* Side Selection */}
           <div style={s.section}>
             <div style={s.sectionLabel}>Side Selection</div>
             <div className="segmented-control">
@@ -162,10 +163,10 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
             </div>
           </div>
 
-          {/* Time Control */}
+          {/* Time Control Selection */}
           <div style={s.section}>
             <div style={s.sectionLabel}>Time Control</div>
-            <div className="segmented-control" style={{ flexWrap: 'wrap' }}>
+            <div className="segmented-control" style={{ flexWrap: 'wrap', gap: '2px' }}>
               {TIME_OPTIONS.map(t => (
                 <button
                   key={t.value}
@@ -180,13 +181,13 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
             </div>
           </div>
 
-          {/* Match Rules */}
+          {/* Match Mode Selection */}
           <div style={s.section}>
             <div style={s.sectionLabel}>Match Mode</div>
             <div className="segmented-control">
               {[
                 { value: 'casual',      label: 'Casual (Allow Undo)' },
-                { value: 'competitive', label: 'Competitive (No Undo)' },
+                { value: 'competitive', label: 'Competitive' },
               ].map(r => (
                 <button
                   key={r.value}
@@ -200,323 +201,193 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
             </div>
           </div>
 
-          {/* Options */}
+          {/* Telemetry Toggle Options */}
           <div style={s.section}>
             <div style={s.sectionLabel}>Telemetry Options</div>
             <div style={s.optionList}>
-              {[
-                { label: 'Show Evaluation Bar',     value: showEvalBar,    set: setShowEvalBar },
-                { label: 'Show Principal Variation', value: showPV,         set: setShowPV },
-                { label: 'Premove System',           value: premoveEnabled, set: setPremoveEnabled },
-                { label: 'Auto-Analyze Game',        value: autoAnalysis,   set: setAutoAnalysis },
-                { label: 'Highlight Search Hints',   value: moveHints,      set: setMoveHints },
-              ].map(opt => (
-                <div key={opt.label} style={s.optionRow}>
-                  <span style={s.optionLabel}>{opt.label}</span>
-                  <button
-                    onClick={() => opt.set(v => !v)}
-                    style={{
-                      ...s.toggle,
-                      backgroundColor: opt.value ? 'var(--color-brand-primary)' : 'rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    <div style={{
-                      ...s.toggleKnob,
-                      transform: opt.value ? 'translateX(16px)' : 'translateX(0)',
-                    }} />
-                  </button>
-                </div>
-              ))}
+              <div style={s.optionRow}>
+                <span style={s.optionLabel}>Show Evaluation Bar</span>
+                <Toggle checked={showEvalBar} onChange={setShowEvalBar} />
+              </div>
+              <div style={s.optionRow}>
+                <span style={s.optionLabel}>Show Principal Variation</span>
+                <Toggle checked={showPV} onChange={setShowPV} />
+              </div>
+              <div style={s.optionRow}>
+                <span style={s.optionLabel}>Premove System</span>
+                <Toggle checked={premoveEnabled} onChange={setPremoveEnabled} />
+              </div>
+              <div style={s.optionRow}>
+                <span style={s.optionLabel}>Auto-Analyze Game</span>
+                <Toggle checked={autoAnalysis} onChange={setAutoAnalysis} />
+              </div>
+              <div style={s.optionRow}>
+                <span style={s.optionLabel}>Highlight Search Hints</span>
+                <Toggle checked={moveHints} onChange={setMoveHints} />
+              </div>
             </div>
           </div>
 
-        </div>{/* end scrollBody */}
+        </div>
 
-        {/* ── Start Match Button — always pinned at bottom ───────────────── */}
+        {/* ── Start Match Button (Pinned) ────────────────────────────────── */}
         <div style={s.startFooter}>
-          <button onClick={handleStart} style={s.startBtn}>
+          <button onClick={handleStart} className="btn-primary" style={s.startBtn}>
             <PlayCircle size={18} />
-            Start Match
+            <span>Start Match</span>
           </button>
         </div>
 
-      </div>{/* end configCol */}
+      </div>
     </div>
   );
 }
 
-// ── Styles ────────────────────────────────────────────────────────────────────
 const s = {
   root: {
     display: 'grid',
-    gridTemplateColumns: '55% 45%',
-    gap: '1.5rem',
+    gridTemplateColumns: '1.2fr 1fr',
+    gap: '40px',
     height: 'calc(100vh - 56px)',
     width: '100%',
-    maxWidth: '1600px',
+    maxWidth: '1440px',
     margin: '0 auto',
-    padding: '1.25rem 1.5rem',
+    padding: '32px 24px',
     boxSizing: 'border-box',
     overflow: 'hidden',
   },
-
-  /* ── Left column ── */
   boardCol: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: '12px',
     height: '100%',
     minHeight: 0,
     overflow: 'hidden',
   },
   boardWrap: {
     width: '100%',
-    maxWidth: '460px',
+    maxWidth: 'min(78vh, 660px)',
     flexShrink: 1,
     minHeight: 0,
   },
-  engineSpecCard: {
-    width: '100%',
-    maxWidth: '460px',
-    flexShrink: 0,
-    backgroundColor: 'var(--color-bg-elevated)',
-    border: '1px solid rgba(212,175,55,0.15)',
-    borderRadius: '8px',
-    padding: '10px 14px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-  },
-  engineSpecRow: {
-    display: 'flex',
-    gap: '10px',
-    alignItems: 'flex-start',
-  },
-  engineSpecName: {
-    fontSize: '0.82rem',
-    fontWeight: 800,
-    color: 'var(--color-brand-primary)',
-  },
-  engineSpecDesc: {
-    fontSize: '0.7rem',
-    color: 'var(--color-text-dim)',
-    lineHeight: 1.5,
-    marginTop: '2px',
-  },
-  tagRow: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '4px',
-  },
-  tag: {
-    fontSize: '0.6rem',
-    fontWeight: 700,
-    textTransform: 'uppercase',
-    letterSpacing: '0.05em',
-    padding: '2px 6px',
-    borderRadius: '3px',
-    backgroundColor: 'rgba(212,175,55,0.08)',
-    color: 'var(--color-brand-primary)',
-    border: '1px solid rgba(212,175,55,0.2)',
-  },
-
-  /* ── Right column — flex column, no overflow so button sticks ── */
+  // Configurations Column (Borderless panel, relies on whitespace & separators)
   configCol: {
     display: 'flex',
     flexDirection: 'column',
     height: '100%',
     minHeight: 0,
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid rgba(76,61,49,0.35)',
-    borderRadius: '8px',
-    boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
-    overflow: 'hidden',   /* clip content, footer is INSIDE flex column */
+    backgroundColor: 'transparent',
+    borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
+    overflow: 'hidden',
   },
-
   panelHeader: {
-    padding: '1.1rem 1.25rem 0.85rem',
-    borderBottom: '1px solid rgba(52,40,30,0.4)',
+    padding: '0 24px 20px 24px',
+    borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
     flexShrink: 0,
   },
   panelBadge: {
-    fontSize: '0.62rem',
-    fontWeight: 700,
+    fontSize: '11px',
+    fontWeight: '700',
     color: 'var(--color-brand-primary)',
     textTransform: 'uppercase',
     letterSpacing: '0.08em',
-    marginBottom: '4px',
+    marginBottom: '6px',
   },
   panelTitle: {
-    fontSize: '1.25rem',
-    fontWeight: 800,
+    fontFamily: 'var(--font-display)',
+    fontSize: '28px',
+    fontWeight: '700',
     color: 'var(--color-text-primary)',
     margin: 0,
   },
-
   scrollBody: {
     flex: 1,
     overflowY: 'auto',
-    padding: '1rem 1.25rem',
+    padding: '24px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1rem',
+    gap: '24px',
     minHeight: 0,
   },
-
+  engineSpecCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    border: '1px solid rgba(255, 255, 255, 0.03)',
+    borderRadius: '16px',
+    padding: '16px',
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  engineSpecHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  engineSpecName: {
+    fontSize: '14px',
+    fontWeight: '700',
+    color: 'var(--color-brand-primary)',
+  },
+  engineSpecDesc: {
+    fontSize: '13px',
+    color: 'var(--color-text-secondary)',
+    lineHeight: 1.45,
+    margin: 0,
+  },
+  tagRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px',
+    marginTop: '2px',
+  },
+  tag: {
+    fontSize: '10px',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+    padding: '2px 8px',
+    borderRadius: '4px',
+    backgroundColor: 'rgba(200, 159, 61, 0.08)',
+    color: 'var(--color-brand-primary)',
+    border: '1px solid rgba(200, 159, 61, 0.15)',
+  },
   section: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '0.45rem',
+    gap: '10px',
   },
   sectionLabel: {
-    fontSize: '0.65rem',
-    fontWeight: 700,
+    fontSize: '11px',
+    fontWeight: '700',
     color: 'var(--color-text-dim)',
     textTransform: 'uppercase',
     letterSpacing: '0.06em',
   },
-
-  /* Engine grid */
-  engineGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
-    gap: '6px',
-  },
-  engineCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '8px 4px',
-    borderRadius: '6px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    position: 'relative',
-  },
-  flagshipBadge: {
-    position: 'absolute',
-    top: '2px',
-    right: '3px',
-    fontSize: '0.55rem',
-    color: 'var(--color-brand-primary)',
-  },
-
-  /* Color grid */
-  colorGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '6px',
-  },
-  colorChip: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '3px',
-    padding: '8px 4px',
-    borderRadius: '6px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-  },
-
-  /* Time grid */
-  timeGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(6, 1fr)',
-    gap: '6px',
-  },
-  timeChip: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '2px',
-    padding: '7px 4px',
-    borderRadius: '6px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-  },
-
-  /* Rules grid */
-  rulesGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: '6px',
-  },
-  rulesChip: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '10px',
-    borderRadius: '6px',
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-  },
-
-  /* Options */
   optionList: {
     display: 'flex',
     flexDirection: 'column',
+    gap: '12px',
   },
   optionRow: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '7px 0',
-    borderBottom: '1px solid rgba(255,255,255,0.03)',
+    padding: '6px 0',
   },
   optionLabel: {
-    fontSize: '0.78rem',
+    fontSize: '13px',
     color: 'var(--color-text-secondary)',
-    fontWeight: 500,
+    fontWeight: '500',
   },
-  toggle: {
-    width: '36px',
-    height: '20px',
-    borderRadius: '10px',
-    border: 'none',
-    padding: '2px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    transition: 'background-color 0.2s ease',
-    flexShrink: 0,
-  },
-  toggleKnob: {
-    width: '16px',
-    height: '16px',
-    borderRadius: '50%',
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.4)',
-    transition: 'transform 0.2s ease',
-  },
-
-  /* Start button — pinned, never scrolls out of view */
   startFooter: {
-    padding: '0.85rem 1.25rem',
-    borderTop: '1px solid rgba(52,40,30,0.4)',
+    padding: '20px 24px 0 24px',
+    borderTop: '1px solid rgba(255, 255, 255, 0.04)',
     flexShrink: 0,
-    backgroundColor: 'var(--color-bg-surface)',
+    backgroundColor: 'transparent',
   },
   startBtn: {
     width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '9px',
-    padding: '0.75rem',
-    fontSize: '0.9rem',
-    fontWeight: 800,
-    borderRadius: '6px',
-    border: 'none',
-    cursor: 'pointer',
-    backgroundColor: 'var(--color-brand-primary)',
-    color: '#1c1410',
-    transition: 'opacity 0.15s ease',
-    letterSpacing: '0.01em',
   },
 };
