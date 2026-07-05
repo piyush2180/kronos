@@ -388,7 +388,7 @@ export default function ChessBoard({
               <span style={styles.hudName}>{displayName}</span>
               {displayRating && <span style={styles.hudRating}>{displayRating}</span>}
               {isTop && !isPlayerSide && modeSelected === 'ai' && (
-                <span style={styles.engineBadge}>Kronos AI</span>
+                <span style={styles.engineBadge}>Kronos</span>
               )}
             </div>
             {!isTop && (
