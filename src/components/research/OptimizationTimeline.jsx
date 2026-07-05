@@ -11,11 +11,22 @@ export default function OptimizationTimeline({ experiments = [] }) {
     { key: 'full', name: '6. Full Kronos Engine (Current Revision)', desc: 'Fully instrumented multithreaded engine running in dedicated Web Workers.' }
   ];
 
+  const stageKeys = {
+    minimax: ['minimax'],
+    alphabeta: ['alpha-beta', 'alphabeta'],
+    ordering: ['ordering', 'mvv-lva'],
+    tt: ['transposition', 'zobrist', 'tt'],
+    quiescence: ['quiescence'],
+    full: ['full kronos']
+  };
+
   const stages = baseStages.map(stg => {
-    const match = experiments.find(exp => 
-      exp.name?.toLowerCase().includes(stg.key) || 
-      exp.engineA?.toLowerCase().includes(stg.key)
-    );
+    const match = experiments.find(exp => {
+      const name = exp.name?.toLowerCase() || '';
+      const engA = exp.engineA?.toLowerCase() || '';
+      const searchTerms = stageKeys[stg.key] || [];
+      return searchTerms.some(term => name.includes(term) || engA.includes(term));
+    });
 
     if (match) {
       return {

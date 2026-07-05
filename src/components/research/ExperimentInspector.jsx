@@ -9,6 +9,39 @@ export default function ExperimentInspector({ experiment, onBack }) {
     return <div style={{ color: '#bdaea4', padding: '2rem' }}>No experiment selected.</div>;
   }
 
+  const handleExportJson = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(experiment, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `${experiment.id}_summary.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleExportCsv = () => {
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + ["Metric,Value", 
+         `Experiment Name,${experiment.name}`,
+         `Engine A,${experiment.engineA}`,
+         `Engine B,${experiment.engineB}`,
+         `Total Games,${experiment.games}`,
+         `Wins,${experiment.stats.wins}`,
+         `Losses,${experiment.stats.losses}`,
+         `Draws,${experiment.stats.draws}`,
+         `Score %,${Number(experiment.stats.scorePct).toFixed(1)}`,
+         `Elo Difference,${experiment.stats.eloDiff}`,
+         `Engine A NPS,${experiment.telemetryA.nps}`,
+         `Engine B NPS,${experiment.telemetryB.nps}`
+        ].join("\n");
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", encodeURI(csvContent));
+    downloadAnchor.setAttribute("download", `${experiment.id}_metrics.csv`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.header}>
@@ -18,8 +51,8 @@ export default function ExperimentInspector({ experiment, onBack }) {
           <p style={styles.sub}>ID: <code>{experiment.id}</code> | Date: {new Date(experiment.timestamp).toLocaleString()}</p>
         </div>
         <div style={styles.btnGroup}>
-          <button style={styles.downloadBtn}><Download size={13} /> Export CSV</button>
-          <button style={styles.downloadBtn}><Download size={13} /> Export JSON</button>
+          <button style={styles.downloadBtn} onClick={handleExportCsv}><Download size={13} /> Export CSV</button>
+          <button style={styles.downloadBtn} onClick={handleExportJson}><Download size={13} /> Export JSON</button>
         </div>
       </div>
 
@@ -34,13 +67,15 @@ export default function ExperimentInspector({ experiment, onBack }) {
           <div style={styles.grid}>
             <div style={styles.statBox}>
               <span style={styles.sLabel}>Score Percentage</span>
-              <span style={styles.sVal}>{experiment.stats.scorePct}%</span>
+              <span style={styles.sVal}>{Number(experiment.stats.scorePct).toFixed(1)}%</span>
               <span style={styles.sSub}>{experiment.stats.wins}W / {experiment.stats.losses}L / {experiment.stats.draws}D</span>
             </div>
             <div style={styles.statBox}>
               <span style={styles.sLabel}>Pairwise Elo Difference</span>
               <span style={styles.sValHighlight}>+{experiment.stats.eloDiff} Elo</span>
-              <span style={styles.sSub}>95% CI: [{experiment.stats.ciLower}, {experiment.stats.ciUpper}]</span>
+              <span style={styles.sSub}>
+                95% CI: [{experiment.stats.ciLower !== undefined && experiment.stats.ciLower !== null ? Number(experiment.stats.ciLower).toFixed(1) : '-'}, {experiment.stats.ciUpper !== undefined && experiment.stats.ciUpper !== null ? Number(experiment.stats.ciUpper).toFixed(1) : '-'}]
+              </span>
             </div>
             <div style={styles.statBox}>
               <span style={styles.sLabel}>Engine A Throughput</span>
@@ -58,7 +93,7 @@ export default function ExperimentInspector({ experiment, onBack }) {
         {subTab === 'report' && (
           <ReportViewer 
             title="Empirical Research Report"
-            content={`# Research Report: ${experiment.name}\n\n**Certification:** ${experiment.certification}\n**Score:** ${experiment.stats.scorePct}%\n**Elo Gain:** +${experiment.stats.eloDiff}`}
+            content={`# Research Report: ${experiment.name}\n\n**Certification:** ${experiment.certification}\n**Score:** ${Number(experiment.stats.scorePct).toFixed(1)}%\n**Elo Gain:** +${experiment.stats.eloDiff}`}
           />
         )}
 

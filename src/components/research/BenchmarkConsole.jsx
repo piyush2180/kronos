@@ -15,12 +15,12 @@ export default function BenchmarkConsole({ logs = [], onClear }) {
   ];
 
   const activeLogs = logs.length > 0 
-    ? logs.map((log, index) => {
+    ? logs.map((log) => {
         if (typeof log === 'object' && log.message) return log;
         return {
-          time: new Date().toLocaleTimeString('en-US', { hour12: false }),
-          level: log.includes('ERROR') ? 'ERROR' : log.includes('SUCCESS') ? 'SUCCESS' : 'INFO',
-          message: log
+          time: '--:--:--',
+          level: 'INFO',
+          message: String(log)
         };
       })
     : defaultLogs;

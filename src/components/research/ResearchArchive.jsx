@@ -128,7 +128,7 @@ export default function ResearchArchive({ experiments = [], onInspect, onDelete,
                 <td style={styles.td}>{exp.engineA} vs {exp.engineB}</td>
                 <td style={styles.td}>{exp.games}</td>
                 <td style={styles.td}>D{exp.depth}</td>
-                <td style={styles.tdHighlight}>{exp.stats.scorePct}%</td>
+                <td style={styles.tdHighlight}>{Number(exp.stats.scorePct).toFixed(1)}%</td>
                 <td style={styles.td}>
                   <span style={styles.certBadge(exp.certification)}>{exp.certification}</span>
                 </td>
@@ -202,10 +202,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    backgroundColor: 'var(--color-bg-surface, #221a14)',
-    border: '1px solid var(--color-border-default, #4c3d31)',
-    borderRadius: '6px',
-    padding: '0.5rem 0.75rem',
+    backgroundColor: 'transparent',
+    border: '1px solid var(--color-border-subtle, #34281e)',
+    borderRadius: '4px',
+    padding: '0.4rem 0.6rem',
     flex: 1
   },
   searchInput: {
@@ -220,10 +220,10 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    backgroundColor: 'var(--color-bg-surface, #221a14)',
-    border: '1px solid var(--color-border-default, #4c3d31)',
-    borderRadius: '6px',
-    padding: '0.5rem 0.75rem'
+    backgroundColor: 'transparent',
+    border: '1px solid var(--color-border-subtle, #34281e)',
+    borderRadius: '4px',
+    padding: '0.4rem 0.6rem'
   },
   select: {
     backgroundColor: 'transparent',
@@ -234,10 +234,10 @@ const styles = {
     cursor: 'pointer'
   },
   tableWrapper: {
-    backgroundColor: 'var(--color-bg-surface, #221a14)',
-    border: '1px solid var(--color-border-default, #4c3d31)',
-    borderRadius: '8px',
-    overflow: 'hidden'
+    borderTop: '1px solid var(--color-border-subtle, #34281e)',
+    borderBottom: '1px solid var(--color-border-subtle, #34281e)',
+    overflow: 'hidden',
+    marginTop: '0.5rem'
   },
   table: {
     width: '100%',

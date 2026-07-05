@@ -19,8 +19,8 @@ export default function ResearchLabPage({ onBack }) {
   const [experiments, setExperiments] = useState([]);
   const [selectedExperiment, setSelectedExperiment] = useState(null);
   const [consoleLogs, setConsoleLogs] = useState([
-    'Benchmark Workspace environment initialized.',
-    'Connected to benchmark data service.'
+    { time: new Date().toLocaleTimeString('en-US', { hour12: false }), level: 'SYSTEM', message: 'Benchmark Workspace environment initialized.' },
+    { time: new Date().toLocaleTimeString('en-US', { hour12: false }), level: 'SUCCESS', message: 'Connected to benchmark data service.' }
   ]);
 
   // Load experiments from BenchmarkDataService on initialization
@@ -40,8 +40,21 @@ export default function ResearchLabPage({ onBack }) {
     }
   };
 
-  const handleAddLog = (msg) => {
-    setConsoleLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
+  const handleAddLog = (msg, level = 'INFO') => {
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    let resolvedLevel = level;
+    let cleanMsg = msg;
+    const lower = msg.toLowerCase();
+    
+    if (lower.includes('success') || lower.includes('completed') || lower.includes('passed')) {
+      resolvedLevel = 'SUCCESS';
+    } else if (lower.includes('failed') || lower.includes('halted') || lower.includes('error')) {
+      resolvedLevel = 'ERROR';
+    } else if (lower.includes('initializing') || lower.includes('deleted') || lower.includes('environment')) {
+      resolvedLevel = 'SYSTEM';
+    }
+    
+    setConsoleLogs(prev => [...prev, { time, level: resolvedLevel, message: cleanMsg }]);
   };
 
   const handleInspect = (exp) => {
@@ -101,7 +114,7 @@ export default function ResearchLabPage({ onBack }) {
 
       {activeView === 'timeline' && <OptimizationTimeline experiments={experiments} />}
       {activeView === 'calibration' && <EngineCalibration experiments={experiments} />}
-      {activeView === 'validation' && <SearchValidationSuite />}
+      {activeView === 'validation' && <SearchValidationSuite onAddLog={handleAddLog} />}
       {activeView === 'architecture' && <ArchitectureViewer />}
       {activeView === 'runner' && (
         <BenchmarkRunnerView 

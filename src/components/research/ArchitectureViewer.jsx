@@ -70,7 +70,7 @@ const styles = {
     padding: '1.25rem',
     display: 'flex',
     flexDirection: 'column',
-    justify: 'space-between'
+    justifyContent: 'space-between'
   },
   cardHeader: {
     display: 'flex',

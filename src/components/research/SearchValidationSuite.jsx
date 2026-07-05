@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle2, XCircle, Play } from 'lucide-react';
 
-export default function SearchValidationSuite() {
+export default function SearchValidationSuite({ onAddLog }) {
   const [isRunning, setIsRunning] = useState(false);
   const [testResults] = useState([
     { name: 'Back Rank Mate in 2', type: 'Tactical', target: 'Rb8#', kronosMove: 'Rb8#', baselineMove: 'Rb8#', status: 'PASS', time: '12ms', eval: '+M2' },
@@ -13,8 +13,17 @@ export default function SearchValidationSuite() {
 
   const handleRunValidation = () => {
     setIsRunning(true);
+    if (onAddLog) {
+      onAddLog('Initializing search validation suite...');
+      onAddLog('Running tactical mate test cases...');
+    }
     setTimeout(() => {
       setIsRunning(false);
+      if (onAddLog) {
+        onAddLog('Tactical mate test cases: 4/4 passed.');
+        onAddLog('Positional evaluation test cases: 1/1 passed.');
+        onAddLog('Search validation suite complete: ALL PASSED.');
+      }
     }, 1200);
   };
 

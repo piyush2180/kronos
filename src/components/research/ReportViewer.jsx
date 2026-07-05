@@ -2,6 +2,16 @@ import React from 'react';
 import { FileText, Download } from 'lucide-react';
 
 export default function ReportViewer({ title = "Experiment Markdown Report", content = "" }) {
+  const handleDownload = () => {
+    const dataStr = "data:text/markdown;charset=utf-8," + encodeURIComponent(content);
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `${title.toLowerCase().replace(/\s+/g, '_')}.md`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.header}>
@@ -9,7 +19,7 @@ export default function ReportViewer({ title = "Experiment Markdown Report", con
           <FileText size={16} color="#d4af37" />
           <h3 style={styles.title}>{title}</h3>
         </div>
-        <button style={styles.downloadBtn} onClick={() => alert("Downloading artifact file...")}>
+        <button style={styles.downloadBtn} onClick={handleDownload}>
           <Download size={13} /> Download .md
         </button>
       </div>

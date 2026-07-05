@@ -46,7 +46,7 @@ export const DEFAULT_EXPERIMENTS = [
       "wins": 28,
       "losses": 18,
       "draws": 139,
-      "scorePct": 52.702702702702695,
+      "scorePct": 52.7,
       "eloDiff": 18.8
     },
     "telemetryA": {
@@ -136,7 +136,7 @@ export const DEFAULT_EXPERIMENTS = [
       "wins": 16,
       "losses": 15,
       "draws": 122,
-      "scorePct": 50.326797385620914,
+      "scorePct": 50.3,
       "eloDiff": 2.3
     },
     "telemetryA": {
