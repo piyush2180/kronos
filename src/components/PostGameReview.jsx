@@ -426,6 +426,7 @@ const s = {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+    height: '100%',
     flex: 1,
     minHeight: 0,
     overflowY: 'auto',

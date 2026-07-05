@@ -839,6 +839,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     width: '100%',
+    height: 'calc(100vh - 64px)',
     minHeight: 0,
     overflow: 'hidden',
   },
