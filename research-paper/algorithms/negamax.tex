@@ -9,10 +9,10 @@
     \Return{QuiescenceSearch($p$, $\alpha$, $\beta$)}\;
 }
 $moves \leftarrow \text{OrderMoves}(\text{GenerateMoves}(p))$\;
-$value \leftarrow -\infty$\;
+$value \leftarrow - \infty$\;
 \ForEach{move $m$ in $moves$}{
     $\text{MakeMove}(p, m)$\;
-    $score \leftarrow -\text{Negamax}(p, d - 1, -\beta, -\alpha)$\;
+    $score \leftarrow - \text{Negamax}(p, d - 1, -\beta, -\alpha)$\;
     $\text{UnmakeMove}(p, m)$\;
     $value \leftarrow \max(value, score)$\;
     $\alpha \leftarrow \max(\alpha, value)$\;

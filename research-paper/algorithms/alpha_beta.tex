@@ -9,7 +9,7 @@
     \Return{Evaluate($p$)}\;
 }
 \If{$pl == \text{MAX}$}{
-    $value \leftarrow -\infty$\;
+    $value \leftarrow - \infty$\;
     \ForEach{legal move $m$ from $p$}{
         $child \leftarrow \text{MakeMove}(p, m)$\;
         $value \leftarrow \max(value, \text{AlphaBeta}(child, d - 1, \alpha, \beta, \text{MIN}))$\;

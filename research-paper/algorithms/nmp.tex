@@ -8,7 +8,7 @@
 \If{$d \ge 3$ \And AllowedToNull \And \Not $\text{InCheck}(p)$ \And $\text{HasBigPieces}(p)$}{
     $\text{MakeNullMove}(p)$\;
     $R \leftarrow 2 + \lfloor d / 6 \rfloor$ \tcp*{Reduction factor}
-    $val \leftarrow -\text{Search}(p, d - 1 - R, -\beta, -\beta + 1, \text{false})$\;
+    $val \leftarrow - \text{Search}(p, d - 1 - R, -\beta, -\beta + 1, \text{false})$\;
     $\text{UnmakeNullMove}(p)$\;
     \If{$val \ge \beta$}{
         \Return{$val$} \tcp*{Prune sub-tree, return cutoff}

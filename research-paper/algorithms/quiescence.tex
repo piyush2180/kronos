@@ -14,7 +14,7 @@ $\alpha \leftarrow \max(\alpha, standPat)$\;
 $captures \leftarrow \text{GenerateSortedCaptures}(p)$\;
 \ForEach{capture move $c$ in $captures$}{
     $\text{MakeMove}(p, c)$\;
-    $score \leftarrow -\text{QuiescenceSearch}(p, -\beta, -\alpha)$\;
+    $score \leftarrow - \text{QuiescenceSearch}(p, -\beta, -\alpha)$\;
     $\text{UnmakeMove}(p, c)$\;
     $\alpha \leftarrow \max(\alpha, score)$\;
     \If{$\alpha \ge \beta$}{
