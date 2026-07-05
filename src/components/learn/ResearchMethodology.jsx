@@ -45,7 +45,7 @@ export default function ResearchMethodology({ onSelectSource }) {
       file: 'benchmark/output/',
       simpleNote: 'Saves all match logs into JSON files with cryptographic verification hashes so research can be verified by anyone.',
       desc: 'Archives every experiment with cryptographic SHA256 reproducibility hashes.',
-      details: 'Generates structured JSON dataset manifests and standard PGN match logs loaded dynamically by the browser Research Lab.'
+      details: 'Generates structured JSON dataset manifests and standard PGN match logs loaded dynamically by the Benchmark Workspace.'
     }
   };
 

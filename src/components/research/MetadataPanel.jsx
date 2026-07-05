@@ -94,7 +94,7 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
 
       <div style={styles.footerBadge}>
         <ShieldCheck size={13} color="#34D399" />
-        <span>Pipeline verified</span>
+        <span>Last benchmark passed</span>
       </div>
     </aside>
   );

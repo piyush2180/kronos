@@ -41,11 +41,11 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
 
       {/* Right Column: Pass & Play Configuration */}
       <div style={styles.sidebarColumn}>
-        <div style={lobby.configPanel} className="card-primary">
+        <div style={{ ...lobby.configPanel, border: '1px solid var(--color-border-subtle)', boxShadow: 'none' }} className="panel-card">
           <div style={lobby.configHeader}>
             <div>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: colors.goldAccent, textTransform: 'capitalize' }}>Local multiplayer match setup</span>
-              <h2 style={{ fontSize: '1.35rem', fontWeight: '700', color: 'var(--color-text-primary)', margin: '0.1rem 0' }}>Pass & Play Configuration</h2>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-brand-primary)', textTransform: 'capitalize' }}>Local match setup</span>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--color-text-primary)', margin: '0.1rem 0' }}>Pass & Play Settings</h2>
             </div>
           </div>
 
@@ -53,15 +53,15 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             {/* Players Matchup */}
             <div style={lobby.section}>
               <div style={lobby.sectionLabel}>Matchup Overview</div>
-              <div style={lobby.playersRow}>
-                <div style={lobby.playerChip}>
-                  <span style={{ fontSize: '1.2rem', color: colors.textPrimary }}>♔</span>
-                  <span style={{ fontWeight: '600', fontSize: '0.8rem' }}>Player 1 (White)</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '12px 0', backgroundColor: 'var(--color-bg-base)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-primary)' }}>♔</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>White</span>
                 </div>
-                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--color-text-dim)' }}>vs</span>
-                <div style={lobby.playerChip}>
-                  <span style={{ fontSize: '1.2rem', color: colors.textSecondary }}>♚</span>
-                  <span style={{ fontWeight: '600', fontSize: '0.8rem' }}>Player 2 (Black)</span>
+                <span style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700' }}>VS</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)' }}>♚</span>
+                  <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Black</span>
                 </div>
               </div>
             </div>
@@ -69,37 +69,32 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             {/* Time Control Chips */}
             <div style={lobby.section}>
               <div style={lobby.sectionLabel}>Time Control</div>
-              <div style={lobby.chipRow}>
+              <div className="segmented-control" style={{ flexWrap: 'wrap' }}>
                 {TIME_OPTIONS.map(t => (
                   <button
                     key={t.value}
                     onClick={() => setSelectedTime(t.value)}
-                    style={{
-                      ...lobby.chipBtn,
-                      backgroundColor: selectedTime === t.value ? 'rgba(200, 159, 61, 0.15)' : 'var(--color-bg-base)',
-                      borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-border-subtle)',
-                      color: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
-                    }}
+                    className={`segmented-control-btn ${selectedTime === t.value ? 'segmented-control-btn-active' : ''}`}
+                    style={{ flex: '1 0 30%' }}
                   >
-                    <span>{t.label}</span>
-                    <span style={{ fontSize: '0.68rem', opacity: 0.7, marginLeft: '0.2rem' }}>({t.type})</span>
+                    {t.label}
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Match Rules & Specs */}
-            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: `${spacing.sm} ${spacing.md}`, borderRadius: geometry.radiusInteractive, fontSize: '0.75rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: spacing.xs }}>
-              <span style={{ fontWeight: '600', color: 'var(--color-text-secondary)' }}>Match rules</span>
-              <span>Two players sharing one device • Board auto-flips orientation after each completed turn</span>
+            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: `10px 14px`, borderRadius: '6px', border: '1px solid var(--color-border-subtle)', fontSize: '0.72rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontWeight: '600', color: 'var(--color-text-secondary)' }}>Rules of Play</span>
+              <span>Two players share one screen. The board flips automatically after each completed move to face the active side.</span>
             </div>
           </div>
 
           {/* Start Button Fixed at Bottom */}
           <div style={lobby.fixedFooter}>
-            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: spacing.md, fontSize: '0.9rem', borderRadius: geometry.radiusInteractive }}>
-              <PlayCircle size={16} />
-              <span>Start Game</span>
+            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem' }}>
+              <PlayCircle size={15} />
+              <span>Start Match</span>
             </button>
           </div>
         </div>

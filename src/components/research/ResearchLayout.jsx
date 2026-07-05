@@ -92,9 +92,9 @@ export default function ResearchLayout({
         {/* Top Header Bar */}
         <header style={styles.topBar}>
           <div style={styles.titleGroup}>
-            <span style={styles.ideBadge}>KRONOS ENGINEERING WORKSPACE</span>
+            <span style={styles.ideBadge}>Benchmark Workspace</span>
             <span style={styles.divider}>/</span>
-            <span style={styles.currentViewName}>{activeView === 'dashboard' ? 'RESEARCH DASHBOARD' : activeView.toUpperCase()}</span>
+            <span style={styles.currentViewName}>{activeView === 'dashboard' ? 'BENCHMARK DASHBOARD' : activeView.toUpperCase()}</span>
           </div>
         </header>
 
@@ -128,9 +128,9 @@ export default function ResearchLayout({
       {/* Top Header Bar */}
       <header style={styles.topBar}>
         <div style={styles.titleGroup}>
-          <span style={styles.ideBadge}>KRONOS ENGINEERING WORKSPACE</span>
+          <span style={styles.ideBadge}>Benchmark Workspace</span>
           <span style={styles.divider}>/</span>
-          <span style={styles.currentViewName}>{activeView === 'dashboard' ? 'RESEARCH DASHBOARD' : activeView.toUpperCase()}</span>
+          <span style={styles.currentViewName}>{activeView === 'dashboard' ? 'BENCHMARK DASHBOARD' : activeView.toUpperCase()}</span>
         </div>
       </header>
       

@@ -58,13 +58,13 @@ const CARDS = [
     cta: 'Start Learning',
   },
   {
-    title: 'Research Lab',
-    desc: 'Empirical workstation. Run engine tournaments, calibrate evaluation weights, and compare depth configurations.',
+    title: 'Benchmark Workspace',
+    desc: 'Run automated engine tournaments, calibrate search parameters, and compare depth scaling profiles.',
     icon: Cpu,
     route: '/research',
     accent: colors.textSecondary,
-    badge: 'LAB',
-    cta: 'Open Lab',
+    badge: 'BENCHMARK',
+    cta: 'Open Workspace',
   },
 ];
 
@@ -75,13 +75,13 @@ export default function Dashboard({ username, navigate }) {
       {/* ── Hero Banner ──────────────────────────────────────────────────── */}
       <div style={styles.hero} className="dashboard-welcome-banner">
         <div style={styles.heroLeft}>
-          <div style={styles.heroBadge}>Kronos Research Engine · V2</div>
+          <div style={styles.heroBadge}>Kronos Chess Suite</div>
           <h1 style={styles.heroTitle}>
             Welcome back,<br />
             <span style={{ color: 'var(--color-brand-primary)' }}>{username || 'Grandmaster'}</span>
           </h1>
           <p style={styles.heroSub}>
-            A classical chess engine built for research. All modes are available below — your sessions are auto-saved.
+            A chess engine and local match benchmarking platform. Select a mode below to start.
           </p>
           <div style={styles.heroActions}>
             <button

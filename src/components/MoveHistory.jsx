@@ -95,10 +95,41 @@ export default function MoveHistory({
       {/* Moves grid list */}
       <div style={styles.scrollWrapper} className="scroll-panel move-history-scroll-panel">
         {gameHistory.length === 0 ? (
-          <div style={styles.emptyState}>
-            <Sliders size={20} style={{ color: 'var(--color-text-dim)', marginBottom: '8px' }} />
-            <div style={styles.emptyTitle}>Awaiting Moves</div>
-            <div style={styles.emptyText}>Algebraic moves and engine evaluations will display here once the match begins.</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: '16px 8px', color: 'var(--color-text-dim)', height: '100%', minHeight: '280px' }}>
+            {/* Status indicators */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderBottom: '1px solid var(--color-border-subtle)', paddingBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 600 }}>
+                <span className="active-pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--color-success)', display: 'inline-block' }} />
+                <span>Search Engine: Ready</span>
+              </div>
+              <div style={{ fontSize: '10px', color: 'var(--color-text-dim)' }}>
+                Stockfish local threads active. Awaiting move telemetry.
+              </div>
+            </div>
+
+            {/* Evaluation Graph Placeholder */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', padding: '12px 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
+              <svg width="140" height="60" viewBox="0 0 140 60" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ opacity: 0.25 }}>
+                <path d="M10 30 H130" stroke="var(--color-border-bright)" strokeWidth="1" strokeDasharray="3 3"/>
+                <path d="M10 50 L30 40 L50 48 L70 25 L90 35 L110 15 L130 18" stroke="var(--color-brand-primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="130" cy="18" r="3" fill="var(--color-brand-primary)"/>
+              </svg>
+              <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--color-text-secondary)' }}>Evaluation Graph</div>
+              <div style={{ fontSize: '9px', textAlign: 'center', maxWidth: '200px' }}>Moves will be graphed live to show engine positional evaluations.</div>
+            </div>
+
+            {/* Recent Evaluations list placeholders */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Engine Search Log</div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', opacity: 0.5 }}>
+                <span>Depth / NPS</span>
+                <span>--</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', opacity: 0.5 }}>
+                <span>Best Line (PV)</span>
+                <span>Waiting for moves...</span>
+              </div>
+            </div>
           </div>
         ) : (
           <div style={styles.movesGrid}>

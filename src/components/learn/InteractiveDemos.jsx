@@ -83,7 +83,7 @@ export default function InteractiveDemos() {
         </div>
       )}
 
-      <CrossNav title="Execute live tournaments in Research Lab" />
+      <CrossNav title="Execute live tournaments in Benchmark Workspace" />
     </div>
   );
 }

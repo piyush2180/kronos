@@ -1,7 +1,7 @@
 import React from 'react';
 import { Play, ArrowRight, ShieldCheck } from 'lucide-react';
 
-export default function CrossNav({ title = "Explore in Research Lab" }) {
+export default function CrossNav({ title = "Explore in Benchmark Workspace" }) {
   const navigateTo = (target) => {
     window.location.hash = `#/research?view=${target}`;
   };
@@ -20,7 +20,7 @@ export default function CrossNav({ title = "Explore in Research Lab" }) {
           <ShieldCheck size={13} color="#4BAF7A" /> Inspect Validation
         </button>
         <button className="btn-primary" style={{ fontSize: '0.75rem' }} onClick={() => navigateTo('dashboard')}>
-          Open Research Lab <ArrowRight size={13} />
+          Open Workspace <ArrowRight size={13} />
         </button>
       </div>
     </div>

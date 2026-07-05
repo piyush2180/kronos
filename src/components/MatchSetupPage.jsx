@@ -44,7 +44,7 @@ const ENGINE_CONFIGS = [
     key: 'expert',
     label: 'Kronos D7',
     depth: 7,
-    description: 'Experimental. Maximum search depth. Strongest, slowest.',
+    description: 'Experimental. Search Depth 7. Strongest, slowest.',
     icon: '🔬',
     tags: ['Depth 7', '~120k NPS'],
   },
@@ -108,9 +108,9 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
         </div>
 
         {/* Engine spec card — shown below board */}
-        <div style={s.engineSpecCard}>
+        <div style={{ ...s.engineSpecCard, border: '1px solid var(--color-border-subtle)', boxShadow: 'none', backgroundColor: 'transparent' }}>
           <div style={s.engineSpecRow}>
-            <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>{selectedConfig.icon}</span>
+            <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{selectedConfig.icon}</span>
             <div>
               <div style={s.engineSpecName}>{selectedConfig.label}</div>
               <div style={s.engineSpecDesc}>{selectedConfig.description}</div>
@@ -123,12 +123,12 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
       </div>
 
       {/* ── Right: Configuration Panel ────────────────────────────────────── */}
-      <div style={s.configCol}>
+      <div style={{ ...s.configCol, boxShadow: 'none', borderColor: 'var(--color-border-subtle)' }}>
 
         {/* Header — always visible */}
         <div style={s.panelHeader}>
-          <div style={s.panelBadge}>Kronos Research Engine</div>
-          <h2 style={s.panelTitle}>Match Setup</h2>
+          <div style={s.panelBadge}>Benchmark Suite Setup</div>
+          <h2 style={s.panelTitle}>Match Settings</h2>
         </div>
 
         {/* Scrollable options */}
@@ -136,26 +136,16 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
 
           {/* Engine */}
           <div style={s.section}>
-            <div style={s.sectionLabel}>Engine Version</div>
-            <div style={s.engineGrid}>
+            <div style={s.sectionLabel}>Search Configuration (Engine Version)</div>
+            <div className="segmented-control">
               {ENGINE_CONFIGS.map(cfg => (
                 <button
                   key={cfg.key}
+                  type="button"
                   onClick={() => setSelectedEngine(cfg.key)}
-                  style={{
-                    ...s.engineCard,
-                    borderColor: selectedEngine === cfg.key ? 'var(--color-brand-primary)' : 'rgba(52,40,30,0.45)',
-                    backgroundColor: selectedEngine === cfg.key
-                      ? 'rgba(212,175,55,0.12)'
-                      : cfg.flagship ? 'rgba(212,175,55,0.03)' : 'rgba(255,255,255,0.02)',
-                  }}
+                  className={`segmented-control-btn ${selectedEngine === cfg.key ? 'segmented-control-btn-active' : ''}`}
                 >
-                  <span style={{ fontSize: '1.1rem' }}>{cfg.icon}</span>
-                  <span style={{
-                    fontSize: '0.6rem', fontWeight: 700, textAlign: 'center', lineHeight: 1.2,
-                    color: selectedEngine === cfg.key ? 'var(--color-brand-primary)' : 'var(--color-text-primary)',
-                  }}>{cfg.label}</span>
-                  {cfg.flagship && <span style={s.flagshipBadge}>★</span>}
+                  {cfg.label}
                 </button>
               ))}
             </div>
@@ -163,21 +153,17 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
 
           {/* Color */}
           <div style={s.section}>
-            <div style={s.sectionLabel}>Play As</div>
-            <div style={s.colorGrid}>
+            <div style={s.sectionLabel}>Side Selection</div>
+            <div className="segmented-control">
               {COLOR_OPTIONS.map(c => (
                 <button
                   key={c.value}
+                  type="button"
                   onClick={() => setSelectedColor(c.value)}
-                  style={{
-                    ...s.colorChip,
-                    borderColor: selectedColor === c.value ? 'var(--color-brand-primary)' : 'rgba(52,40,30,0.45)',
-                    backgroundColor: selectedColor === c.value ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.02)',
-                    color: selectedColor === c.value ? 'var(--color-brand-primary)' : 'var(--color-text-primary)',
-                  }}
+                  className={`segmented-control-btn ${selectedColor === c.value ? 'segmented-control-btn-active' : ''}`}
                 >
-                  <span style={{ fontSize: '1.1rem' }}>{c.symbol}</span>
-                  <span style={{ fontWeight: 600, fontSize: '0.75rem' }}>{c.label}</span>
+                  <span style={{ marginRight: '4px' }}>{c.symbol}</span>
+                  {c.label}
                 </button>
               ))}
             </div>
@@ -186,20 +172,16 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
           {/* Time Control */}
           <div style={s.section}>
             <div style={s.sectionLabel}>Time Control</div>
-            <div style={s.timeGrid}>
+            <div className="segmented-control" style={{ flexWrap: 'wrap' }}>
               {TIME_OPTIONS.map(t => (
                 <button
                   key={t.value}
+                  type="button"
                   onClick={() => setSelectedTime(t.value)}
-                  style={{
-                    ...s.timeChip,
-                    borderColor: selectedTime === t.value ? 'var(--color-brand-primary)' : 'rgba(52,40,30,0.45)',
-                    backgroundColor: selectedTime === t.value ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.02)',
-                    color: selectedTime === t.value ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
-                  }}
+                  className={`segmented-control-btn ${selectedTime === t.value ? 'segmented-control-btn-active' : ''}`}
+                  style={{ flex: '1 0 30%' }}
                 >
-                  <span style={{ fontWeight: 700, fontSize: '0.8rem' }}>{t.label}</span>
-                  <span style={{ fontSize: '0.6rem', opacity: 0.6 }}>{t.type}</span>
+                  {t.label}
                 </button>
               ))}
             </div>
@@ -207,24 +189,19 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
 
           {/* Match Rules */}
           <div style={s.section}>
-            <div style={s.sectionLabel}>Match Rules</div>
-            <div style={s.rulesGrid}>
+            <div style={s.sectionLabel}>Match Mode</div>
+            <div className="segmented-control">
               {[
-                { value: 'casual',      label: 'Casual (Allow Undo)', symbol: '🔄' },
-                { value: 'competitive', label: 'Competitive (No Undo)', symbol: '🛡️' },
+                { value: 'casual',      label: 'Casual (Allow Undo)' },
+                { value: 'competitive', label: 'Competitive (No Undo)' },
               ].map(r => (
                 <button
                   key={r.value}
+                  type="button"
                   onClick={() => setRulesLevel(r.value)}
-                  style={{
-                    ...s.rulesChip,
-                    borderColor: rulesLevel === r.value ? 'var(--color-brand-primary)' : 'rgba(52,40,30,0.45)',
-                    backgroundColor: rulesLevel === r.value ? 'rgba(212,175,55,0.12)' : 'rgba(255,255,255,0.02)',
-                    color: rulesLevel === r.value ? 'var(--color-brand-primary)' : 'var(--color-text-primary)',
-                  }}
+                  className={`segmented-control-btn ${rulesLevel === r.value ? 'segmented-control-btn-active' : ''}`}
                 >
-                  <span style={{ marginRight: '6px', fontSize: '1rem' }}>{r.symbol}</span>
-                  <span style={{ fontWeight: 600, fontSize: '0.75rem' }}>{r.label}</span>
+                  {r.label}
                 </button>
               ))}
             </div>
@@ -232,14 +209,14 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
 
           {/* Options */}
           <div style={s.section}>
-            <div style={s.sectionLabel}>Game Options</div>
+            <div style={s.sectionLabel}>Telemetry Options</div>
             <div style={s.optionList}>
               {[
                 { label: 'Show Evaluation Bar',     value: showEvalBar,    set: setShowEvalBar },
                 { label: 'Show Principal Variation', value: showPV,         set: setShowPV },
-                { label: 'Premove',                  value: premoveEnabled, set: setPremoveEnabled },
-                { label: 'Auto-Analyze After Game',  value: autoAnalysis,   set: setAutoAnalysis },
-                { label: 'Show Move Hints',          value: moveHints,      set: setMoveHints },
+                { label: 'Premove System',           value: premoveEnabled, set: setPremoveEnabled },
+                { label: 'Auto-Analyze Game',        value: autoAnalysis,   set: setAutoAnalysis },
+                { label: 'Highlight Search Hints',   value: moveHints,      set: setMoveHints },
               ].map(opt => (
                 <div key={opt.label} style={s.optionRow}>
                   <span style={s.optionLabel}>{opt.label}</span>

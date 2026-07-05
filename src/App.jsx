@@ -217,7 +217,7 @@ export default function App() {
                 style={styles.navLink(activeTab === 'research')}
                 className="nav-link-hoverable"
               >
-                Research Lab
+                Benchmark Workspace
               </button>
             </nav>
 
@@ -375,7 +375,7 @@ export default function App() {
                   onClick={() => { navigate('/research'); setIsDrawerOpen(false); }}
                   style={styles.drawerItem(activeTab === 'research')}
                 >
-                  Research Lab
+                  Benchmark Workspace
                 </button>
               </div>
             </div>

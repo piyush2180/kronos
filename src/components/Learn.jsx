@@ -92,7 +92,7 @@ export default function Learn() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: spacing.sm, paddingTop: spacing.sm, borderTop: '1px solid var(--color-border-subtle)' }}>
           <span style={{ fontSize: '0.7rem', color: colors.textMuted, fontWeight: '600' }}>Workstation Navigation</span>
           <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem', padding: '0.55rem', borderRadius: geometry.radiusInteractive }} onClick={() => navigateToResearch('runner')}>
-            <Play size={13} /> Launch Research Lab
+            <Play size={13} /> Open Benchmark Workspace
           </button>
         </div>
       </aside>

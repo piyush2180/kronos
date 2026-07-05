@@ -418,11 +418,11 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={styles.sidebarColumn} className="puzzle-sidebar-column">
+        <div style={{ ...styles.sidebarColumn, border: '1px solid var(--color-border-subtle)', boxShadow: 'none', padding: '16px', borderRadius: '6px', backgroundColor: 'var(--color-bg-surface)' }} className="puzzle-sidebar-column panel-card">
           
           {/* Rating Selection Grid */}
-          <div className="panel-card" style={{ padding: spacing.md }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs, display: 'flex', alignItems: 'center', gap: '5px' }}><Trophy size={11} /> Select Rating Band</div>
+          <div style={{ paddingBottom: '16px', borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Trophy size={11} /> Select Rating Band</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px' }}>
               {RATING_BANDS.map(band => (
                 <button
@@ -433,11 +433,12 @@ export default function Puzzles({ boardTheme, onBack }) {
                     fontSize: '0.72rem',
                     fontWeight: '600',
                     border: '1px solid',
-                    borderRadius: geometry.radiusInteractive,
+                    borderRadius: '4px',
                     cursor: 'pointer',
                     backgroundColor: selectedRange === band.label ? 'rgba(200, 159, 61, 0.12)' : 'var(--color-bg-base)',
                     borderColor: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-border-default)',
-                    color: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)'
+                    color: selectedRange === band.label ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                    transition: 'all 0.12s ease'
                   }}
                 >
                   {band.label}
@@ -447,13 +448,13 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Theme Dropdown */}
-          <div className="panel-card" style={{ padding: spacing.md }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs, display: 'flex', alignItems: 'center', gap: '5px' }}><Filter size={11} /> Filter by Theme</div>
+          <div style={{ padding: '12px 0 16px 0', borderBottom: '1px solid var(--color-border-subtle)' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}><Filter size={11} /> Filter by Theme</div>
             <select
               value={selectedTheme}
               onChange={(e) => setSelectedTheme(e.target.value)}
               className="select-field"
-              style={{ width: '100%', borderRadius: geometry.radiusInteractive }}
+              style={{ width: '100%', borderRadius: '4px' }}
             >
               {availableThemes.map(theme => (
                 <option key={theme} value={theme}>{theme}</option>
@@ -462,9 +463,9 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Puzzle List Bank */}
-          <div className="panel-card" style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', padding: spacing.md }}>
-            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: spacing.xs }}>Puzzle Bank ({filteredPuzzles.length})</div>
-            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px' }} className="scroll-panel">
+          <div style={{ flex: 1, minHeight: '260px', display: 'flex', flexDirection: 'column', paddingTop: '12px' }}>
+            <div style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px' }}>Puzzle Bank ({filteredPuzzles.length})</div>
+            <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', maxHeight: '280px' }} className="scroll-panel nav-list">
               {paginatedPuzzles.map((p, idx) => {
                 const isSolved = solvedIds.includes(p.id);
                 const absIndex = (currentPage - 1) * pageSize + idx;
@@ -473,20 +474,14 @@ export default function Puzzles({ boardTheme, onBack }) {
                   <button
                     key={p.id}
                     onClick={() => handleSelectPuzzle(p)}
-                    className="puzzle-bank-btn"
-                    style={{
-                      backgroundColor: isCurrent ? 'var(--color-bg-elevated)' : 'transparent',
-                      borderLeft: isCurrent ? '3px solid var(--color-brand-primary)' : '3px solid transparent',
-                      color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
-                      borderRadius: geometry.radiusInteractive
-                    }}
+                    className={`nav-list-item ${isCurrent ? 'nav-list-item-active' : ''}`}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       {isSolved ? <CheckCircle2 size={13} color={colors.success} /> : <Play size={10} color="var(--color-text-dim)" />}
                       <span style={{ fontSize: '0.78rem', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Puzzle #{p.id}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '6px' }}>
-                      <span style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-brand-primary)' }}>★{p.rating}</span>
+                      <span style={{ fontSize: '0.68rem', fontWeight: '600', color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-dim)' }}>★{p.rating}</span>
                     </div>
                   </button>
                 );

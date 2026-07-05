@@ -6,10 +6,10 @@ export default function BenchmarkConsole({ logs = [], onClear }) {
   const bodyRef = useRef(null);
 
   const defaultLogs = [
-    { time: '09:32:14', level: 'SYSTEM', message: 'Initializing Research Workspace...' },
+    { time: '09:32:14', level: 'SYSTEM', message: 'Initializing Benchmark Workspace...' },
     { time: '09:32:14', level: 'INFO', message: 'Loading benchmark artifacts...' },
     { time: '09:32:15', level: 'INFO', message: '2 experiment datasets discovered in benchmark/output/' },
-    { time: '09:32:15', level: 'SUCCESS', message: 'SHA256 reproducible pipeline verified' },
+    { time: '09:32:15', level: 'SUCCESS', message: 'Last benchmark passed' },
     { time: '09:32:16', level: 'SYSTEM', message: 'Stockfish Worker threads online (multithreaded)' },
     { time: '09:32:16', level: 'SUCCESS', message: 'Engineering suite online. Ready for benchmark execution.' }
   ];

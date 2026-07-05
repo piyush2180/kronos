@@ -19,8 +19,8 @@ export default function ResearchLabPage({ onBack }) {
   const [experiments, setExperiments] = useState([]);
   const [selectedExperiment, setSelectedExperiment] = useState(null);
   const [consoleLogs, setConsoleLogs] = useState([
-    'Research Suite v2 environment initialized.',
-    'Connected to benchmark data abstraction service.'
+    'Benchmark Workspace environment initialized.',
+    'Connected to benchmark data service.'
   ]);
 
   // Load experiments from BenchmarkDataService on initialization
