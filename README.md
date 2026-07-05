@@ -113,8 +113,8 @@ The engine runs in a dedicated Web Worker, keeping search calculations off the m
 ### Key Results
 
 * **Heap stabilization**: Size-bounded transposition tables keep heap usage flat, preventing V8 GC sweeps during deep search.
-* **Quiescence search validation**: Under SPRT testing, quiescence search showed a +202 Elo gain (95% CI: [118, 316]), confirming its role in resolving the horizon effect.
-* **LMR contribution**: Ablation runs showed LMR provides the largest search space reduction — up to 80% fewer nodes with minimal tactical loss.
+* **Quiescence search validation**: Ablation testing showed that deactivating quiescence search at depth 3 results in a **-371 Elo** rating regression (dropping from 1,387 to 1,016 Elo), with SPRT testing certifying this playing strength gain as highly statistically significant.
+* **LMR contribution**: Ablation runs at depth 4 showed LMR provides the largest search space reduction, yielding a **66.3%** reduction in searched nodes (from 24,572 down to 8,286 nodes) with minimal tactical loss.
 
 ---
 
