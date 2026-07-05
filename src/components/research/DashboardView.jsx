@@ -32,20 +32,20 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
       </div>
 
       {/* 2. Engineering Status Bar */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, backgroundColor: colors.bgSurface, padding: `${spacing.sm} ${spacing.lg}`, borderRadius: geometry.radiusInteractive, fontSize: '0.78rem', flexWrap: 'wrap', border: `1px solid ${colors.borderSubtle}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md, backgroundColor: 'rgba(255, 255, 255, 0.01)', padding: `${spacing.sm} ${spacing.lg}`, borderRadius: geometry.radiusInteractive, fontSize: '0.78rem', flexWrap: 'wrap', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
           <span style={{ color: colors.textMuted }}>Branch</span>
           <span style={{ fontWeight: '600', color: colors.textPrimary }}>{latest.repositoryBranch || 'main'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
           <span style={{ color: colors.textMuted }}>Commit</span>
           <span style={{ fontWeight: '600', color: colors.textPrimary }}>{latest.gitCommitHash ? latest.gitCommitHash.substring(0, 7) : 'HEAD'}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: colors.bgElevated }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
           <span style={{ color: colors.textMuted }}>Datasets</span>
           <span style={{ fontWeight: '600', color: colors.textPrimary }}>{experiments.length} Loaded</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(75, 175, 122, 0.08)', border: `1px solid rgba(75, 175, 122, 0.2)` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: spacing.xs, padding: '0.2rem 0.5rem', borderRadius: geometry.radiusBadge, backgroundColor: 'rgba(75, 175, 122, 0.08)', border: '1px solid rgba(75, 175, 122, 0.2)' }}>
           <span style={{ color: colors.textMuted }}>Integrity</span>
           <span style={{ color: SUCCESS_COLOR, fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
             <ShieldCheck size={13} /> {latest.certification || 'Verified'}
@@ -54,7 +54,7 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
       </div>
 
       {/* 3. Live Telemetry Stream */}
-      <div className="card-secondary" style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, padding: spacing.lg, borderRadius: geometry.radiusCard, border: `1px solid ${colors.borderSubtle}` }}>
+      <div className="card-secondary" style={{ display: 'flex', flexDirection: 'column', gap: spacing.lg, padding: spacing.lg, borderRadius: geometry.radiusCard, border: 'none' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: spacing.md }}>
             <span className="active-pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: SUCCESS_COLOR, boxShadow: `0 0 8px ${SUCCESS_COLOR}`, display: 'inline-block' }} />
@@ -98,7 +98,7 @@ export default function DashboardView({ experiments = [], onNavigate, onInspect 
           </button>
         </div>
 
-        <div className="card-primary" style={{ padding: 0, overflow: 'hidden', borderRadius: geometry.radiusCard, border: `1px solid ${colors.borderSubtle}` }}>
+        <div className="card-primary" style={{ padding: 0, overflow: 'hidden', borderRadius: geometry.radiusCard, border: 'none' }}>
           <table className="table-research">
             <thead>
               <tr>

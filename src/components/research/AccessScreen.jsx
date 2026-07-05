@@ -114,7 +114,8 @@ export default function AccessScreen({ onEnter }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder={activeUser === 'Guest' ? "Password (leave blank for Guest)..." : "Enter account password..."}
-                style={styles.textInput}
+                className="input-field"
+                style={{ width: '100%' }}
                 disabled={isAuthenticating}
                 required={activeUser !== 'Guest'}
               />
@@ -126,7 +127,8 @@ export default function AccessScreen({ onEnter }) {
 
             <button 
               type="submit" 
-              style={styles.enterBtn} 
+              className="btn-primary"
+              style={{ width: '100%' }} 
               disabled={isAuthenticating}
             >
               <span>{isAuthenticating ? 'Unlocking Workspace...' : 'Authenticate Session'}</span>
@@ -236,9 +238,9 @@ const styles = {
     marginBottom: '20px'
   },
   statusItem: {
-    backgroundColor: 'var(--color-bg-base)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
+    backgroundColor: 'rgba(255, 255, 255, 0.01)',
+    border: '1px solid rgba(255, 255, 255, 0.03)',
+    borderRadius: '12px',
     padding: '10px 12px',
     display: 'flex',
     flexDirection: 'column',
@@ -315,8 +317,8 @@ const styles = {
     alignItems: 'center',
     gap: '8px',
     backgroundColor: 'rgba(255,255,255,0.01)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '4px',
+    border: '1px solid rgba(255, 255, 255, 0.03)',
+    borderRadius: '12px',
     padding: '8px 12px',
     fontSize: '0.7rem',
     color: 'var(--color-text-dim)',

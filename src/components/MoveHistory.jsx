@@ -385,12 +385,6 @@ const styles = {
     height: '14px',
     borderRadius: '3px',
   },
-  emptyState: {
-    textAlign: 'center',
-    padding: '20px 10px',
-    color: 'var(--color-text-dim)',
-    fontSize: '12px',
-  },
   navRow: {
     display: 'flex',
     alignItems: 'center',

@@ -41,11 +41,11 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
 
       {/* Right Column: Pass & Play Configuration */}
       <div style={styles.sidebarColumn}>
-        <div style={{ ...lobby.configPanel, border: '1px solid var(--color-border-subtle)', boxShadow: 'none' }} className="panel-card">
+        <div style={lobby.configPanel}>
           <div style={lobby.configHeader}>
             <div>
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', color: 'var(--color-brand-primary)', textTransform: 'capitalize' }}>Local match setup</span>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--color-text-primary)', margin: '0.1rem 0' }}>Pass & Play Settings</h2>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Local Match Setup</span>
+              <h2 className="heading-section" style={{ margin: '4px 0 0 0' }}>Pass & Play Settings</h2>
             </div>
           </div>
 
@@ -53,15 +53,15 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             {/* Players Matchup */}
             <div style={lobby.section}>
               <div style={lobby.sectionLabel}>Matchup Overview</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '12px 0', backgroundColor: 'var(--color-bg-base)', borderRadius: '6px', border: '1px solid var(--color-border-subtle)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '12px 0', backgroundColor: 'rgba(255, 255, 255, 0.01)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '1.2rem', color: 'var(--color-text-primary)' }}>♔</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>White</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600' }}>White</span>
                 </div>
-                <span style={{ fontSize: '0.68rem', color: 'var(--color-text-dim)', fontWeight: '700' }}>VS</span>
+                <span style={{ fontSize: '11px', color: 'var(--color-text-dim)', fontWeight: '700' }}>VS</span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <span style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)' }}>♚</span>
-                  <span style={{ fontSize: '0.8rem', fontWeight: '600' }}>Black</span>
+                  <span style={{ fontSize: '14px', fontWeight: '600' }}>Black</span>
                 </div>
               </div>
             </div>
@@ -69,7 +69,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             {/* Time Control Chips */}
             <div style={lobby.section}>
               <div style={lobby.sectionLabel}>Time Control</div>
-              <div className="segmented-control" style={{ flexWrap: 'wrap' }}>
+              <div className="segmented-control" style={{ flexWrap: 'wrap', gap: '2px' }}>
                 {TIME_OPTIONS.map(t => (
                   <button
                     key={t.value}
@@ -84,16 +84,16 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
             </div>
 
             {/* Match Rules & Specs */}
-            <div style={{ backgroundColor: 'var(--color-bg-base)', padding: `10px 14px`, borderRadius: '6px', border: '1px solid var(--color-border-subtle)', fontSize: '0.72rem', color: 'var(--color-text-dim)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <span style={{ fontWeight: '600', color: 'var(--color-text-secondary)' }}>Rules of Play</span>
-              <span>Two players share one screen. The board flips automatically after each completed move to face the active side.</span>
+            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)', padding: `12px 16px`, borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.03)', fontSize: '13px', color: 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <span style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>Rules of Play</span>
+              <span style={{ lineHeight: '1.4' }}>Two players share one screen. The board flips automatically after each completed move to face the active side.</span>
             </div>
           </div>
 
           {/* Start Button Fixed at Bottom */}
           <div style={lobby.fixedFooter}>
-            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem' }}>
-              <PlayCircle size={15} />
+            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%' }}>
+              <PlayCircle size={18} />
               <span>Start Match</span>
             </button>
           </div>
@@ -251,7 +251,7 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
 
       {/* Right: Sidebar */}
       <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
-        <div style={styles.sidebarWrapper} className="panel-card sidebar-card-wrapper">
+        <div style={styles.sidebarWrapper} className="sidebar-card-wrapper">
           {reviewTabActive ? (
             <PostGameReview
               gameHistory={game.gameHistory}
@@ -325,11 +325,11 @@ const lobby = {
   configPanel: {
     display: 'flex',
     flexDirection: 'column',
-    height: '100%',
+    minHeight: 0,
+    backgroundColor: 'transparent',
+    borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
     boxSizing: 'border-box',
-    padding: spacing.xl,
-    gap: spacing.xl,
-    overflow: 'hidden'
+    padding: '0 24px 20px 24px',
   },
   configHeader: {
     paddingBottom: spacing.sm,
@@ -398,7 +398,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: '60% 40%',
     gap: spacing.xl,
-    height: 'calc(100vh - 56px)',
+    minHeight: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
@@ -409,23 +409,19 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
     minWidth: 0,
     minHeight: 0
   },
   sidebarColumn: {
-    height: '100%',
-    minHeight: 0,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    minHeight: 0
   },
   sidebarWrapper: {
     flex: 1,
-    minHeight: 0,
     padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'hidden',
     boxSizing: 'border-box'
   },
   controlSection: {
