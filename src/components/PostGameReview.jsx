@@ -195,42 +195,45 @@ export default function PostGameReview({
           </div>
         </div>
 
-        {/* Generate Analysis CTA */}
-        <div style={s.analysisCta}>
-          <div style={s.ctaIcon}>
-            <BarChart2 size={36} style={{ color: 'var(--color-brand-primary)' }} />
+        {/* Scrollable Body */}
+        <div style={s.scrollBody} className="scroll-panel">
+          {/* Generate Analysis CTA */}
+          <div style={s.analysisCta}>
+            <div style={s.ctaIcon}>
+              <BarChart2 size={36} style={{ color: 'var(--color-brand-primary)' }} />
+            </div>
+            <div style={s.ctaTitle}>Generate Game Analysis</div>
+            <div style={s.ctaDesc}>
+              Evaluate every position using {engineLabel}. Identifies accuracy, blunders, critical moments, and best moves.
+            </div>
+            <div style={s.ctaInfo}>
+              <Zap size={11} />
+              <span>~{Math.max(5, Math.round(gameHistory.length * 0.8))} seconds · {gameHistory.length} positions</span>
+            </div>
+            <button
+              onClick={triggerAnalysis}
+              disabled={!triggerAnalysis || gameHistory.length === 0}
+              style={s.analyzeBtn}
+            >
+              <BarChart2 size={15} />
+              Generate Analysis
+            </button>
           </div>
-          <div style={s.ctaTitle}>Generate Game Analysis</div>
-          <div style={s.ctaDesc}>
-            Evaluate every position using {engineLabel}. Identifies accuracy, blunders, critical moments, and best moves.
-          </div>
-          <div style={s.ctaInfo}>
-            <Zap size={11} />
-            <span>~{Math.max(5, Math.round(gameHistory.length * 0.8))} seconds · {gameHistory.length} positions</span>
-          </div>
-          <button
-            onClick={triggerAnalysis}
-            disabled={!triggerAnalysis || gameHistory.length === 0}
-            style={s.analyzeBtn}
-          >
-            <BarChart2 size={15} />
-            Generate Analysis
-          </button>
-        </div>
 
-        {/* Quick game info */}
-        <div style={s.quickInfo}>
-          <div style={s.quickInfoRow}>
-            <span style={s.qiLabel}>Engine</span>
-            <span style={s.qiVal}>{engineLabel}</span>
-          </div>
-          <div style={s.quickInfoRow}>
-            <span style={s.qiLabel}>Moves played</span>
-            <span style={s.qiVal}>{gameHistory.length}</span>
-          </div>
-          <div style={s.quickInfoRow}>
-            <span style={s.qiLabel}>Mode</span>
-            <span style={s.qiVal}>{modeSelected === 'simulate' ? 'Engine vs Engine' : 'Play vs Engine'}</span>
+          {/* Quick game info */}
+          <div style={s.quickInfo}>
+            <div style={s.quickInfoRow}>
+              <span style={s.qiLabel}>Engine</span>
+              <span style={s.qiVal}>{engineLabel}</span>
+            </div>
+            <div style={s.quickInfoRow}>
+              <span style={s.qiLabel}>Moves played</span>
+              <span style={s.qiVal}>{gameHistory.length}</span>
+            </div>
+            <div style={s.quickInfoRow}>
+              <span style={s.qiLabel}>Mode</span>
+              <span style={s.qiVal}>{modeSelected === 'simulate' ? 'Engine vs Engine' : 'Play vs Engine'}</span>
+            </div>
           </div>
         </div>
 
@@ -293,114 +296,117 @@ export default function PostGameReview({
         <button onClick={onReset} style={s.newMatchBtn}><RefreshCw size={12} /> New</button>
       </div>
 
-      {/* Accuracy Cards */}
-      {modeSelected !== 'simulate' && (
-        <div style={s.accRow}>
-          <div style={s.accCard}>
-            <div style={s.accPct(myAcc)}>{myAcc}%</div>
-            <div style={s.accLabel}>You ({myColor === 'w' ? 'White' : 'Black'})</div>
-            <div style={{ ...s.accBar, width: '100%' }}>
-              <div style={{ ...s.accFill, width: `${myAcc}%`, backgroundColor: myAcc >= 75 ? '#34d399' : myAcc >= 50 ? '#fbbf24' : '#f87171' }} />
+      {/* Scrollable Body */}
+      <div style={s.scrollBody} className="scroll-panel">
+        {/* Accuracy Cards */}
+        {modeSelected !== 'simulate' && (
+          <div style={s.accRow}>
+            <div style={s.accCard}>
+              <div style={s.accPct(myAcc)}>{myAcc}%</div>
+              <div style={s.accLabel}>You ({myColor === 'w' ? 'White' : 'Black'})</div>
+              <div style={{ ...s.accBar, width: '100%' }}>
+                <div style={{ ...s.accFill, width: `${myAcc}%`, backgroundColor: myAcc >= 75 ? '#34d399' : myAcc >= 50 ? '#fbbf24' : '#f87171' }} />
+              </div>
+            </div>
+            <div style={s.accCard}>
+              <div style={s.accPct(oppAcc)}>{oppAcc}%</div>
+              <div style={s.accLabel}>Engine</div>
+              <div style={{ ...s.accBar, width: '100%' }}>
+                <div style={{ ...s.accFill, width: `${oppAcc}%`, backgroundColor: oppAcc >= 75 ? '#34d399' : oppAcc >= 50 ? '#fbbf24' : '#f87171' }} />
+              </div>
             </div>
           </div>
-          <div style={s.accCard}>
-            <div style={s.accPct(oppAcc)}>{oppAcc}%</div>
-            <div style={s.accLabel}>Engine</div>
-            <div style={{ ...s.accBar, width: '100%' }}>
-              <div style={{ ...s.accFill, width: `${oppAcc}%`, backgroundColor: oppAcc >= 75 ? '#34d399' : oppAcc >= 50 ? '#fbbf24' : '#f87171' }} />
-            </div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {/* Evaluation Graph */}
-      <div style={s.graphCard}>
-        <div style={s.cardTitle}>Evaluation Graph</div>
-        <EvalGraph
-          gameHistory={gameHistory}
-          previewIndex={previewIndex}
-          onSelectPly={(idx) => onSelectMoveIndex(idx)}
-        />
-      </div>
-
-      {/* Move Counts */}
-      <div style={s.countsRow}>
-        {[
-          { label: 'Best', key: 'best',      color: '#34d399' },
-          { label: '!',    key: 'excellent',  color: '#6ee7b7' },
-          { label: '?!',   key: 'inaccuracy', color: '#fbbf24' },
-          { label: '?',    key: 'mistake',    color: '#f97316' },
-          { label: '??',   key: 'blunder',    color: '#f87171' },
-        ].map(cat => (
-          <div key={cat.key} style={s.countCell}>
-            <div style={{ ...s.countNum, color: cat.color }}>
-              {modeSelected !== 'simulate' ? myCounts[cat.key] : (stats.w[cat.key] + stats.b[cat.key])}
-            </div>
-            <div style={s.countLabel}>{cat.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Critical Moments */}
-      <div style={s.momentsCard}>
-        <div style={s.momentsTitleRow}>
-          <span style={s.cardTitle}>Critical Moments</span>
-          <div style={s.filterRow}>
-            {[
-              { key: 'all',        label: 'All' },
-              { key: 'error',      label: '?/?' },
-              { key: 'inaccuracy', label: '?!' },
-            ].map(f => (
-              <button
-                key={f.key}
-                onClick={() => setActiveFilter(f.key)}
-                style={{
-                  ...s.filterBtn,
-                  backgroundColor: activeFilter === f.key ? 'rgba(212,175,55,0.15)' : 'transparent',
-                  color: activeFilter === f.key ? 'var(--color-brand-primary)' : 'var(--color-text-dim)',
-                  borderColor: activeFilter === f.key ? 'rgba(212,175,55,0.3)' : 'rgba(255,255,255,0.06)',
-                }}
-              >{f.label}</button>
-            ))}
-          </div>
+        {/* Evaluation Graph */}
+        <div style={s.graphCard}>
+          <div style={s.cardTitle}>Evaluation Graph</div>
+          <EvalGraph
+            gameHistory={gameHistory}
+            previewIndex={previewIndex}
+            onSelectPly={(idx) => onSelectMoveIndex(idx)}
+          />
         </div>
 
-        <div style={s.momentsList}>
-          {filteredMoments.length === 0 ? (
-            <div style={s.emptyMoments}>
-              <CheckCircle2 size={14} style={{ opacity: 0.4 }} />
-              <span>No {activeFilter === 'all' ? 'critical' : activeFilter} moments found</span>
+        {/* Move Counts */}
+        <div style={s.countsRow}>
+          {[
+            { label: 'Best', key: 'best',      color: '#34d399' },
+            { label: '!',    key: 'excellent',  color: '#6ee7b7' },
+            { label: '?!',   key: 'inaccuracy', color: '#fbbf24' },
+            { label: '?',    key: 'mistake',    color: '#f97316' },
+            { label: '??',   key: 'blunder',    color: '#f87171' },
+          ].map(cat => (
+            <div key={cat.key} style={s.countCell}>
+              <div style={{ ...s.countNum, color: cat.color }}>
+                {modeSelected !== 'simulate' ? myCounts[cat.key] : (stats.w[cat.key] + stats.b[cat.key])}
+              </div>
+              <div style={s.countLabel}>{cat.label}</div>
             </div>
-          ) : (
-            filteredMoments.slice(0, 8).map((moment, i) => {
-              const cc = classifyColor(moment.classification);
-              return (
+          ))}
+        </div>
+
+        {/* Critical Moments */}
+        <div style={s.momentsCard}>
+          <div style={s.momentsTitleRow}>
+            <span style={s.cardTitle}>Critical Moments</span>
+            <div style={s.filterRow}>
+              {[
+                { key: 'all',        label: 'All' },
+                { key: 'error',      label: '?/?' },
+                { key: 'inaccuracy', label: '?!' },
+              ].map(f => (
                 <button
-                  key={i}
+                  key={f.key}
+                  onClick={() => setActiveFilter(f.key)}
                   style={{
-                    ...s.momentRow,
-                    borderLeft: `3px solid ${cc.color}`,
-                    backgroundColor: previewIndex === moment.ply ? 'rgba(212,175,55,0.06)' : 'transparent',
+                    ...s.filterBtn,
+                    backgroundColor: activeFilter === f.key ? 'rgba(212,175,55,0.15)' : 'transparent',
+                    color: activeFilter === f.key ? 'var(--color-brand-primary)' : 'var(--color-text-dim)',
+                    borderColor: activeFilter === f.key ? 'rgba(212,175,55,0.3)' : 'rgba(255,255,255,0.06)',
                   }}
-                  onClick={() => onSelectMoveIndex(moment.ply)}
-                >
-                  <span style={{ color: 'var(--color-text-dim)', fontSize: '0.65rem', minWidth: '22px' }}>
-                    {Math.floor(moment.ply / 2) + 1}{moment.ply % 2 === 0 ? '.' : '…'}
-                  </span>
-                  <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--color-text-primary)' }}>
-                    {moment.san}
-                  </span>
-                  <span style={{ ...s.clsBadge, color: cc.color, borderColor: `${cc.color}33` }}>
-                    {cc.icon} {moment.classification}
-                  </span>
-                  <span style={{ marginLeft: 'auto', fontSize: '0.65rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>
-                    {scoreDisplay(moment.evalBefore)} → {scoreDisplay(moment.evalAfter)}
-                  </span>
-                  <ChevronRight size={11} style={{ opacity: 0.3, flexShrink: 0 }} />
-                </button>
-              );
-            })
-          )}
+                >{f.label}</button>
+              ))}
+            </div>
+          </div>
+
+          <div style={s.momentsList}>
+            {filteredMoments.length === 0 ? (
+              <div style={s.emptyMoments}>
+                <CheckCircle2 size={14} style={{ opacity: 0.4 }} />
+                <span>No {activeFilter === 'all' ? 'critical' : activeFilter} moments found</span>
+              </div>
+            ) : (
+              filteredMoments.slice(0, 8).map((moment, i) => {
+                const cc = classifyColor(moment.classification);
+                return (
+                  <button
+                    key={i}
+                    style={{
+                      ...s.momentRow,
+                      borderLeft: `3px solid ${cc.color}`,
+                      backgroundColor: previewIndex === moment.ply ? 'rgba(212,175,55,0.06)' : 'transparent',
+                    }}
+                    onClick={() => onSelectMoveIndex(moment.ply)}
+                  >
+                    <span style={{ color: 'var(--color-text-dim)', fontSize: '0.65rem', minWidth: '22px' }}>
+                      {Math.floor(moment.ply / 2) + 1}{moment.ply % 2 === 0 ? '.' : '…'}
+                    </span>
+                    <span style={{ fontWeight: 700, fontSize: '0.78rem', fontFamily: 'monospace', color: 'var(--color-text-primary)' }}>
+                      {moment.san}
+                    </span>
+                    <span style={{ ...s.clsBadge, color: cc.color, borderColor: `${cc.color}33` }}>
+                      {cc.icon} {moment.classification}
+                    </span>
+                    <span style={{ marginLeft: 'auto', fontSize: '0.65rem', color: 'var(--color-text-dim)', fontFamily: 'monospace' }}>
+                      {scoreDisplay(moment.evalBefore)} → {scoreDisplay(moment.evalAfter)}
+                    </span>
+                    <ChevronRight size={11} style={{ opacity: 0.3, flexShrink: 0 }} />
+                  </button>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
 
@@ -427,9 +433,17 @@ const s = {
     flexDirection: 'column',
     gap: '12px',
     height: '100%',
+    width: '100%',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
+  },
+  scrollBody: {
     flex: 1,
     minHeight: 0,
     overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '12px',
     paddingRight: '6px',
     scrollbarWidth: 'thin',
     scrollbarColor: 'var(--color-border-default) transparent',
@@ -683,7 +697,7 @@ const s = {
     display: 'flex',
     gap: '8px',
     flexShrink: 0,
-    marginTop: 'auto',
+    paddingTop: '4px',
   },
   primaryBtn: {
     flex: 1,
