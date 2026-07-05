@@ -197,7 +197,9 @@ export default function PostGameReview({
 
         {/* Generate Analysis CTA */}
         <div style={s.analysisCta}>
-          <div style={s.ctaIcon}>📊</div>
+          <div style={s.ctaIcon}>
+            <BarChart2 size={36} style={{ color: 'var(--color-brand-primary)' }} />
+          </div>
           <div style={s.ctaTitle}>Generate Game Analysis</div>
           <div style={s.ctaDesc}>
             Evaluate every position using {engineLabel}. Identifies accuracy, blunders, critical moments, and best moves.
@@ -423,10 +425,13 @@ const s = {
   root: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '10px',
-    height: '100%',
+    gap: '12px',
+    flex: 1,
+    minHeight: 0,
     overflowY: 'auto',
-    padding: '2px 4px 8px 0',
+    paddingRight: '6px',
+    scrollbarWidth: 'thin',
+    scrollbarColor: 'var(--color-border-default) transparent',
   },
   resultBanner: {
     display: 'flex',

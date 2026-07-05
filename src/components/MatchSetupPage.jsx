@@ -248,7 +248,7 @@ const s = {
     display: 'grid',
     gridTemplateColumns: '1.2fr 1fr',
     gap: '40px',
-    height: 'calc(100vh - 56px)',
+    height: 'calc(100vh - 64px)',
     width: '100%',
     maxWidth: '1440px',
     margin: '0 auto',

@@ -350,6 +350,21 @@ export function useChessGame(storageKey = 'kronos_v2_game_state', defaultMode = 
 
       const evaluateSingleFen = (fen) => {
         return new Promise((resolve) => {
+          try {
+            const tempChess = new Chess(fen);
+            if (tempChess.isGameOver()) {
+              if (tempChess.isCheckmate()) {
+                const turn = tempChess.turn();
+                resolve(turn === 'w' ? '-M0' : 'M0');
+                return;
+              }
+              resolve('0.00');
+              return;
+            }
+          } catch (e) {
+            console.warn('Error checking FEN game over in analysis:', e);
+          }
+
           let score = '0.00';
           const parts = fen.split(' ');
           const turn = parts[1] || 'w';

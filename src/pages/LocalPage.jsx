@@ -6,7 +6,7 @@ import { useChessGame } from '../hooks/useChessGame';
 import ChessBoard from '../components/ChessBoard';
 import ControlPanel from '../components/ControlPanel';
 import PostGameReview from '../components/PostGameReview';
-import { PlayCircle } from 'lucide-react';
+import { PlayCircle, User } from 'lucide-react';
 
 // ── Lobby Setup Screen ────────────────────────────────────────────────────────
 function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
@@ -58,7 +58,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
               <div style={lobby.sectionLabel}>Players</div>
               <div style={lobby.inputGroup}>
                 <div style={lobby.inputWrapper}>
-                  <span style={{ fontSize: '18px', color: '#f0d9b5', userSelect: 'none' }}>♔</span>
+                  <User size={16} style={{ color: '#f0d9b5', flexShrink: 0 }} />
                   <input
                     type="text"
                     value={whiteName}
@@ -68,7 +68,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
                   />
                 </div>
                 <div style={lobby.inputWrapper}>
-                  <span style={{ fontSize: '18px', color: '#b58863', userSelect: 'none' }}>♚</span>
+                  <User size={16} style={{ color: '#b58863', flexShrink: 0 }} />
                   <input
                     type="text"
                     value={blackName}
