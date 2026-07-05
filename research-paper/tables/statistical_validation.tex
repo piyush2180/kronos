@@ -1,6 +1,6 @@
 \begin{table}[htbp]
 \centering
-\caption[Statistical Significance Validation Matrix (SPRT)]{Statistical significance validation matrix (SPRT) at depth 4.}
+\caption[Statistical Significance Validation Matrix (SPRT)]{Statistical significance validation matrix (SPRT) at depth 3.\footnotemark}
 \label{tab:statistical_validation}
 \begin{tabularx}{\textwidth}{X c c c c}
 \toprule
@@ -14,6 +14,7 @@ Iterative Deepening vs.\ TT (EXP-5)        & $[-2.944, 2.944]$ & 153 & $-$0.171 
 Quiescence Search vs.\ No Quiescence (EXP-6) & $[-2.944, 2.944]$ & 400 & 75.433 & Accepted ($H_1$) \\
 \bottomrule
 \end{tabularx}
+\footnotetext{Note: EXP-3 and EXP-4 report identical game counts and LLR metrics because both tournaments involve matchups between mathematically decision-equivalent minimax formulations under a fixed-depth constraint. Since Alpha-Beta pruning, move ordering, and transposition table caching preserve search value evaluations and output identical move selections under deterministic execution, the resulting game trajectories are identical.}
 \end{table}
 
 

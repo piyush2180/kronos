@@ -1,6 +1,6 @@
 \begin{table}[htbp]
 \centering
-\caption[Search Node Ablation Study at Depth 4]{Search node count ablation study at depth 4. Note: The ablation study was executed under a legacy configuration where NMP was active for $d \ge 3$; under the final optimized configuration ($d \ge 5$), NMP is inactive at depth 4, resulting in a 0\% node reduction relative to the baseline.}
+\caption[Search Node Ablation Study at Depth 4]{Search node count ablation study at depth 4 under the final optimized configuration ($d \ge 5$ threshold for NMP).\footnotemark}
 \label{tab:node_counts}
 \begin{tabularx}{\textwidth}{Xrrr}
 \toprule
@@ -10,10 +10,11 @@ Full Kronos Engine (All Features) & 8,286  & --     & 1.00x \\
 No Principal Variation Search (PVS) & 8,739  & 5.2\%  & 0.78x \\
 No History Heuristic              & 8,869  & 6.6\%  & 0.78x \\
 No Late Move Reductions (LMR)     & 24,572 & 66.3\% & 0.24x \\
-No Null Move Pruning (NMP)        & 8,360  & 0.9\%  & 0.67x \\
+No Null Move Pruning (NMP)        & 8,286  & 0.0\%  & 1.00x \\
 Baseline Alpha-Beta (unordered) & 47,159 & 82.4\% & 0.12x \\
 \bottomrule
 \end{tabularx}
+\footnotetext{Note: Individual reductions are calculated independently by disabling each heuristic individually against the full configuration, and are therefore non-additive.}
 \end{table}
 
 

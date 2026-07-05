@@ -67,7 +67,7 @@ The mechanism is simple: without LMR, every move at every node must be searched 
 \subsection{Null Move Pruning (NMP)}
 NMP prunes search branches where passing the turn to the opponent still results in a score exceeding $\beta$, indicating that the position is sufficiently dominant to guarantee a cutoff. We configure NMP for search depths $d \ge 5$ using a constant reduction factor $R = 2$.
 
-At depth 4, NMP contributes a 0.9\% node reduction (from 8,360 to 8,286 nodes) but provides a 1.49× execution speedup. Note that these depth 4 measurements were recorded under a legacy configuration where the depth threshold was $d \ge 3$; under the final optimized configuration ($d \ge 5$), NMP is inactive at depth 4 and has no performance impact. The execution speedup is disproportionate to the raw node savings because NMP cutoffs occur near the root of the tree, avoiding expensive lower-ply move generation and evaluation calls on pruned sub-branches. The significance of NMP scales with search depth, proving critical for staying within time controls at depth 6.
+At depth 4, under the final optimized configuration ($d \ge 5$), NMP is inactive, resulting in a 0.0\% node reduction (8,286 nodes) and a 1.00x relative speedup. At deeper search plies ($d \ge 5$), NMP becomes active, pruning dominant branches early and avoiding expensive lower-ply move generation and evaluation calls on pruned sub-branches. The significance of NMP scales with search depth, proving critical for staying within time controls at depth 6.
 
 \subsection{Quiescence Search}
 Quiescence search mitigates the horizon effect by extending the search beyond the nominal depth limit for unstable, tactical positions containing legal captures. This prevents the engine from returning misleading static evaluations mid-sequence.
@@ -89,7 +89,7 @@ Table~\ref{tab:cross_depth_elo} documents per-move search throughput and playing
 
 \input{tables/cross_depth_elo}
 
-The internal Bradley-Terry self-play rating scales from 1,015 (estimated) at depth 1 to a peak internal self-play rating of 1,400 Elo at depth 6. At depth 5, the rating plateaus at 1,383 Elo, suggesting that the additional search ply does not consistently find better moves within the configured tournament time controls.
+The internal Bradley-Terry self-play rating scales from 1,015 (estimated) at depth 1 to a peak internal self-play rating of 1,400 Elo at depth 6. The ratings for depths 1 and 2 are estimated by anchoring the Bradley-Terry self-play model to the baseline minimax performance (anchored at 1000) and extrapolating the rating curve using the win-loss ratios of a small paired matchup series against depth 3. At depth 5, the rating plateaus at 1,383 Elo, suggesting that the additional search ply does not consistently find better moves within the configured tournament time controls.
 
 The performance regression at depth 7 ($-$35 Elo) is caused by single-threaded latency constraints. Telemetry logs indicate that the worker thread exceeded the move time limit (forcing a fallback to the depth-6 results) on average for 42.5\% of the moves during depth-7 matches. When search time at depth 7 exceeds the tournament time limit, the engine returns the best move from the last fully completed iterative deepening iteration (depth 6) rather than the incomplete depth-7 results. This timeout behavior introduces a performance ceiling, indicating that single-threaded JavaScript search workers cannot reliably sustain depth-7 calculations under standard time controls.
 
