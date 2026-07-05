@@ -70,7 +70,7 @@ const CARDS = [
 
 export default function Dashboard({ username, navigate }) {
   const stats = [
-    { label: 'Environment', value: 'Local Host', icon: Cpu, accent: colors.goldAccent },
+    { label: 'Platform', value: 'Vercel Cloud', icon: Cpu, accent: colors.goldAccent },
     { label: 'Developer Access', value: username || 'Guest', icon: Target, accent: colors.success },
     { label: 'Diagnostics', value: 'Connected', icon: ShieldCheck, accent: colors.warning },
     { label: 'Engine Version', value: 'Kronos D6', icon: PlayCircle, accent: colors.danger },
