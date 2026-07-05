@@ -5,7 +5,7 @@ Kronos is not only a chess engine—it is a complete research platform. This cha
 
 
 \section{User-Facing Application Platform}
-The Kronos application is a React-based single-page application running in the browser. It exposes six distinct interaction modes, each serving a different research or gameplay purpose. Figure~\ref{fig:app_screenshots} shows the four most research-relevant pages.
+The Kronos application is a React-based single-page application running in the browser. It exposes six distinct interaction modes, each serving a different research or gameplay purpose. Figure~\ref{fig:app_screenshots} shows the four most research-relevant pages. The live platform is publicly deployed at \url{https://kronos-mocha.vercel.app}.
 
 \begin{figure}[htbp]
 \centering
@@ -31,7 +31,7 @@ The \textbf{Analysis Board} (Figure~\ref{fig:app_screenshots}c) integrates Stock
 The \textbf{Research Lab} (Figure~\ref{fig:app_screenshots}d) is a restricted-access engineering workstation. It surfaces SPRT verification routines, benchmark pipeline status, and raw empirical dataset inspection tools. Access is gated by authorization status, enforcing a clear boundary between the research and public-facing layers of the application.
 
 \section{Asynchronous Worker Architecture}
-The architectural challenge of running chess search in a browser is that JavaScript's main thread is also responsible for rendering the UI. Blocking it with a synchronous search loop causes the interface to freeze. Kronos solves this with a decoupled Web Worker architecture.
+The decoupled web architecture is fully realized in the live browser application deployed at \url{https://kronos-mocha.vercel.app}. The architectural challenge of running chess search in a browser is that JavaScript's main thread is also responsible for rendering the UI. Blocking it with a synchronous search loop causes the interface to freeze. Kronos solves this with a decoupled Web Worker architecture.
 
 The React UI instantiates a background \texttt{CustomChessWorker} thread at startup. All search computation executes on this worker. Communication between the main thread and the worker uses structured message passing: the host sends a serialized control command containing the board state (as a FEN string), the configured search depth, and a time limit. The worker parses the payload, initializes search variables, and begins Negamax recursion. During search, the worker emits periodic \texttt{ITERATION\_COMPLETE} telemetry messages—containing current depth, nodes searched, NPS, and principal variation—which update the evaluation bar and move list in real time. On completion, a final \texttt{SEARCH\_COMPLETE} message returns the best move.
 

@@ -1,5 +1,7 @@
 # Kronos Chess Engine
 
+**Live Site:** [kronos-mocha.vercel.app](https://kronos-mocha.vercel.app)
+
 [![JavaScript](https://img.shields.io/badge/Language-JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](#)
 [![React](https://img.shields.io/badge/Frontend-React_19-61DAFB?style=flat-square&logo=react&logoColor=black)](#)
 [![Vite](https://img.shields.io/badge/Build-Vite_8-646CFF?style=flat-square&logo=vite&logoColor=white)](#)
@@ -16,7 +18,7 @@ Kronos is a chess engine and research platform that explores how game-tree searc
 
 The project has three parts:
 
-1. **React UI** — a browser-based workstation for playing against the engine, analyzing positions, solving puzzles, and exploring openings.
+1. **React UI** — a browser-based workstation (live at [kronos-mocha.vercel.app](https://kronos-mocha.vercel.app)) for playing against the engine, analyzing positions, solving puzzles, and exploring openings.
 2. **Search Engine** — runs in a Web Worker to keep the UI responsive during deep searches.
 3. **Benchmark Framework** — a headless Node.js runner for automated tournaments, ablation studies, and Stockfish calibration.
 
