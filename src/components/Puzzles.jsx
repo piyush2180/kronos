@@ -357,7 +357,7 @@ export default function Puzzles({ boardTheme, onBack }) {
           </div>
 
           {/* Board */}
-          <div className="puzzle-board-card panel-card">
+          <div style={{ width: '100%', maxWidth: 'min(62vh, 480px)', aspectRatio: '1', backgroundColor: '#171311', borderRadius: '12px', border: 'none', padding: 0 }} className="puzzle-board-card">
             <Chessboard
               options={{
                 id: 'PuzzleBoard',
@@ -418,7 +418,7 @@ export default function Puzzles({ boardTheme, onBack }) {
         </div>
 
         {/* Right column: filters & puzzle list */}
-        <div style={{ ...styles.sidebarColumn, border: '1px solid var(--color-border-subtle)', boxShadow: 'none', padding: '16px', borderRadius: '6px', backgroundColor: 'var(--color-bg-surface)' }} className="puzzle-sidebar-column panel-card">
+        <div style={{ ...styles.sidebarColumn, borderLeft: '1px solid rgba(255, 255, 255, 0.04)', padding: '0 0 0 24px', backgroundColor: 'transparent' }} className="puzzle-sidebar-column">
           
           {/* Rating Selection Grid */}
           <div style={{ paddingBottom: '16px', borderBottom: '1px solid var(--color-border-subtle)' }}>
@@ -530,9 +530,8 @@ const styles = {
     maxWidth: '1600px',
     margin: '0 auto',
     padding: `${spacing.lg} ${spacing.xl}`,
-    height: 'calc(100vh - 56px)',
+    minHeight: 'calc(100vh - 56px)',
     boxSizing: 'border-box',
-    overflow: 'hidden',
   },
   header: {
     display: 'flex',

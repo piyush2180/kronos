@@ -124,7 +124,7 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
 
       {/* Right: Sidebar container */}
       <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
-        <div style={styles.sidebarWrapper} className="panel-card sidebar-card-wrapper">
+        <div style={styles.sidebarWrapper} className="sidebar-card-wrapper">
           <div style={styles.controlSection}>
             <ControlPanel
               modeSelected={game.modeSelected}
@@ -190,7 +190,7 @@ const styles = {
     display: 'grid',
     gridTemplateColumns: '60% 40%',
     gap: spacing.xl,
-    height: 'calc(100vh - 56px)',
+    minHeight: 'calc(100vh - 56px)',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
@@ -202,24 +202,20 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: '100%',
     minWidth: 0,
     minHeight: 0,
   },
   sidebarColumn: {
-    height: '100%',
-    minHeight: 0,
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
+    minHeight: 0,
   },
   sidebarWrapper: {
     flex: 1,
-    minHeight: 0,
     padding: spacing.lg,
     display: 'flex',
     flexDirection: 'column',
-    overflow: 'hidden',
     position: 'relative',
     boxSizing: 'border-box',
   },
