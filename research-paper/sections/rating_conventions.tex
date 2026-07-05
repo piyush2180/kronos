@@ -1,0 +1,11 @@
+\section{Rating Pool Conventions and Playing Strength Bounds}
+\label{sec:rating_conventions}
+
+The internal Elo ratings reported in this work represent relative playing strength fitted using the Bradley-Terry model. Because Bradley-Terry ratings can only be fitted within a closed player pool, our results utilize two distinct rating pools, each anchored to a baseline minimax reference configuration of 1,000 Elo:
+\begin{enumerate}
+    \item \textbf{Cross-Depth Pool:} This pool evaluates the scaling performance of the final optimized engine across depths 1 through 7, anchored to the Baseline Minimax at Depth 1 (Table~\ref{tab:cross_depth_elo}). Ratings in this pool measure strength gains obtained purely from additional search plies.
+    \item \textbf{Configuration Ablation Pool:} This pool evaluates the individual contributions of search heuristics at a fixed search horizon (Depth 3), anchored to the Baseline Minimax at Depth 3 (Table~\ref{tab:tournament_results}). Ratings in this pool isolate the strength impact of each configuration.
+\end{enumerate}
+Because these pools feature different player mixes and baseline anchors, ratings are pool-dependent and cannot be directly compared across pools (for example, Depth 3 corresponds to 1,295 Elo in the cross-depth tournament, but the Full Engine at Depth 3 corresponds to 1,387 Elo in the ablation tournament).
+
+We emphasize that these internal self-play ratings measure relative consistency and improvement within our closed variant pools; they are not comparable to external absolute Elo scales (such as FIDE or CCRL). The depth-limited Stockfish calibration matches (Section 6.4) are presented solely to establish the empirical bounds of this relative scale, not to assert absolute playing strength. In a closed, deterministic self-play environment, a rating of 1,400 Elo represents peak relative consistency under our search limits, even if the engine remains systematically weaker than external reference models like depth-limited Stockfish.

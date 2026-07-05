@@ -73,7 +73,7 @@ Table~\ref{tab:engine_feature_matrix} documents which search optimizations are a
 \input{tables/engine_feature_matrix}
 
 \section{Benchmarking and Calibration Pipelines}
-Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run research} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to compare the relative self-play Elo ratings against an external reference scale.
+Beyond the interactive application, Kronos includes a CLI-driven research backend. The benchmarking pipeline is invoked via \texttt{npm run research} and orchestrates the full tournament workflow: loading opening positions from \texttt{openings.json}, running paired color-flipped matches, recording PGN game files, computing SPRT boundaries, and generating HTML/CSV report artifacts. A separate calibration pipeline runs Kronos against depth-limited Stockfish 18 configurations to compare the relative internal self-play ratings (Elo) against an external reference scale.
 
 These pipelines are the experimental foundation for Chapter~\ref{ch:experimental_results}. All results reported in this paper are produced by these pipelines with fixed seeds and are fully reproducible from the repository.
 

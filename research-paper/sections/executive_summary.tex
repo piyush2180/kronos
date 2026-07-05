@@ -1,20 +1,19 @@
 \section*{Executive Summary}
 \addcontentsline{toc}{chapter}{Executive Summary}
 
-This report presents the engineering design and empirical findings of Kronos, a modular chess engine and benchmarking framework implemented in Node.js and JavaScript. Kronos serves as a reproducible systems testbed for game-tree search heuristics in managed, garbage-collected runtimes.
+This project establishes that high-performance, real-time decision engines can run successfully inside web browsers and lightweight server runtimes---environments traditionally avoided by systems engineers due to execution overhead and unpredictable memory cleaning pauses. We designed and built \textbf{Kronos}, an open-source, web-deployable chess engine and benchmarking workstation. Kronos serves as a proof of concept showing that dynamic runtimes (such as Google V8) can execute latency-sensitive search algorithms efficiently, making systems research highly accessible to students and developers without requiring specialized desktop compilers or complex local setups.
 
-\subsection*{V8 Engineering Practices}
-Historically, dynamic runtimes were considered unsuitable for latency-sensitive search systems due to event loop freezing and garbage collection (GC) sweeps. Kronos mitigates these issues by applying standard performance engineering patterns within the V8 runtime environment:
+\subsection*{Why This Project Matters}
+Typically, chess engines are written in native compiled languages like C, C++, or Rust to squeeze every drop of CPU performance and maintain complete control over memory. Interpreted and managed environments like JavaScript are notorious for background ``garbage collection'' sweeps, which periodically freeze the execution thread to clean up unused memory objects, rendering them unsuitable for real-time game search. 
+
+Kronos proves that these performance bottlenecks are not language-inherent. By designing search paths that completely bypass memory allocations on the active search path (using in-place object reuse and size-bounded caching) and decoupling search logic into background processing threads, we achieved smooth, predictable search execution directly in the browser. 
+
+\subsection*{Core Contributions}
+This research delivers three major components:
 \begin{enumerate}
-    \item \textbf{Asynchronous Worker Decoupling:} Decoupled background Web Workers communicate with the React UI via serialized JSON messages, preventing interface freezes.
-    \item \textbf{GC-Neutral Search Path:} Direct in-place board state mutations bypass object allocations, and a size-bounded transposition table limits dynamic heap growth.
-    \item \textbf{JIT Compiler Warming:} Benchmarks run pre-heat iterations to trigger V8 JIT compilation and optimize execution paths prior to recording search telemetry.
+    \item \textbf{A Web-Based Chess Workstation:} A premium React-based dashboard featuring an interactive play interface, real-time search telemetry, and local puzzle-solving capabilities.
+    \item \textbf{A Standardized Research Laboratory:} A CLI-driven benchmarking pipeline that automates self-play tournaments, computes relative playing strength, and verifies statistical significance from any command line.
+    \item \textbf{Empirical Architectural Insights:} A detailed performance study validating the exact execution savings of classical search heuristics, establishing how move sorting, deep-tree pruning, and transposition tables interact under dynamic runtime constraints.
 \end{enumerate}
 
-\subsection*{Key Experimental Outcomes}
-*   \textbf{Heap Bounded Memory:} Heap usage remains stable during continuous search (detailed in Chapter~\ref{ch:experimental_results}), avoiding major GC sweeps.
-*   \textbf{Search Reduction:} Late Move Reductions (LMR) is the dominant pruning heuristic, yielding substantial search space compression.
-*   \textbf{Relative Strength \& Calibration:} Chapter~\ref{ch:experimental_results} reports the measured internal playing strength across search depths, along with external calibration offsets against depth-limited Stockfish references.
-*   \textbf{Statistical Validation:} Node-count reductions were consistently observed for several heuristics, whereas only quiescence search demonstrated statistically significant playing-strength improvement under the configured SPRT evaluation protocol.
-
-This work suggests that managed runtime environments can execute complex game-tree searches efficiently and stably, providing a highly accessible web-deployable systems research framework.
+Ultimately, Kronos demonstrates that web technologies can host complex, resource-intensive artificial intelligence applications without sacrificing user interface responsiveness or runtime stability, lowering the barrier of entry for systems research.

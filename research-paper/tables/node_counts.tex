@@ -1,6 +1,6 @@
 \begin{table}[htbp]
 \centering
-\caption[Search Node Ablation Study at Depth 4]{Search node count ablation study at depth 4 under the final optimized configuration ($d \ge 5$ threshold for NMP).\footnotemark}
+\caption[Search Node Ablation Study at Depth 4]{Search node count ablation study at depth 4 under the final optimized configuration ($d \ge 5$ threshold for NMP). Individual reductions are calculated independently by disabling each heuristic against the full configuration, and are therefore non-additive.}
 \label{tab:node_counts}
 \begin{tabularx}{\textwidth}{Xrrr}
 \toprule
@@ -15,7 +15,6 @@ Baseline Alpha-Beta (ordered, no reductions) & 21,784 & 62.0\% & 0.22x \\
 Baseline Alpha-Beta (unordered) & 47,159 & 82.4\% & 0.12x \\
 \bottomrule
 \end{tabularx}
-\footnotetext{Note: Individual reductions are calculated independently by disabling each heuristic individually against the full configuration, and are therefore non-additive.}
 \end{table}
 
 
