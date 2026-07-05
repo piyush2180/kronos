@@ -57,43 +57,45 @@ export default function SearchValidationSuite({ onAddLog }) {
         </div>
       </div>
 
-      <div className="card-primary" style={{ padding: 0, overflow: 'hidden' }}>
-        <table className="table-research">
-          <thead>
-            <tr>
-              <th>Suite Test Name</th>
-              <th>Category</th>
-              <th>Target Move</th>
-              <th>Full Kronos Solution</th>
-              <th>Baseline Minimax Solution</th>
-              <th className="num-col">Eval</th>
-              <th style={{ textAlign: 'right' }}>Validation</th>
-            </tr>
-          </thead>
-          <tbody>
-            {testResults.map((p, idx) => (
-              <tr key={idx}>
-                <td style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{p.name}</td>
-                <td>{p.type}</td>
-                <td style={{ color: 'var(--color-brand-primary)', fontWeight: '600' }}>{p.target}</td>
-                <td style={{ color: '#34D399', fontWeight: '600' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={13} /> {p.kronosMove}</span>
-                </td>
-                <td style={{ color: p.baselineMove === p.target ? '#34D399' : '#FCA5A5', fontWeight: '500' }}>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
-                    {p.baselineMove === p.target ? <CheckCircle2 size={13} /> : <XCircle size={13} />} {p.baselineMove}
-                  </span>
-                </td>
-                <td className="num-col" style={{ color: '#9CA3AF' }}>{p.eval}</td>
-                <td style={{ textAlign: 'right' }}>
-                  <span style={{ backgroundColor: 'rgba(52, 211, 153, 0.1)', color: '#34D399', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
-                    {p.status} ({p.time})
-                  </span>
-                </td>
+      <div className="card-primary" style={{ padding: 0, overflow: 'hidden', width: '100%' }}>
+        <div style={{ overflowX: 'auto', width: '100%' }}>
+          <table className="table-research">
+            <thead>
+              <tr>
+                <th>Suite Test Name</th>
+                <th>Category</th>
+                <th>Target Move</th>
+                <th>Full Kronos Solution</th>
+                <th>Baseline Minimax Solution</th>
+                <th className="num-col">Eval</th>
+                <th style={{ textAlign: 'right' }}>Validation</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {testResults.map((p, idx) => (
+                <tr key={idx}>
+                  <td style={{ fontWeight: '600', color: 'var(--color-text-primary)' }}>{p.name}</td>
+                  <td>{p.type}</td>
+                  <td style={{ color: 'var(--color-brand-primary)', fontWeight: '600' }}>{p.target}</td>
+                  <td style={{ color: '#34D399', fontWeight: '600' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}><CheckCircle2 size={13} /> {p.kronosMove}</span>
+                  </td>
+                  <td style={{ color: p.baselineMove === p.target ? '#34D399' : '#FCA5A5', fontWeight: '500' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}>
+                      {p.baselineMove === p.target ? <CheckCircle2 size={13} /> : <XCircle size={13} />} {p.baselineMove}
+                    </span>
+                  </td>
+                  <td className="num-col" style={{ color: '#9CA3AF' }}>{p.eval}</td>
+                  <td style={{ textAlign: 'right' }}>
+                    <span style={{ backgroundColor: 'rgba(52, 211, 153, 0.1)', color: '#34D399', padding: '0.2rem 0.5rem', borderRadius: '4px', fontSize: '0.7rem', fontWeight: '600', border: '1px solid rgba(52, 211, 153, 0.3)' }}>
+                      {p.status} ({p.time})
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

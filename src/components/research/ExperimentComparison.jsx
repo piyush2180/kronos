@@ -95,6 +95,7 @@ const styles = {
   selectorRow: {
     display: 'flex',
     gap: '1.5rem',
+    flexWrap: 'wrap',
     backgroundColor: 'var(--color-bg-surface, #221a14)',
     border: '1px solid var(--color-border-default, #4c3d31)',
     borderRadius: '8px',
@@ -123,7 +124,7 @@ const styles = {
     backgroundColor: 'var(--color-bg-surface, #221a14)',
     border: '1px solid var(--color-border-default, #4c3d31)',
     borderRadius: '8px',
-    overflow: 'hidden'
+    overflowX: 'auto'
   },
   table: {
     width: '100%',

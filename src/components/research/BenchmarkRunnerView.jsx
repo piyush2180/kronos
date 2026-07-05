@@ -325,7 +325,10 @@ const styles = {
   cmdCode: {
     fontFamily: 'monospace',
     fontSize: '0.78rem',
-    color: '#34D399'
+    color: '#34D399',
+    overflowX: 'auto',
+    whiteSpace: 'nowrap',
+    marginRight: '1rem',
   },
   copyBtn: {
     backgroundColor: 'transparent',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Download, ShieldCheck, Database, Layers } from 'lucide-react';
+import { FileText, Download, ShieldCheck, Database, Layers, ArrowLeft } from 'lucide-react';
 import ReportViewer from './ReportViewer';
 
 export default function ExperimentInspector({ experiment, onBack }) {
@@ -45,10 +45,17 @@ export default function ExperimentInspector({ experiment, onBack }) {
   return (
     <div style={styles.container} className="animate-fade-in">
       <div style={styles.header}>
-        <div>
-          <span style={styles.certBadge(experiment.certification)}>{experiment.certification}</span>
-          <h2 style={styles.title}>{experiment.name}</h2>
-          <p style={styles.sub}>ID: <code>{experiment.id}</code> | Date: {new Date(experiment.timestamp).toLocaleString()}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {onBack && (
+            <button onClick={onBack} style={styles.backBtn} title="Go Back">
+              <ArrowLeft size={16} />
+            </button>
+          )}
+          <div>
+            <span style={styles.certBadge(experiment.certification)}>{experiment.certification}</span>
+            <h2 style={styles.title}>{experiment.name}</h2>
+            <p style={styles.sub}>ID: <code>{experiment.id}</code> | Date: {new Date(experiment.timestamp).toLocaleString()}</p>
+          </div>
         </div>
         <div style={styles.btnGroup}>
           <button style={styles.downloadBtn} onClick={handleExportCsv}><Download size={13} /> Export CSV</button>
@@ -209,5 +216,17 @@ const styles = {
     fontSize: '0.75rem',
     color: '#bdaea4',
     marginTop: '0.3rem'
+  },
+  backBtn: {
+    backgroundColor: 'var(--color-bg-elevated)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: '4px',
+    padding: '0.35rem 0.55rem',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--color-text-secondary)',
+    transition: 'all 0.15s ease'
   }
 };

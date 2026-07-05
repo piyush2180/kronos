@@ -236,7 +236,7 @@ const styles = {
   tableWrapper: {
     borderTop: '1px solid var(--color-border-subtle, #34281e)',
     borderBottom: '1px solid var(--color-border-subtle, #34281e)',
-    overflow: 'hidden',
+    overflowX: 'auto',
     marginTop: '0.5rem'
   },
   table: {
