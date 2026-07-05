@@ -12,8 +12,8 @@ export const DIFFICULTY_SETTINGS = {
   beginner: { label: 'Kronos D2',             maxDepth: 2, timeLimitMs: 400,  blunderRate: 0.20 },
   casual:   { label: 'Kronos D4',             maxDepth: 4, timeLimitMs: 800,  blunderRate: 0.10 },
   club:     { label: 'Kronos D5',             maxDepth: 5, timeLimitMs: 1500, blunderRate: 0.05 },
-  advanced: { label: '⭐ Kronos D6 Flagship',   maxDepth: 6, timeLimitMs: 3000, blunderRate: 0.00 },
-  expert:   { label: 'Kronos D7 Experimental', maxDepth: 7, timeLimitMs: 5000, blunderRate: 0.00 }
+  advanced: { label: 'Kronos D6 Flagship',   maxDepth: 6, timeLimitMs: 3000, blunderRate: 0.00 },
+  expert:   { label: 'Kronos D7', maxDepth: 7, timeLimitMs: 5000, blunderRate: 0.00 }
 };
 
 export function getInitialTime(control) {

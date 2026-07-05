@@ -282,8 +282,8 @@ export default function ControlPanel({
                   {difficulty === 'beginner' ? 'Kronos D2' :
                    difficulty === 'casual'   ? 'Kronos D4' :
                    difficulty === 'club'     ? 'Kronos D5' :
-                   difficulty === 'advanced' ? '⭐ Kronos D6 Flagship' :
-                                              '🔬 Kronos D7 Experimental'}
+                   difficulty === 'advanced' ? 'Kronos D6 Flagship' :
+                                              'Kronos D7'}
                 </span>
                 <div style={styles.statusPill(isSearching)}>
                   <span style={styles.statusDot(isSearching)} className={isSearching ? 'active-pulse-dot' : ''} />

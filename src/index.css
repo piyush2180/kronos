@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
-
 /* ============================================================
    KRONOS CHESS V2 — Premium Dark Walnut Design System
    ============================================================ */
@@ -25,8 +23,8 @@
   --color-warning:         #C98A39;
   --color-danger:          #C45D5D;
   
-  --font-display: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* ============================================================

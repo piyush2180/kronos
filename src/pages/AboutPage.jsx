@@ -12,7 +12,7 @@ export default function AboutPage({ onBack }) {
         </button>
         <h1 style={styles.title}>About Kronos Chess</h1>
         <p style={styles.subtitle}>
-          Kronos Chess is a web-based chess engine workstation designed for play, analysis, and research.
+          Kronos Chess is a web-based chess engine workstation designed for play, analysis, and suite benchmarking.
         </p>
       </div>
 
@@ -118,15 +118,14 @@ const styles = {
     marginTop: spacing.sm,
   },
   card: {
-    padding: spacing.xl,
-    borderRadius: geometry.radiusCard,
+    padding: '0px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    gap: spacing.md,
-    backgroundColor: 'rgba(21, 16, 12, 0.25)',
-    border: '1px solid var(--color-border-subtle)',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+    gap: spacing.xs,
+    backgroundColor: 'transparent',
+    border: 'none',
+    boxShadow: 'none',
   },
   iconContainer: {
     width: '44px',

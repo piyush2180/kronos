@@ -1,25 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Cpu, ArrowRight, Lock, Terminal, CheckCircle2 } from 'lucide-react';
-import { colors, spacing, geometry, typography } from '../../theme/designTokens';
 
 export default function AccessScreen({ onEnter }) {
-  const [sessionToken, setSessionToken] = useState('local-maintainer-key');
+  const [password, setPassword] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [activeUser, setActiveUser] = useState('Guest');
+  const [correctPassword, setCorrectPassword] = useState('');
+
+  // Retrieve active user and correct password from LocalStorage on mount
+  useEffect(() => {
+    try {
+      const user = localStorage.getItem('kronos_v2_active_user') || 'Guest';
+      setActiveUser(user);
+
+      if (user === 'Guest') {
+        // If guest, allow any password or a default
+        setCorrectPassword('');
+      } else {
+        const db = JSON.parse(localStorage.getItem('kronos_v2_users') || '{}');
+        const userDetails = db[user];
+        if (userDetails) {
+          setCorrectPassword(userDetails.password);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to retrieve user authentication details', e);
+    }
+  }, []);
 
   const handleAuthenticate = (e) => {
     e.preventDefault();
     setIsAuthenticating(true);
     setErrorMsg('');
 
-    // Pluggable local authentication logic:
-    // Future expansion point: Invoke API request to verify invites/tokens or check GitHub session
     setTimeout(() => {
       setIsAuthenticating(false);
-      if (!sessionToken.trim()) {
-        setErrorMsg('Authentication token cannot be blank.');
+      // Verify against user password
+      if (activeUser !== 'Guest' && password !== correctPassword) {
+        setErrorMsg('Invalid password. Please enter the correct password for your account.');
       } else {
-        // Callback grants access to parent layout
         onEnter();
       }
     }, 600);
@@ -27,20 +47,21 @@ export default function AccessScreen({ onEnter }) {
 
   return (
     <div style={styles.container} className="animate-fade-in">
-      <div style={{ ...styles.card, border: '1px solid var(--color-border-subtle)', boxShadow: 'none' }} className="panel-card">
-        
-        {/* Status indicator row */}
-        <div style={styles.headerBadge}>
-          <Lock size={12} color="var(--color-brand-primary)" />
-          <span>Internal Tools Build</span>
-        </div>
+      
+      {/* Left Panel: Branding Details */}
+      <div style={styles.brandPanel} className="desktop-only">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '56px', height: '56px', marginBottom: '20px' }}>
+          <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+          <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+          <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+        </svg>
         
         <h1 style={styles.title}>Benchmark Workspace</h1>
         <p style={styles.subtitle}>
           Local build environment for engine calibration, search telemetry, and automated tournament runs.
         </p>
 
-        {/* Workspace Telemetry Checklist */}
+        {/* Status Indicators */}
         <div style={styles.statusGrid}>
           <div style={styles.statusItem}>
             <span style={styles.statusLabel}>Environment Build</span>
@@ -53,7 +74,7 @@ export default function AccessScreen({ onEnter }) {
           <div style={styles.statusItem}>
             <span style={styles.statusLabel}>Local Diagnostics</span>
             <span style={styles.statusValueSuccess}>
-              <CheckCircle2 size={12} /> Connected
+              Connected
             </span>
           </div>
           <div style={styles.statusItem}>
@@ -61,57 +82,65 @@ export default function AccessScreen({ onEnter }) {
             <span style={styles.statusValue}>Kronos D6 Suite</span>
           </div>
         </div>
+      </div>
 
-        {/* Pluggable Access Form */}
-        <form onSubmit={handleAuthenticate} style={styles.authForm}>
-          <div style={styles.inputGroup}>
-            <label style={styles.inputLabel}>Maintainer Session Token</label>
-            <input 
-              type="text" 
-              value={sessionToken}
-              onChange={(e) => setSessionToken(e.target.value)}
-              placeholder="Enter local developer key..."
-              style={styles.textInput}
-              disabled={isAuthenticating}
-            />
+      {/* Right Panel: Workspace Password Form */}
+      <div style={styles.formPanel}>
+        <div style={styles.formWidthWrapper}>
+          
+          {/* Mobile Branding Indicator */}
+          <div style={styles.mobileLogoHeader} className="mobile-only">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '40px', height: '40px', marginBottom: '12px', marginInline: 'auto', display: 'block' }}>
+              <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+              <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+              <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+            </svg>
+            <div style={styles.logoText}>Benchmark Workspace</div>
+            <div style={styles.logoSubtitle}>Workspace Lock</div>
           </div>
 
-          {errorMsg && (
-            <div style={styles.errorText}>{errorMsg}</div>
-          )}
+          <div style={styles.headerBadge}>
+            <Lock size={12} color="var(--color-brand-primary)" />
+            <span>Maintainer Session Authentication</span>
+          </div>
 
-          <div style={styles.buttonRow}>
+          <form onSubmit={handleAuthenticate} style={styles.authForm}>
+            <div style={styles.inputGroup}>
+              <label style={styles.inputLabel}>
+                {activeUser === 'Guest' ? 'Guest Authentication' : `Password for ${activeUser}`}
+              </label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={activeUser === 'Guest' ? "Password (leave blank for Guest)..." : "Enter account password..."}
+                style={styles.textInput}
+                disabled={isAuthenticating}
+                required={activeUser !== 'Guest'}
+              />
+            </div>
+
+            {errorMsg && (
+              <div style={styles.errorText}>{errorMsg}</div>
+            )}
+
             <button 
               type="submit" 
               style={styles.enterBtn} 
               disabled={isAuthenticating}
             >
-              <span>{isAuthenticating ? 'Authenticating...' : 'Authenticate Local Session'}</span>
+              <span>{isAuthenticating ? 'Unlocking Workspace...' : 'Authenticate Session'}</span>
               <ArrowRight size={14} />
             </button>
+          </form>
+
+          <div style={styles.disclaimerBox}>
+            <Terminal size={12} color="var(--color-text-dim)" />
+            <span>Workstation session is authenticated locally against local storage credentials.</span>
           </div>
-        </form>
-
-        <div style={styles.dividerRow}>
-          <span style={styles.dividerLine}></span>
-          <span style={styles.dividerText}>or</span>
-          <span style={styles.dividerLine}></span>
-        </div>
-
-        <button 
-          style={styles.oauthBtn} 
-          onClick={() => alert("GitHub Authentication requires remote server deployment. Under local session rules, use the local session key instead.")}
-          type="button"
-        >
-          <Cpu size={14} />
-          <span>Sign in with GitHub (Invite List Only)</span>
-        </button>
-
-        <div style={styles.disclaimerBox}>
-          <Terminal size={12} color="var(--color-text-dim)" />
-          <span>Local sessions are logged to the benchmark workspace repository automatically.</span>
         </div>
       </div>
+
     </div>
   );
 }
@@ -122,20 +151,38 @@ const styles = {
     width: '100%',
     height: '100%',
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '24px',
     backgroundColor: 'var(--color-bg-base)'
   },
-  card: {
-    width: '100%',
-    maxWidth: '480px',
+  brandPanel: {
+    flex: 1.2,
     backgroundColor: 'var(--color-bg-surface)',
-    borderRadius: '6px',
-    padding: '28px',
+    borderRight: '1px solid var(--color-border-subtle)',
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: '40px',
+    textAlign: 'center',
+  },
+  formPanel: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '40px',
+    backgroundColor: 'var(--color-bg-base)'
+  },
+  formWidthWrapper: {
+    width: '100%',
+    maxWidth: '360px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  mobileLogoHeader: {
+    textAlign: 'center',
+    marginBottom: '20px',
   },
   headerBadge: {
     display: 'inline-flex',
@@ -149,7 +196,7 @@ const styles = {
     fontSize: '0.68rem',
     fontWeight: 700,
     letterSpacing: '0.04em',
-    marginBottom: '16px'
+    alignSelf: 'flex-start'
   },
   title: {
     fontSize: '1.35rem',
@@ -158,18 +205,34 @@ const styles = {
     margin: '0 0 6px 0',
     fontFamily: 'var(--font-display)',
   },
+  logoText: {
+    fontFamily: 'var(--font-display)',
+    fontSize: '24px',
+    fontWeight: '800',
+    color: 'var(--color-brand-primary)',
+    letterSpacing: '0.05em',
+  },
+  logoSubtitle: {
+    fontSize: '11px',
+    color: 'var(--color-text-dim)',
+    textTransform: 'uppercase',
+    letterSpacing: '0.1em',
+    marginTop: '4px',
+  },
   subtitle: {
     fontSize: '0.8rem',
     color: 'var(--color-text-secondary)',
     lineHeight: 1.5,
-    marginBottom: '20px',
+    marginBottom: '24px',
     textAlign: 'center',
+    maxWidth: '360px'
   },
   statusGrid: {
     display: 'grid',
     gridTemplateColumns: '1fr 1fr',
     gap: '10px',
     width: '100%',
+    maxWidth: '360px',
     marginBottom: '20px'
   },
   statusItem: {
@@ -223,7 +286,7 @@ const styles = {
   textInput: {
     width: '100%',
     padding: '8px 12px',
-    backgroundColor: 'var(--color-bg-base)',
+    backgroundColor: 'var(--color-bg-surface)',
     border: '1px solid var(--color-border-default)',
     borderRadius: '4px',
     color: 'var(--color-text-primary)',
@@ -247,38 +310,6 @@ const styles = {
     gap: '8px',
     transition: 'all 0.15s ease'
   },
-  oauthBtn: {
-    width: '100%',
-    backgroundColor: 'transparent',
-    color: 'var(--color-text-secondary)',
-    border: '1px solid var(--color-border-default)',
-    borderRadius: '4px',
-    padding: '8px 10px',
-    fontSize: '0.75rem',
-    fontWeight: 600,
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    transition: 'all 0.15s ease'
-  },
-  dividerRow: {
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    gap: '10px',
-    margin: '12px 0'
-  },
-  dividerLine: {
-    flex: 1,
-    height: '1px',
-    backgroundColor: 'var(--color-border-subtle)'
-  },
-  dividerText: {
-    fontSize: '0.7rem',
-    color: 'var(--color-text-dim)'
-  },
   disclaimerBox: {
     display: 'flex',
     alignItems: 'center',
@@ -290,7 +321,6 @@ const styles = {
     fontSize: '0.7rem',
     color: 'var(--color-text-dim)',
     textAlign: 'left',
-    marginTop: '16px',
     width: '100%'
   },
   errorText: {

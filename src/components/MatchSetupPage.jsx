@@ -12,7 +12,6 @@ const ENGINE_CONFIGS = [
     label: 'Kronos D2',
     depth: 2,
     description: 'Horizon depth 2. Rapid moves, minimal lookahead.',
-    icon: '🔵',
     tags: ['Depth 2', '~2k NPS'],
   },
   {
@@ -20,7 +19,6 @@ const ENGINE_CONFIGS = [
     label: 'Kronos D4',
     depth: 4,
     description: 'Full alpha-beta at depth 4. Solid, principled chess.',
-    icon: '🟢',
     tags: ['Depth 4', '~8k NPS', 'Alpha-Beta'],
   },
   {
@@ -28,7 +26,6 @@ const ENGINE_CONFIGS = [
     label: 'Kronos D5',
     depth: 5,
     description: 'PVS + killer heuristics. Threatens tactics and plans.',
-    icon: '🟡',
     tags: ['Depth 5', '~20k NPS', 'PVS + Killers'],
   },
   {
@@ -36,7 +33,6 @@ const ENGINE_CONFIGS = [
     label: 'Kronos D6',
     depth: 6,
     description: 'Flagship. Full LMR, NMP, History heuristics. ~1485 Elo anchor.',
-    icon: '⭐',
     tags: ['Depth 6', '~50k NPS', 'LMR · NMP', '~1485 Elo'],
     flagship: true,
   },
@@ -45,7 +41,6 @@ const ENGINE_CONFIGS = [
     label: 'Kronos D7',
     depth: 7,
     description: 'Experimental. Search Depth 7. Strongest, slowest.',
-    icon: '🔬',
     tags: ['Depth 7', '~120k NPS'],
   },
 ];
@@ -60,10 +55,10 @@ const TIME_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  { value: 'w',        label: 'White',   symbol: '♔' },
-  { value: 'b',        label: 'Black',   symbol: '♚' },
-  { value: 'random',   label: 'Random',  symbol: '⚄' },
-  { value: 'simulate', label: 'Spectate',symbol: '👁' },
+  { value: 'w',        label: 'White' },
+  { value: 'b',        label: 'Black' },
+  { value: 'random',   label: 'Random' },
+  { value: 'simulate', label: 'Spectate' },
 ];
 
 export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTimeControl, boardTheme }) {
@@ -110,7 +105,6 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
         {/* Engine spec card — shown below board */}
         <div style={{ ...s.engineSpecCard, border: '1px solid var(--color-border-subtle)', boxShadow: 'none', backgroundColor: 'transparent' }}>
           <div style={s.engineSpecRow}>
-            <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{selectedConfig.icon}</span>
             <div>
               <div style={s.engineSpecName}>{selectedConfig.label}</div>
               <div style={s.engineSpecDesc}>{selectedConfig.description}</div>
@@ -162,7 +156,6 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
                   onClick={() => setSelectedColor(c.value)}
                   className={`segmented-control-btn ${selectedColor === c.value ? 'segmented-control-btn-active' : ''}`}
                 >
-                  <span style={{ marginRight: '4px' }}>{c.symbol}</span>
                   {c.label}
                 </button>
               ))}

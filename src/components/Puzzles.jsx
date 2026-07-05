@@ -352,7 +352,7 @@ export default function Puzzles({ boardTheme, onBack }) {
               {activePuzzle.themes && activePuzzle.themes.slice(0, 1).map(theme => (
                 <span key={theme} style={{ fontSize: '0.68rem', fontWeight: '700', padding: '2px 6px', backgroundColor: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.25)', color: 'var(--color-brand-primary)', borderRadius: '3px' }}>{theme}</span>
               ))}
-              <span style={{ fontSize: '0.68rem', fontWeight: '600', padding: '2px 6px', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)', borderRadius: '3px' }}>★ {activePuzzle.rating}</span>
+              <span style={{ fontSize: '0.68rem', fontWeight: '600', padding: '2px 6px', backgroundColor: 'var(--color-bg-elevated)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)', borderRadius: '3px' }}>Elo: {activePuzzle.rating}</span>
             </div>
           </div>
 
@@ -481,7 +481,7 @@ export default function Puzzles({ boardTheme, onBack }) {
                       <span style={{ fontSize: '0.78rem', fontWeight: '500', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Puzzle #{p.id}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '6px' }}>
-                      <span style={{ fontSize: '0.68rem', fontWeight: '600', color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-dim)' }}>★{p.rating}</span>
+                      <span style={{ fontSize: '0.68rem', fontWeight: '600', color: isCurrent ? 'var(--color-brand-primary)' : 'var(--color-text-dim)' }}>{p.rating} Elo</span>
                     </div>
                   </button>
                 );

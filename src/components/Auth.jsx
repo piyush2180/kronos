@@ -205,81 +205,52 @@ export default function Auth({ onAuthSuccess }) {
 
   return (
     <div style={styles.authContainer} className="animate-fade-in">
-      <div style={styles.authCard} className="panel-card">
-        
-        {/* Title / Logo */}
-        <div style={styles.logoHeader}>
-          <div style={styles.logoText}>KRONOS CHESS</div>
-          <div style={styles.logoSubtitle}>V2 Platform Rebuild</div>
-        </div>
+      {/* Left Panel: Branding & Pawn Icon */}
+      <div style={styles.brandPanel} className="desktop-only">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '56px', height: '56px', marginBottom: '20px' }}>
+          <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+          <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+          <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+        </svg>
+        <div style={styles.logoText}>KRONOS CHESS</div>
+        <div style={styles.logoSubtitle}>Engine & Benchmark Suite</div>
+      </div>
 
-        {/* Success/Error displays */}
-        {errorMsg && (
-          <div style={styles.errorBanner}>
-            <ShieldAlert size={14} />
-            <span>{errorMsg}</span>
+      {/* Right Panel: Credentials Input Form */}
+      <div style={styles.formPanel}>
+        <div style={styles.formWidthWrapper}>
+          
+          {/* Mobile Branding Indicator */}
+          <div style={styles.mobileLogoHeader} className="mobile-only">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#C89F3D" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: '40px', height: '40px', marginBottom: '12px', marginInline: 'auto', display: 'block' }}>
+              <circle cx="12" cy="6" r="3" fill="#C89F3D" />
+              <path d="M12 9a5 5 0 0 0-5 5v3h10v-3a5 5 0 0 0-5-5z" fill="#C89F3D" />
+              <rect x="5" y="19" width="14" height="2" rx="1" fill="#C89F3D" />
+            </svg>
+            <div style={styles.logoText}>KRONOS CHESS</div>
+            <div style={styles.logoSubtitle}>Engine & Benchmark Suite</div>
           </div>
-        )}
-        {successMsg && (
-          <div style={styles.successBanner}>
-            <CheckCircle size={14} />
-            <span>{successMsg}</span>
-          </div>
-        )}
 
-        {/* FORGOT PASSWORD FORM */}
-        {isForgot ? (
-          <form onSubmit={handleForgotPassword} style={styles.form}>
-            <div style={styles.formTitle}>Recover Account</div>
-            <div style={styles.formDesc}>Provide your email to receive recovery instructions.</div>
-
-            <div style={styles.inputWrapper}>
-              <Mail size={16} style={styles.inputIcon} />
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={styles.inputField}
-                disabled={loading}
-                required
-              />
+          {/* Messages */}
+          {errorMsg && (
+            <div style={styles.errorBanner}>
+              <ShieldAlert size={14} />
+              <span>{errorMsg}</span>
             </div>
-
-            <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
-              {loading ? <Loader size={16} className="animate-spin" /> : 'Send Reset Link'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsForgot(false)}
-              style={styles.backBtn}
-              disabled={loading}
-            >
-              Back to Sign In
-            </button>
-          </form>
-        ) : (
-          /* SIGN IN & SIGN UP FORMS */
-          <form onSubmit={isSignUp ? handleSignUp : handleSignIn} style={styles.form}>
-            <div style={styles.formTitle}>{isSignUp ? 'Create Account' : 'Sign In'}</div>
-
-            {/* Username field */}
-            <div style={styles.inputWrapper}>
-              <User size={16} style={styles.inputIcon} />
-              <input
-                type="text"
-                placeholder={isSignUp ? "Username" : "Username or Email"}
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                style={styles.inputField}
-                disabled={loading}
-                required
-              />
+          )}
+          {successMsg && (
+            <div style={styles.successBanner}>
+              <CheckCircle size={14} />
+              <span>{successMsg}</span>
             </div>
+          )}
 
-            {/* Email field (Sign up only) */}
-            {isSignUp && (
+          {/* Recovery Form */}
+          {isForgot ? (
+            <form onSubmit={handleForgotPassword} style={styles.form}>
+              <div style={styles.formTitle}>Recover Account</div>
+              <div style={styles.formDesc}>Provide your email to receive recovery instructions.</div>
+
               <div style={styles.inputWrapper}>
                 <Mail size={16} style={styles.inputIcon} />
                 <input
@@ -292,116 +263,171 @@ export default function Auth({ onAuthSuccess }) {
                   required
                 />
               </div>
-            )}
 
-            {/* Password field */}
-            <div style={styles.inputWrapper}>
-              <Lock size={16} style={styles.inputIcon} />
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={styles.inputField}
+              <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
+                {loading ? <Loader size={16} className="animate-spin" /> : 'Send Reset Link'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsForgot(false)}
+                style={styles.backBtn}
                 disabled={loading}
-                required
-              />
-            </div>
+              >
+                Back to Sign In
+              </button>
+            </form>
+          ) : (
+            /* Auth Form */
+            <form onSubmit={isSignUp ? handleSignUp : handleSignIn} style={styles.form}>
+              <div style={styles.formTitle}>{isSignUp ? 'Create Account' : 'Sign In'}</div>
 
-            {/* Password confirm field (Sign up only) */}
-            {isSignUp && (
               <div style={styles.inputWrapper}>
-                <Lock size={16} style={styles.inputIcon} />
+                <User size={16} style={styles.inputIcon} />
                 <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  type="text"
+                  placeholder={isSignUp ? "Username" : "Username or Email"}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   style={styles.inputField}
                   disabled={loading}
                   required
                 />
               </div>
-            )}
 
-            {/* Forgot password trigger */}
-            {!isSignUp && (
-              <div style={styles.forgotContainer}>
+              {isSignUp && (
+                <div style={styles.inputWrapper}>
+                  <Mail size={16} style={styles.inputIcon} />
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={styles.inputField}
+                    disabled={loading}
+                    required
+                  />
+                </div>
+              )}
+
+              <div style={styles.inputWrapper}>
+                <Lock size={16} style={styles.inputIcon} />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={styles.inputField}
+                  disabled={loading}
+                  required
+                />
+              </div>
+
+              {isSignUp && (
+                <div style={styles.inputWrapper}>
+                  <Lock size={16} style={styles.inputIcon} />
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    style={styles.inputField}
+                    disabled={loading}
+                    required
+                  />
+                </div>
+              )}
+
+              {!isSignUp && (
+                <div style={styles.forgotContainer}>
+                  <button
+                    type="button"
+                    onClick={() => setIsForgot(true)}
+                    style={styles.forgotBtn}
+                    disabled={loading}
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
+                {loading ? <Loader size={16} className="animate-spin" /> : (isSignUp ? 'Create Account' : 'Sign In')}
+              </button>
+
+              <div style={styles.switchTabs}>
+                <span>{isSignUp ? 'Already registered?' : 'New to Kronos?'}</span>
                 <button
                   type="button"
-                  onClick={() => setIsForgot(true)}
-                  style={styles.forgotBtn}
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  style={styles.switchBtn}
                   disabled={loading}
                 >
-                  Forgot password?
+                  {isSignUp ? 'Sign In here' : 'Sign Up here'}
                 </button>
               </div>
-            )}
 
-            {/* Submit */}
-            <button type="submit" style={styles.submitBtn} className="btn-gold" disabled={loading}>
-              {loading ? <Loader size={16} className="animate-spin" /> : (isSignUp ? 'Create Account' : 'Sign In')}
-            </button>
+              <div style={styles.divider}>
+                <div style={styles.dividerLine} />
+                <span style={styles.dividerText}>or</span>
+                <div style={styles.dividerLine} />
+              </div>
 
-            {/* Toggle tabs */}
-            <div style={styles.switchTabs}>
-              <span>{isSignUp ? 'Already registered?' : 'New to Kronos?'}</span>
               <button
                 type="button"
-                onClick={() => setIsSignUp(!isSignUp)}
-                style={styles.switchBtn}
+                onClick={handleGuestMode}
+                style={styles.guestBtn}
+                className="btn-bronze"
                 disabled={loading}
               >
-                {isSignUp ? 'Sign In here' : 'Sign Up here'}
+                Continue as Guest
               </button>
-            </div>
-
-            {/* Divider */}
-            <div style={styles.divider}>
-              <div style={styles.dividerLine} />
-              <span style={styles.dividerText}>or</span>
-              <div style={styles.dividerLine} />
-            </div>
-
-            {/* Guest mode */}
-            <button
-              type="button"
-              onClick={handleGuestMode}
-              style={styles.guestBtn}
-              className="btn-bronze"
-              disabled={loading}
-            >
-              Continue as Guest
-            </button>
-          </form>
-        )}
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
-// Cohesive Walnut design object styling rules
+// Design variables using walnuts designTokens values
 const styles = {
   authContainer: {
     display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     minHeight: '100vh',
     width: '100vw',
     backgroundColor: 'var(--color-bg-base)',
-    padding: '20px',
   },
-  authCard: {
+  brandPanel: {
+    flex: 1.2,
+    backgroundColor: 'var(--color-bg-surface)',
+    borderRight: '1px solid var(--color-border-subtle)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '40px',
+    textAlign: 'center',
+  },
+  formPanel: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: '40px',
+    backgroundColor: 'var(--color-bg-base)',
+  },
+  formWidthWrapper: {
     width: '100%',
-    maxWidth: '400px',
-    padding: '35px 30px',
+    maxWidth: '360px',
     display: 'flex',
     flexDirection: 'column',
     gap: '20px',
   },
-  logoHeader: {
+  mobileLogoHeader: {
     textAlign: 'center',
-    marginBottom: '5px',
+    marginBottom: '20px',
   },
   logoText: {
     fontFamily: 'var(--font-display)',
@@ -415,7 +441,7 @@ const styles = {
     color: 'var(--color-text-dim)',
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
-    marginTop: '2px',
+    marginTop: '4px',
   },
   form: {
     display: 'flex',
@@ -446,7 +472,7 @@ const styles = {
   inputField: {
     width: '100%',
     padding: '11px 12px 11px 38px',
-    backgroundColor: 'var(--color-bg-base)',
+    backgroundColor: 'var(--color-bg-surface)',
     border: '1px solid var(--color-border-default)',
     borderRadius: '4px',
     color: 'var(--color-text-primary)',
