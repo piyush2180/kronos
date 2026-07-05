@@ -1,9 +1,9 @@
 // Kronos Chess V2 — Control Panel Component
 // Manages game state options, timers, action triggers, and engine telemetry display.
-
 import React, { useState } from 'react';
 import { Target, Shuffle, Volume2, RefreshCw, Flag, Award, Eye, Clipboard, ArrowLeft, Cpu, Sliders, FileText, ExternalLink, ShieldAlert } from 'lucide-react';
 import { colors, spacing, geometry, typography } from '../theme/designTokens';
+import MoveHistory from './MoveHistory';
 
 export default function ControlPanel({
   modeSelected,
@@ -36,6 +36,8 @@ export default function ControlPanel({
   premoveEnabled = true,
   setPremoveEnabled = () => {},
   showPV = true,
+  previewIndex,
+  setPreviewIndex,
 }) {
   const [activeTab, setActiveTab] = useState('game'); // 'game' | 'engine' | 'tools'
   const [fenInput, setFenInput] = useState('');
@@ -158,55 +160,8 @@ export default function ControlPanel({
         {/* GAME TAB */}
         {currentTab === 'game' && (
           <div style={styles.tabPane} className="animate-fade-in">
-            {/* Configurations Grid */}
-            {modeSelected !== 'analysis' && (
-              <div style={styles.configGrid}>
-                {modeSelected === 'ai' && (
-                  <div style={styles.configCol}>
-                    <label style={styles.configLabel}>Engine Strength</label>
-                    <div style={styles.readOnlyField}>
-                      {difficulty === 'beginner' && 'Kronos D2'}
-                      {difficulty === 'casual' && 'Kronos D4'}
-                      {difficulty === 'club' && 'Kronos D5'}
-                      {difficulty === 'advanced' && 'Kronos D6'}
-                      {difficulty === 'expert' && 'Kronos D7'}
-                    </div>
-                  </div>
-                )}
-
-                <div style={styles.configCol}>
-                  <label style={styles.configLabel}>Time Control</label>
-                  <div style={styles.readOnlyField}>
-                    {timeControl === 'casual' && 'Untimed Match'}
-                    {timeControl === '1+0' && 'Bullet (1m)'}
-                    {timeControl === '3+0' && 'Blitz (3m)'}
-                    {timeControl === '5+0' && 'Blitz (5m)'}
-                    {timeControl === '10+0' && 'Rapid (10m)'}
-                    {timeControl === '30+0' && 'Classical (30m)'}
-                    {!['casual', '1+0', '3+0', '5+0', '10+0', '30+0'].includes(timeControl) && (timeControl || 'Untimed Match')}
-                  </div>
-                </div>
-
-                <div style={styles.configCol}>
-                  <label style={styles.configLabel}>Match Rules</label>
-                  <div style={styles.readOnlyField}>
-                    {rulesLevel === 'competitive' ? 'Competitive (No Undo)' : 'Casual (Allows Undo)'}
-                  </div>
-                </div>
-
-                {modeSelected === 'ai' && (
-                  <div style={styles.configCol}>
-                    <label style={styles.configLabel}>Premove System</label>
-                    <div style={styles.readOnlyField}>
-                      {premoveEnabled ? 'Premove: Enabled' : 'Premove: Disabled'}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Game Over Announcements */}
-            {gameStatus !== 'active' && (
+            {gameStatus !== 'active' && gameStatus !== 'idle' && (
               <div style={styles.gameResultBanner}>
                 <Award size={18} style={{ color: 'var(--color-brand-primary)' }} />
                 <div>
@@ -221,43 +176,64 @@ export default function ControlPanel({
               </div>
             )}
 
-            {/* Actions Grid */}
-            <div style={styles.buttonsGrid}>
-              <button onClick={() => resetGame()} style={styles.actionBtn} className="btn-gold">
-                <RefreshCw size={13} />
-                <span>New Game</span>
-              </button>
+            {/* Actions Responsive Toolbar */}
+            <div style={styles.toolbarContainer}>
               <button 
-                onClick={resignGame} 
-                style={styles.actionBtn} 
-                className="btn-bronze"
-                disabled={gameStatus !== 'active'}
+                onClick={() => resetGame()} 
+                style={styles.toolbarBtn} 
+                className="btn-gold" 
+                title="New Game"
               >
-                <Flag size={13} />
-                <span>Resign</span>
-              </button>
-              <button 
-                onClick={offerDraw} 
-                style={styles.actionBtn} 
-                className="btn-bronze"
-                disabled={gameStatus !== 'active'}
-              >
-                <Award size={13} />
-                <span>Draw</span>
-              </button>
-              <button onClick={flipBoard} style={styles.actionBtn} className="btn-bronze">
-                <Shuffle size={13} />
-                <span>Flip Board</span>
+                <RefreshCw size={15} />
               </button>
               <button 
                 onClick={undoMove} 
-                style={styles.actionBtn} 
-                className="btn-bronze"
+                style={styles.toolbarBtn} 
+                className="btn-bronze" 
+                title="Undo Move" 
                 disabled={rulesLevel === 'competitive' || gameHistory.length === 0}
               >
-                <ArrowLeft size={13} />
-                <span>Undo</span>
+                <ArrowLeft size={15} />
               </button>
+              <button 
+                onClick={flipBoard} 
+                style={styles.toolbarBtn} 
+                className="btn-bronze" 
+                title="Flip Board"
+              >
+                <Shuffle size={15} />
+              </button>
+              <button 
+                onClick={offerDraw} 
+                style={styles.toolbarBtn} 
+                className="btn-bronze" 
+                title="Offer Draw" 
+                disabled={gameStatus !== 'active'}
+              >
+                <Award size={15} />
+              </button>
+              <button 
+                onClick={resignGame} 
+                style={styles.toolbarBtn} 
+                className="btn-bronze" 
+                title="Resign Game" 
+                disabled={gameStatus !== 'active'}
+              >
+                <Flag size={15} />
+              </button>
+            </div>
+
+            {/* Move List */}
+            <div style={styles.historyWrapper}>
+              <MoveHistory
+                gameHistory={gameHistory}
+                openingName={openingName}
+                ecoCode={ecoCode}
+                previewIndex={previewIndex}
+                setPreviewIndex={setPreviewIndex}
+                modeSelected={modeSelected}
+                onOpenExplorer={onOpenExplorer}
+              />
             </div>
           </div>
         )}
@@ -469,11 +445,37 @@ const styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
   },
   tabPane: {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+    flex: 1,
+    minHeight: 0,
+    overflow: 'hidden',
+  },
+  toolbarContainer: {
+    display: 'flex',
+    gap: '8px',
+    width: '100%',
+    flexShrink: 0,
+  },
+  toolbarBtn: {
+    flex: 1,
+    height: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: '4px',
+    cursor: 'pointer',
+    transition: 'all 0.15s ease',
+  },
+  historyWrapper: {
+    flex: 1,
+    minHeight: 0,
+    display: 'flex',
+    flexDirection: 'column',
   },
   configGrid: {
     display: 'grid',

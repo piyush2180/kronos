@@ -5,7 +5,6 @@ import React, { useState, useEffect } from 'react';
 import { useChessGame } from '../hooks/useChessGame';
 import ChessBoard from '../components/ChessBoard';
 import ControlPanel from '../components/ControlPanel';
-import MoveHistory from '../components/MoveHistory';
 import OpeningExplorer from '../components/OpeningExplorer';
 import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
@@ -96,7 +95,7 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
 
   return (
     <div style={styles.splitGrid} className="animate-fade-in game-split-grid">
-      {/* Left: Chessboard */}
+      {/* Left: Chessboard Column */}
       <div style={styles.boardColumn} className="board-column-wrapper">
         <ChessBoard
           fen={boardFen}
@@ -125,51 +124,37 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
       {/* Right: Sidebar container */}
       <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
         <div style={styles.sidebarWrapper} className="sidebar-card-wrapper">
-          <div style={styles.controlSection}>
-            <ControlPanel
-              modeSelected={game.modeSelected}
-              setModeSelected={game.setModeSelected}
-              difficulty={game.difficulty}
-              setDifficulty={game.setDifficulty}
-              rulesLevel={game.rulesLevel}
-              setRulesLevel={game.setRulesLevel}
-              timeControl={game.timeControl}
-              setTimeControl={game.setTimeControl}
-              engineStats={game.engineStats}
-              candidateMoves={game.candidateMoves}
-              isSearching={game.isSearching}
-              thinkingStatus={game.thinkingStatus}
-              gameStatus={game.gameStatus}
-              winner={game.winner}
-              playerColor={game.playerColor}
-              resetGame={game.resetGame}
-              resignGame={game.resignGame}
-              offerDraw={game.offerDraw}
-              flipBoard={game.flipBoard}
-              undoMove={game.undoMove}
-              fen={game.fen}
-              gameHistory={game.gameHistory}
-              importFen={game.importFen}
-              importPgn={game.importPgn}
-              openingName={game.openingName}
-              ecoCode={game.ecoCode}
-              onOpenExplorer={() => setShowExplorer(true)}
-            />
-          </div>
-
-          <div style={styles.historyDivider} />
-
-          <div style={styles.historySection}>
-            <MoveHistory
-              gameHistory={game.gameHistory}
-              openingName={game.openingName}
-              ecoCode={game.ecoCode}
-              previewIndex={previewIndex}
-              setPreviewIndex={setPreviewIndex}
-              modeSelected={game.modeSelected}
-              onOpenExplorer={() => setShowExplorer(true)}
-            />
-          </div>
+          <ControlPanel
+            modeSelected={game.modeSelected}
+            setModeSelected={game.setModeSelected}
+            difficulty={game.difficulty}
+            setDifficulty={game.setDifficulty}
+            rulesLevel={game.rulesLevel}
+            setRulesLevel={game.setRulesLevel}
+            timeControl={game.timeControl}
+            setTimeControl={game.setTimeControl}
+            engineStats={game.engineStats}
+            candidateMoves={game.candidateMoves}
+            isSearching={game.isSearching}
+            thinkingStatus={game.thinkingStatus}
+            gameStatus={game.gameStatus}
+            winner={game.winner}
+            playerColor={game.playerColor}
+            resetGame={game.resetGame}
+            resignGame={game.resignGame}
+            offerDraw={game.offerDraw}
+            flipBoard={game.flipBoard}
+            undoMove={game.undoMove}
+            fen={game.fen}
+            gameHistory={game.gameHistory}
+            importFen={game.importFen}
+            importPgn={game.importPgn}
+            openingName={game.openingName}
+            ecoCode={game.ecoCode}
+            onOpenExplorer={() => setShowExplorer(true)}
+            previewIndex={previewIndex}
+            setPreviewIndex={setPreviewIndex}
+          />
         </div>
 
         {/* Slide-out Opening Explorer Panel */}
@@ -188,15 +173,16 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '60% 40%',
-    gap: spacing.xl,
-    minHeight: 'calc(100vh - 56px)',
+    gridTemplateColumns: '1fr 440px',
+    gap: '24px',
+    height: '100%',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: `${spacing.lg} ${spacing.xl}`,
+    padding: '24px',
     position: 'relative',
     boxSizing: 'border-box',
+    overflow: 'hidden',
   },
   boardColumn: {
     display: 'flex',
@@ -204,35 +190,29 @@ const styles = {
     alignItems: 'center',
     minWidth: 0,
     minHeight: 0,
+    overflow: 'hidden',
+    height: '100%',
   },
   sidebarColumn: {
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
+    height: '100%',
+    width: '440px',
+    overflow: 'hidden',
   },
   sidebarWrapper: {
     flex: 1,
-    padding: spacing.lg,
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
     boxSizing: 'border-box',
-  },
-  controlSection: {
-    flexShrink: 0,
-  },
-  historyDivider: {
-    height: '1px',
-    backgroundColor: 'var(--color-border-subtle)',
-    margin: `${spacing.md} 0`,
-    flexShrink: 0,
-  },
-  historySection: {
-    flex: 1,
-    minHeight: 0,
+    backgroundColor: 'var(--color-bg-surface)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: '8px',
+    height: '100%',
     overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
   },
 };

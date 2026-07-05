@@ -5,14 +5,16 @@ import React, { useState, useEffect } from 'react';
 import { useChessGame } from '../hooks/useChessGame';
 import ChessBoard from '../components/ChessBoard';
 import ControlPanel from '../components/ControlPanel';
-import MoveHistory from '../components/MoveHistory';
 import PostGameReview from '../components/PostGameReview';
-import { PlayCircle, Users } from 'lucide-react';
-import { colors, spacing, geometry, typography } from '../theme/designTokens';
+import { PlayCircle } from 'lucide-react';
 
 // ── Lobby Setup Screen ────────────────────────────────────────────────────────
 function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
   const [selectedTime, setSelectedTime] = useState(defaultTimeControl || '10+0');
+  const [whiteName, setWhiteName] = useState('White Player');
+  const [blackName, setBlackName] = useState('Black Player');
+  const [startingOrientation, setStartingOrientation] = useState('white');
+  const [rules, setRules] = useState('casual');
 
   const TIME_OPTIONS = [
     { value: '1+0', label: '1 min', type: 'Bullet' },
@@ -29,13 +31,16 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
       <div style={styles.boardColumn}>
         <ChessBoard
           fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-          boardOrientation="white"
+          boardOrientation={startingOrientation}
           boardTheme={boardTheme}
           evalScore=""
           isSearching={false}
           gameStatus="idle"
           playerColor="w"
           makeMove={() => {}}
+          whitePlayerName={whiteName}
+          blackPlayerName={blackName}
+          timeControl={selectedTime}
         />
       </div>
 
@@ -43,39 +48,48 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
       <div style={styles.sidebarColumn}>
         <div style={lobby.configPanel}>
           <div style={lobby.configHeader}>
-            <div>
-              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Local Match Setup</span>
-              <h2 className="heading-section" style={{ margin: '4px 0 0 0' }}>Pass & Play Settings</h2>
-            </div>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--color-brand-primary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Local Match Setup</span>
+            <h2 className="heading-section" style={{ margin: '4px 0 0 0', fontSize: '20px' }}>Pass & Play</h2>
           </div>
 
-          <div style={lobby.scrollBody}>
-            {/* Players Matchup */}
-            <div style={lobby.section}>
-              <div style={lobby.sectionLabel}>Matchup Overview</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2rem', padding: '12px 0', backgroundColor: 'rgba(255, 255, 255, 0.01)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.03)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-primary)' }}>♔</span>
-                  <span style={{ fontSize: '14px', fontWeight: '600' }}>White</span>
+          <div style={lobby.scrollBody} className="scroll-panel">
+            {/* Players card */}
+            <div style={lobby.card}>
+              <div style={lobby.sectionLabel}>Players</div>
+              <div style={lobby.inputGroup}>
+                <div style={lobby.inputWrapper}>
+                  <span style={{ fontSize: '18px', color: '#f0d9b5', userSelect: 'none' }}>♔</span>
+                  <input
+                    type="text"
+                    value={whiteName}
+                    onChange={(e) => setWhiteName(e.target.value)}
+                    style={lobby.textInput}
+                    placeholder="White Player Name"
+                  />
                 </div>
-                <span style={{ fontSize: '11px', color: 'var(--color-text-dim)', fontWeight: '700' }}>VS</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)' }}>♚</span>
-                  <span style={{ fontSize: '14px', fontWeight: '600' }}>Black</span>
+                <div style={lobby.inputWrapper}>
+                  <span style={{ fontSize: '18px', color: '#b58863', userSelect: 'none' }}>♚</span>
+                  <input
+                    type="text"
+                    value={blackName}
+                    onChange={(e) => setBlackName(e.target.value)}
+                    style={lobby.textInput}
+                    placeholder="Black Player Name"
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Time Control Chips */}
-            <div style={lobby.section}>
+            {/* Time Control selection */}
+            <div style={lobby.card}>
               <div style={lobby.sectionLabel}>Time Control</div>
-              <div className="segmented-control" style={{ flexWrap: 'wrap', gap: '2px' }}>
+              <div className="segmented-control" style={{ flexWrap: 'wrap', gap: '4px', background: 'transparent', border: 'none', padding: 0 }}>
                 {TIME_OPTIONS.map(t => (
                   <button
                     key={t.value}
                     onClick={() => setSelectedTime(t.value)}
                     className={`segmented-control-btn ${selectedTime === t.value ? 'segmented-control-btn-active' : ''}`}
-                    style={{ flex: '1 0 30%' }}
+                    style={{ flex: '1 0 30%', borderRadius: '4px', border: '1px solid var(--color-border-subtle)', padding: '10px 4px' }}
                   >
                     {t.label}
                   </button>
@@ -83,16 +97,92 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
               </div>
             </div>
 
-            {/* Match Rules & Specs */}
-            <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.01)', padding: `12px 16px`, borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.03)', fontSize: '13px', color: 'var(--color-text-secondary)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-              <span style={{ fontWeight: '700', color: 'var(--color-text-primary)' }}>Rules of Play</span>
-              <span style={{ lineHeight: '1.4' }}>Two players share one screen. The board flips automatically after each completed move to face the active side.</span>
+            {/* Starting Orientation */}
+            <div style={lobby.card}>
+              <div style={lobby.sectionLabel}>Board Orientation</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => setStartingOrientation('white')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: startingOrientation === 'white' ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-elevated)',
+                    border: startingOrientation === 'white' ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-default)',
+                    color: startingOrientation === 'white' ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  White on Bottom
+                </button>
+                <button
+                  onClick={() => setStartingOrientation('black')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: startingOrientation === 'black' ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-elevated)',
+                    border: startingOrientation === 'black' ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-default)',
+                    color: startingOrientation === 'black' ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Black on Bottom
+                </button>
+              </div>
+            </div>
+
+            {/* Match Rules */}
+            <div style={lobby.card}>
+              <div style={lobby.sectionLabel}>Rules level</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => setRules('casual')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: rules === 'casual' ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-elevated)',
+                    border: rules === 'casual' ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-default)',
+                    color: rules === 'casual' ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Casual (Allows Undo)
+                </button>
+                <button
+                  onClick={() => setRules('competitive')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: rules === 'competitive' ? 'rgba(212, 175, 55, 0.15)' : 'var(--color-bg-elevated)',
+                    border: rules === 'competitive' ? '1px solid var(--color-brand-primary)' : '1px solid var(--color-border-default)',
+                    color: rules === 'competitive' ? 'var(--color-brand-primary)' : 'var(--color-text-secondary)',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Competitive (No Undo)
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Start Button Fixed at Bottom */}
           <div style={lobby.fixedFooter}>
-            <button onClick={() => onStart(selectedTime)} className="btn-primary" style={{ width: '100%' }}>
+            <button 
+              onClick={() => onStart({ timeControl: selectedTime, startingOrientation, rules, whiteName, blackName })} 
+              className="btn-primary" 
+              style={{ width: '100%', height: '48px', fontSize: '14px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '6px', border: 'none', backgroundColor: 'var(--color-brand-primary)', color: '#1a130e', cursor: 'pointer' }}
+            >
               <PlayCircle size={18} />
               <span>Start Match</span>
             </button>
@@ -109,6 +199,20 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
   const { previewIndex, setPreviewIndex } = game;
   const [reviewTabActive, setReviewTabActive] = useState(false);
   const [showHeatmap, setShowHeatmap] = useState(false);
+
+  // Custom Player Names state (loaded from cache)
+  const [whitePlayerName, setWhitePlayerName] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('kronos_v2_local_state') || '{}');
+      return saved?.whitePlayerName || 'White Player';
+    } catch { return 'White Player'; }
+  });
+  const [blackPlayerName, setBlackPlayerName] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('kronos_v2_local_state') || '{}');
+      return saved?.blackPlayerName || 'Black Player';
+    } catch { return 'Black Player'; }
+  });
 
   // Show lobby if no active game with moves played
   const [gameStarted, setGameStarted] = useState(() => {
@@ -193,9 +297,22 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
     };
   }, [game, previewIndex]);
 
-  const handleLobbyStart = (timeControl) => {
-    // resetGame applies timeControl and resets all state including timers
-    game.resetGame(null, timeControl, 'local');
+  const handleLobbyStart = ({ timeControl, startingOrientation, rules, whiteName, blackName }) => {
+    setWhitePlayerName(whiteName || 'White Player');
+    setBlackPlayerName(blackName || 'Black Player');
+    game.setRulesLevel(rules);
+    game.setBoardOrientation(startingOrientation);
+    game.resetGame(startingOrientation === 'white' ? 'w' : 'b', timeControl, 'local');
+
+    // Save names to cache alongside the state
+    try {
+      const stateKey = 'kronos_v2_local_state';
+      const existing = JSON.parse(localStorage.getItem(stateKey) || '{}');
+      existing.whitePlayerName = whiteName || 'White Player';
+      existing.blackPlayerName = blackName || 'Black Player';
+      localStorage.setItem(stateKey, JSON.stringify(existing));
+    } catch {}
+
     setGameStarted(true);
     setReviewTabActive(false);
     setPreviewIndex(null);
@@ -246,6 +363,8 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
           makeMove={game.makeMove}
           reviewedMove={previewIndex !== null ? game.gameHistory[previewIndex] : null}
           showHeatmap={showHeatmap}
+          whitePlayerName={whitePlayerName}
+          blackPlayerName={blackPlayerName}
         />
       </div>
 
@@ -270,49 +389,36 @@ export default function LocalPage({ boardTheme, soundEnabled }) {
               cancelAnalysis={game.cancelPostGameAnalysis}
             />
           ) : (
-            <>
-              <div style={styles.controlSection}>
-                <ControlPanel
-                  modeSelected={game.modeSelected}
-                  setModeSelected={game.setModeSelected}
-                  difficulty={game.difficulty}
-                  setDifficulty={game.setDifficulty}
-                  rulesLevel={game.rulesLevel}
-                  setRulesLevel={game.setRulesLevel}
-                  timeControl={game.timeControl}
-                  setTimeControl={game.setTimeControl}
-                  engineStats={game.engineStats}
-                  candidateMoves={game.candidateMoves}
-                  isSearching={false}
-                  thinkingStatus={game.thinkingStatus}
-                  gameStatus={game.gameStatus}
-                  winner={game.winner}
-                  playerColor={game.playerColor}
-                  resetGame={handleResetToLobby}
-                  resignGame={game.resignGame}
-                  offerDraw={game.offerDraw}
-                  flipBoard={game.flipBoard}
-                  undoMove={game.undoMove}
-                  fen={game.fen}
-                  gameHistory={game.gameHistory}
-                  importFen={game.importFen}
-                  importPgn={game.importPgn}
-                  openingName={game.openingName}
-                  ecoCode={game.ecoCode}
-                />
-              </div>
-              <div style={styles.historyDivider} />
-              <div style={styles.historySection}>
-                <MoveHistory
-                  gameHistory={game.gameHistory}
-                  openingName={game.openingName}
-                  ecoCode={game.ecoCode}
-                  previewIndex={previewIndex}
-                  setPreviewIndex={setPreviewIndex}
-                  modeSelected={game.modeSelected}
-                />
-              </div>
-            </>
+            <ControlPanel
+              modeSelected={game.modeSelected}
+              setModeSelected={game.setModeSelected}
+              difficulty={game.difficulty}
+              setDifficulty={game.setDifficulty}
+              rulesLevel={game.rulesLevel}
+              setRulesLevel={game.setRulesLevel}
+              timeControl={game.timeControl}
+              setTimeControl={game.setTimeControl}
+              engineStats={game.engineStats}
+              candidateMoves={game.candidateMoves}
+              isSearching={false}
+              thinkingStatus={game.thinkingStatus}
+              gameStatus={game.gameStatus}
+              winner={game.winner}
+              playerColor={game.playerColor}
+              resetGame={handleResetToLobby}
+              resignGame={game.resignGame}
+              offerDraw={game.offerDraw}
+              flipBoard={game.flipBoard}
+              undoMove={game.undoMove}
+              fen={game.fen}
+              gameHistory={game.gameHistory}
+              importFen={game.importFen}
+              importPgn={game.importPgn}
+              openingName={game.openingName}
+              ecoCode={game.ecoCode}
+              previewIndex={previewIndex}
+              setPreviewIndex={setPreviewIndex}
+            />
           )}
         </div>
       </div>
@@ -325,119 +431,113 @@ const lobby = {
   configPanel: {
     display: 'flex',
     flexDirection: 'column',
-    minHeight: 0,
-    backgroundColor: 'transparent',
-    borderLeft: '1px solid rgba(255, 255, 255, 0.04)',
+    height: '100%',
     boxSizing: 'border-box',
-    padding: '0 24px 20px 24px',
   },
   configHeader: {
-    paddingBottom: spacing.sm,
-    borderBottom: '1px solid var(--color-border-subtle)'
+    paddingBottom: '16px',
+    borderBottom: '1px solid var(--color-border-subtle)',
+    flexShrink: 0,
   },
   scrollBody: {
     flex: 1,
     overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.xl,
-    paddingRight: '0.2rem'
+    gap: '20px',
+    padding: '16px 4px 16px 0',
   },
-  section: {
+  card: {
+    backgroundColor: 'rgba(255, 255, 255, 0.01)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: '8px',
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    gap: spacing.xs
+    gap: '12px',
   },
   sectionLabel: {
-    fontSize: '0.7rem',
-    fontWeight: '600',
+    fontSize: '11px',
+    fontWeight: '700',
     color: 'var(--color-text-dim)',
-    textTransform: 'capitalize'
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
   },
-  playersRow: {
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  inputWrapper: {
     display: 'flex',
     alignItems: 'center',
-    gap: spacing.sm
-  },
-  playerChip: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: spacing.sm,
-    padding: `${spacing.sm} ${spacing.md}`,
+    gap: '10px',
     backgroundColor: 'var(--color-bg-base)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: geometry.radiusCard,
-    flex: 1
+    border: '1px solid var(--color-border-default)',
+    borderRadius: '6px',
+    padding: '6px 12px',
   },
-  chipRow: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: spacing.xs
-  },
-  chipBtn: {
-    padding: `${spacing.xs} ${spacing.md}`,
-    fontSize: '0.78rem',
+  textInput: {
+    flex: 1,
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--color-text-primary)',
+    fontSize: '13px',
     fontWeight: '600',
-    borderRadius: geometry.radiusInteractive,
-    border: '1px solid',
-    cursor: 'pointer',
-    transition: 'all 0.15s ease',
-    display: 'inline-flex',
-    alignItems: 'center'
+    outline: 'none',
   },
   fixedFooter: {
-    paddingTop: spacing.md,
+    paddingTop: '16px',
     borderTop: '1px solid var(--color-border-subtle)',
-    marginTop: 'auto'
-  }
+    flexShrink: 0,
+    marginTop: 'auto',
+  },
 };
 
 // ── Game Page Styles ──────────────────────────────────────────────────────────
 const styles = {
   splitGrid: {
     display: 'grid',
-    gridTemplateColumns: '60% 40%',
-    gap: spacing.xl,
-    minHeight: 'calc(100vh - 56px)',
+    gridTemplateColumns: '1fr 440px',
+    gap: '24px',
+    height: '100%',
     width: '100%',
     maxWidth: '1600px',
     margin: '0 auto',
-    padding: `${spacing.lg} ${spacing.xl}`,
-    boxSizing: 'border-box'
+    padding: '24px',
+    position: 'relative',
+    boxSizing: 'border-box',
+    overflow: 'hidden',
   },
   boardColumn: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     minWidth: 0,
-    minHeight: 0
+    minHeight: 0,
+    overflow: 'hidden',
+    height: '100%',
   },
   sidebarColumn: {
+    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
-    minHeight: 0
+    minHeight: 0,
+    height: '100%',
+    width: '440px',
+    overflow: 'hidden',
   },
   sidebarWrapper: {
     flex: 1,
-    padding: spacing.lg,
+    padding: '16px',
     display: 'flex',
     flexDirection: 'column',
-    boxSizing: 'border-box'
-  },
-  controlSection: {
-    flexShrink: 0
-  },
-  historyDivider: {
-    height: '1px',
-    backgroundColor: 'var(--color-border-subtle)',
-    margin: `${spacing.md} 0`,
-    flexShrink: 0
-  },
-  historySection: {
-    flex: 1,
-    minHeight: 0,
+    position: 'relative',
+    boxSizing: 'border-box',
+    backgroundColor: 'var(--color-bg-surface)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: '8px',
+    height: '100%',
     overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column'
-  }
+  },
 };

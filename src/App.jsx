@@ -551,7 +551,7 @@ const styles = {
     overflow: 'hidden',
   },
   header: {
-    height: '56px',
+    height: '64px',
     backgroundColor: 'var(--color-bg-surface)',
     borderBottom: '1px solid var(--color-border-subtle)',
     padding: '0 24px',

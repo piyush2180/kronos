@@ -38,7 +38,9 @@ export default function ChessBoard({
   clearPremove,
   candidateMoves = [],
   reviewedMove = null,
-  showHeatmap = false
+  showHeatmap = false,
+  whitePlayerName = 'White Player',
+  blackPlayerName = 'Black Player'
 }) {
   const [selectedSquare, setSelectedSquare] = useState(null);
 
@@ -335,7 +337,7 @@ export default function ChessBoard({
   ]);
 
   // ── HUD renderer ──────────────────────────────────────────────────────────
-  const renderHUD = (side) => {
+  const renderHUD = (side, isTop) => {
     const isPlayerSide = side === boardOrientation;
 
     let displayName = 'Player';
@@ -351,16 +353,25 @@ export default function ChessBoard({
         displayRating = ` (${depthVal}-ply)`;
       }
     } else if (modeSelected === 'local') {
-      displayName = side === 'white' ? 'White Player' : 'Black Player';
+      displayName = side === 'white' ? whitePlayerName : blackPlayerName;
     } else if (modeSelected === 'analysis') {
       displayName = isPlayerSide ? 'Player' : 'Stockfish';
     } else if (modeSelected === 'simulate') {
       displayName = side === 'white' ? 'Kronos (White)' : 'Kronos (Black)';
     }
 
-    const clockTime = side === 'white'
-      ? (isWhiteBottom ? playerTime : engineTime)
-      : (isWhiteBottom ? engineTime : playerTime);
+    // Fix the timer swapping bug when board is flipped
+    let clockTime = 0;
+    if (modeSelected === 'local') {
+      clockTime = side === 'white' ? playerTime : engineTime;
+    } else {
+      const isPlayerWhite = playerColor === 'w';
+      if (side === 'white') {
+        clockTime = isPlayerWhite ? playerTime : engineTime;
+      } else {
+        clockTime = isPlayerWhite ? engineTime : playerTime;
+      }
+    }
 
     const hasClock = timeControl !== 'casual' && modeSelected !== 'analysis';
     const capturedList = side === 'white' ? (captured?.w || []) : (captured?.b || []);
@@ -372,18 +383,25 @@ export default function ChessBoard({
       <div style={styles.hudWrapper}>
         <div style={styles.hudLeft}>
           <div style={styles.avatarCircle}>{displayName[0].toUpperCase()}</div>
-          <div>
-            <span style={styles.hudName}>{displayName}</span>
-            <span style={styles.hudRating}>{displayRating}</span>
-          </div>
-          <div style={styles.capturedContainer}>
-            {capturedList.map((p, idx) => (
-              <span key={idx} style={styles.capturedPiece}>
-                {HUD_PIECE_GLYPHS[p.type] || p.type}
-              </span>
-            ))}
-            {showBalance && (
-              <span style={styles.balanceText}>+{Math.abs(balance)}</span>
+          <div style={styles.hudInfo}>
+            <div style={styles.nameRow}>
+              <span style={styles.hudName}>{displayName}</span>
+              {displayRating && <span style={styles.hudRating}>{displayRating}</span>}
+              {isTop && !isPlayerSide && modeSelected === 'ai' && (
+                <span style={styles.engineBadge}>Kronos AI</span>
+              )}
+            </div>
+            {!isTop && (
+              <div style={styles.capturedContainer}>
+                {capturedList.map((p, idx) => (
+                  <span key={idx} style={styles.capturedPiece}>
+                    {HUD_PIECE_GLYPHS[p.type] || p.type}
+                  </span>
+                ))}
+                {showBalance && (
+                  <span style={styles.balanceText}>+{Math.abs(balance)}</span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -391,7 +409,7 @@ export default function ChessBoard({
         {hasClock && (
           <div style={{
             ...styles.timerBox,
-            backgroundColor: isLowTime ? '#4a1111' : 'var(--color-bg-surface)',
+            backgroundColor: isLowTime ? '#4a1111' : 'var(--color-bg-elevated)',
             borderColor:     isLowTime ? '#9b2c2c' : 'rgba(255, 255, 255, 0.05)',
             color:           isLowTime ? '#f56565' : 'var(--color-text-primary)'
           }}>
@@ -403,20 +421,24 @@ export default function ChessBoard({
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
-  return (
-    <div style={styles.boardHUDWrapper}>
-      {renderHUD(topSide)}
+  const hasEvalBar = modeSelected !== 'local' && evalScore !== undefined && evalScore !== '';
+  const boardSize = 'min(70vh, 50vw, 700px)';
+  const totalWidth = hasEvalBar ? `calc(${boardSize} + 28px)` : boardSize;
 
-      <div style={styles.boardRow}>
-        {modeSelected !== 'local' && (
+  return (
+    <div style={{ ...styles.boardHUDWrapper, maxWidth: totalWidth }}>
+      {renderHUD(topSide, true)}
+
+      <div style={{ ...styles.boardRow, height: boardSize }}>
+        {hasEvalBar && (
           <EvaluationBar score={evalScore} orientation={boardOrientation} />
         )}
-        <div style={styles.boardContainer}>
+        <div style={{ ...styles.boardContainer, width: boardSize, height: boardSize }}>
           <Chessboard options={boardOptions} />
         </div>
       </div>
 
-      {renderHUD(bottomSide)}
+      {renderHUD(bottomSide, false)}
     </div>
   );
 }
@@ -425,35 +447,60 @@ const styles = {
   boardHUDWrapper: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '12px',
+    gap: '8px',
     width: '100%',
-    maxWidth: 'min(82vh, 760px)',
   },
   hudWrapper: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '4px 8px',
-    height: '44px',
-    minHeight: '44px',
+    padding: '0 12px',
+    height: '56px',
+    minHeight: '56px',
+    boxSizing: 'border-box',
+    width: '100%',
+    backgroundColor: 'var(--color-bg-surface)',
+    border: '1px solid var(--color-border-subtle)',
+    borderRadius: '4px',
   },
   hudLeft: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
     minWidth: 0,
-    overflow: 'hidden',
+  },
+  hudInfo: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minWidth: 0,
+  },
+  nameRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+  },
+  engineBadge: {
+    fontSize: '9px',
+    fontWeight: '850',
+    backgroundColor: 'rgba(200, 159, 61, 0.1)',
+    color: 'var(--color-brand-primary)',
+    border: '1px solid rgba(200, 159, 61, 0.3)',
+    padding: '1px 5px',
+    borderRadius: '3px',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase',
   },
   avatarCircle: {
-    width: '28px',
-    height: '28px',
+    width: '36px',
+    height: '36px',
     borderRadius: '50%',
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid rgba(255, 255, 255, 0.04)',
+    backgroundColor: 'var(--color-bg-elevated)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: '12px',
+    fontSize: '14px',
     fontWeight: '800',
     color: 'var(--color-brand-primary)',
     flexShrink: 0,
@@ -478,7 +525,6 @@ const styles = {
     color: 'var(--color-text-secondary)',
     overflow: 'hidden',
     flexShrink: 1,
-    marginLeft: '4px',
   },
   capturedPiece: {
     lineHeight: 1,
@@ -506,10 +552,9 @@ const styles = {
   },
   boardRow: {
     display: 'flex',
-    gap: '12px',
+    gap: '0px',
     alignItems: 'stretch',
     width: '100%',
-    aspectRatio: '1',
   },
   boardContainer: {
     flex: 1,
