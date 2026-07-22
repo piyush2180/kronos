@@ -1,12 +1,7 @@
-// Kronos Chess V2 — Analysis Board Page
-// Manages isolated analysis state with Stockfish telemetry and slide-out opening explorer.
-
 import React, { useState, useEffect } from 'react';
 import { useChessGame } from '../hooks/useChessGame';
-import ChessBoard from '../components/ChessBoard';
-import ControlPanel from '../components/ControlPanel';
-import OpeningExplorer from '../components/OpeningExplorer';
-import { colors, spacing, geometry, typography } from '../theme/designTokens';
+import AnalysisDesktop from '../components/analysis/AnalysisDesktop';
+import AnalysisMobile from '../components/analysis/AnalysisMobile';
 
 export default function AnalysisPage({ boardTheme, soundEnabled }) {
   const game = useChessGame('kronos_v2_analysis_state', 'analysis');
@@ -14,12 +9,20 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
   const [showExplorer, setShowExplorer] = useState(false);
   const [evalBarVisible, setEvalBarVisible] = useState(true);
 
-  // Force modeSelected to analysis on mount
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     game.setModeSelected('analysis');
   }, []);
 
-  // Sync theme and sound from global shell
   useEffect(() => {
     game.setBoardTheme(boardTheme);
   }, [boardTheme]);
@@ -28,7 +31,6 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
     game.setSoundEnabled(soundEnabled);
   }, [soundEnabled]);
 
-  // Keyboard shortcuts and command palette events
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!e || typeof e.key !== 'string') return;
@@ -93,126 +95,19 @@ export default function AnalysisPage({ boardTheme, soundEnabled }) {
     ? game.gameHistory[previewIndex].after
     : game.fen;
 
-  return (
-    <div style={styles.splitGrid} className="animate-fade-in game-split-grid">
-      {/* Left: Chessboard Column */}
-      <div style={styles.boardColumn} className="board-column-wrapper">
-        <ChessBoard
-          fen={boardFen}
-          gameHistory={game.gameHistory}
-          boardOrientation={game.boardOrientation}
-          boardTheme={game.boardTheme}
-          evalScore={evalBarVisible ? game.evalScore : ''}
-          isSearching={game.isSearching}
-          gameStatus={game.gameStatus}
-          playerColor={game.playerColor}
-          playerTime={game.playerTime}
-          engineTime={game.engineTime}
-          captured={game.captured}
-          inCheck={game.inCheck}
-          modeSelected={game.modeSelected}
-          difficulty={game.difficulty}
-          timeControl={game.timeControl}
-          makeMove={game.makeMove}
-          premove={game.premove}
-          onPremove={game.queuePremove}
-          clearPremove={game.clearPremove}
-          candidateMoves={game.candidateMoves}
-        />
-      </div>
+  const props = {
+    game,
+    boardFen,
+    evalBarVisible,
+    showExplorer,
+    setShowExplorer,
+    previewIndex,
+    setPreviewIndex,
+  };
 
-      {/* Right: Sidebar container */}
-      <div style={styles.sidebarColumn} className="sidebar-column-wrapper">
-        <div style={styles.sidebarWrapper} className="sidebar-card-wrapper">
-          <ControlPanel
-            modeSelected={game.modeSelected}
-            setModeSelected={game.setModeSelected}
-            difficulty={game.difficulty}
-            setDifficulty={game.setDifficulty}
-            rulesLevel={game.rulesLevel}
-            setRulesLevel={game.setRulesLevel}
-            timeControl={game.timeControl}
-            setTimeControl={game.setTimeControl}
-            engineStats={game.engineStats}
-            candidateMoves={game.candidateMoves}
-            isSearching={game.isSearching}
-            thinkingStatus={game.thinkingStatus}
-            gameStatus={game.gameStatus}
-            winner={game.winner}
-            playerColor={game.playerColor}
-            resetGame={game.resetGame}
-            resignGame={game.resignGame}
-            offerDraw={game.offerDraw}
-            flipBoard={game.flipBoard}
-            undoMove={game.undoMove}
-            fen={game.fen}
-            gameHistory={game.gameHistory}
-            importFen={game.importFen}
-            importPgn={game.importPgn}
-            openingName={game.openingName}
-            ecoCode={game.ecoCode}
-            onOpenExplorer={() => setShowExplorer(true)}
-            previewIndex={previewIndex}
-            setPreviewIndex={setPreviewIndex}
-          />
-        </div>
+  if (isMobile) {
+    return <AnalysisMobile {...props} />;
+  }
 
-        {/* Slide-out Opening Explorer Panel */}
-        {showExplorer && (
-          <OpeningExplorer
-            openingName={game.openingName}
-            ecoCode={game.ecoCode}
-            onClose={() => setShowExplorer(false)}
-          />
-        )}
-      </div>
-    </div>
-  );
+  return <AnalysisDesktop {...props} />;
 }
-
-const styles = {
-  splitGrid: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 440px',
-    gap: '24px',
-    height: '100%',
-    width: '100%',
-    maxWidth: '1600px',
-    margin: '0 auto',
-    padding: '24px',
-    position: 'relative',
-    boxSizing: 'border-box',
-    overflow: 'hidden',
-  },
-  boardColumn: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 0,
-    minHeight: 0,
-    overflow: 'hidden',
-    height: '100%',
-  },
-  sidebarColumn: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: 0,
-    height: '100%',
-    width: '440px',
-    overflow: 'hidden',
-  },
-  sidebarWrapper: {
-    flex: 1,
-    padding: '16px',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative',
-    boxSizing: 'border-box',
-    backgroundColor: 'var(--color-bg-surface)',
-    border: '1px solid var(--color-border-subtle)',
-    borderRadius: '8px',
-    height: '100%',
-    overflow: 'hidden',
-  },
-};

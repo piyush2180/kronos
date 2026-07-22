@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AccessScreen from '../components/research/AccessScreen';
-import ResearchLayout from '../components/research/ResearchLayout';
-import DashboardView from '../components/research/DashboardView';
-import ResearchArchive from '../components/research/ResearchArchive';
-import OptimizationTimeline from '../components/research/OptimizationTimeline';
-import EngineCalibration from '../components/research/EngineCalibration';
-import SearchValidationSuite from '../components/research/SearchValidationSuite';
-import ArchitectureViewer from '../components/research/ArchitectureViewer';
-import BenchmarkRunnerView from '../components/research/BenchmarkRunnerView';
-import ExperimentInspector from '../components/research/ExperimentInspector';
-import ExperimentComparison from '../components/research/ExperimentComparison';
-import ReportViewer from '../components/research/ReportViewer';
+import BenchmarkDesktop from '../components/research/BenchmarkDesktop';
+import BenchmarkMobile from '../components/research/BenchmarkMobile';
 import { BenchmarkDataService } from '../services/benchmarkService';
 
 export default function ResearchLabPage({ onBack }) {
@@ -23,7 +14,16 @@ export default function ResearchLabPage({ onBack }) {
     { time: new Date().toLocaleTimeString('en-US', { hour12: false }), level: 'SUCCESS', message: 'Connected to benchmark data service.' }
   ]);
 
-  // Load experiments from BenchmarkDataService on initialization
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const loaded = BenchmarkDataService.getExperiments();
     setExperiments(loaded);
@@ -85,51 +85,26 @@ export default function ResearchLabPage({ onBack }) {
     return <AccessScreen onEnter={() => setIsAuthorized(true)} />;
   }
 
-  return (
-    <ResearchLayout
-      activeView={activeView}
-      setActiveView={setActiveView}
-      onExit={() => { setIsAuthorized(false); if (onBack) onBack(); }}
-      experimentCount={experiments.length}
-      latestExperiment={experiments[0] || null}
-      consoleLogs={consoleLogs}
-      onClearConsole={() => setConsoleLogs([])}
-    >
-      {activeView === 'dashboard' && (
-        <DashboardView 
-          experiments={experiments} 
-          onNavigate={setActiveView} 
-          onInspect={handleInspect} 
-        />
-      )}
+  const props = {
+    isAuthorized,
+    setIsAuthorized,
+    activeView,
+    setActiveView,
+    experiments,
+    selectedExperiment,
+    consoleLogs,
+    setConsoleLogs,
+    handleAddLog,
+    handleInspect,
+    handleDelete,
+    handleImportJson,
+    refreshExperiments,
+    onBack,
+  };
 
-      {activeView === 'archive' && (
-        <ResearchArchive 
-          experiments={experiments} 
-          onInspect={handleInspect} 
-          onDelete={handleDelete} 
-          onImportJson={handleImportJson}
-        />
-      )}
+  if (isMobile) {
+    return <BenchmarkMobile {...props} />;
+  }
 
-      {activeView === 'timeline' && <OptimizationTimeline experiments={experiments} />}
-      {activeView === 'calibration' && <EngineCalibration experiments={experiments} />}
-      {activeView === 'validation' && <SearchValidationSuite onAddLog={handleAddLog} />}
-      {activeView === 'architecture' && <ArchitectureViewer />}
-      {activeView === 'runner' && (
-        <BenchmarkRunnerView 
-          onAddLog={handleAddLog} 
-          onTournamentComplete={() => refreshExperiments()} 
-        />
-      )}
-      {activeView === 'inspector' && <ExperimentInspector experiment={selectedExperiment} onBack={() => setActiveView('archive')} />}
-      {activeView === 'compare' && <ExperimentComparison experiments={experiments} />}
-      {activeView === 'reports' && (
-        <ReportViewer 
-          title="Repository Benchmark Calibration Log" 
-          content="# Kronos Research Telemetry Log\n\n- All benchmark runs verified.\n- Reproducible seed engine active." 
-        />
-      )}
-    </ResearchLayout>
-  );
+  return <BenchmarkDesktop {...props} />;
 }
