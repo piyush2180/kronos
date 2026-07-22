@@ -1,7 +1,7 @@
 import React from 'react';
-import { BookOpen, Cpu, Shield, HelpCircle, Layers, Award, BarChart3, Database } from 'lucide-react';
+import { BookOpen, Cpu, Shield, HelpCircle, Layers, Award, BarChart3, Database, X } from 'lucide-react';
 
-export default function LearnSidebar({ activeSection, setActiveSection }) {
+export default function LearnSidebar({ activeSection, setActiveSection, isSidebarOpen, setIsSidebarOpen }) {
   const groups = [
     {
       title: 'Beginner Path',
@@ -34,10 +34,15 @@ export default function LearnSidebar({ activeSection, setActiveSection }) {
   ];
 
   return (
-    <aside className="card-secondary" style={{ width: '240px', padding: '1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0, borderColor: 'rgba(139, 115, 85, 0.2)' }}>
-      <div style={{ padding: '0 0.5rem 0.5rem 0.5rem', borderBottom: '1px solid rgba(139, 115, 85, 0.2)' }}>
-        <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#8D837A', textTransform: 'capitalize' }}>Technical docs</span>
-        <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#F4F1EA', margin: '0.1rem 0' }}>Learn & Specs</h3>
+    <aside className={`card-secondary learn-mobile-drawer ${isSidebarOpen ? 'open' : ''}`} style={{ width: '240px', padding: '1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0, borderColor: 'rgba(139, 115, 85, 0.2)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0 0.5rem 0.5rem 0.5rem', borderBottom: '1px solid rgba(139, 115, 85, 0.2)' }}>
+        <div>
+          <span style={{ fontSize: '0.68rem', fontWeight: '600', color: '#8D837A', textTransform: 'capitalize' }}>Technical docs</span>
+          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#F4F1EA', margin: '0.1rem 0' }}>Learn & Specs</h3>
+        </div>
+        <button className="desktop-only" onClick={() => setIsSidebarOpen(false)} style={{ background: 'transparent', border: 'none', color: '#B7AEA5', cursor: 'pointer' }}>
+          <X size={18} />
+        </button>
       </div>
 
       <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
@@ -53,7 +58,7 @@ export default function LearnSidebar({ activeSection, setActiveSection }) {
                 return (
                   <button
                     key={sec.id}
-                    onClick={() => setActiveSection(sec.id)}
+                    onClick={() => { setActiveSection(sec.id); setIsSidebarOpen(false); }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

@@ -177,7 +177,7 @@ function LocalGameLobby({ onStart, defaultTimeControl, boardTheme }) {
           </div>
 
           {/* Start Button Fixed at Bottom */}
-          <div style={lobby.fixedFooter}>
+          <div style={lobby.fixedFooter} className="match-setup-btn-sticky">
             <button 
               onClick={() => onStart({ timeControl: selectedTime, startingOrientation, rules, whiteName, blackName })} 
               className="btn-primary" 

@@ -12,7 +12,7 @@ export default function MetadataPanel({ experimentCount = 0, latestExperiment = 
           <Cpu size={14} color="#d4af37" />
           <span style={styles.headerTitle}>System Metadata Inspector (Diagnostics)</span>
         </div>
-        <div style={styles.tabletGrid}>
+        <div style={styles.tabletGrid} className="tabletGrid">
           <div style={styles.tabletSection}>
             <span style={styles.sectionLabel}>Workspace Status</span>
             <span style={styles.itemValSuccess}>Connected</span>

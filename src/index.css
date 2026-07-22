@@ -947,6 +947,311 @@ textarea:focus-visible,
   transform: translateX(4px);
 }
 
+/* ============================================================
+   STRICT MOBILE-ONLY RESPONSIVE OVERRIDES (max-width: 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+  /* 2. Documentation (Learn.jsx) */
+  .learn-mobile-container {
+    flex-direction: column !important;
+  }
+  .learn-mobile-drawer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    z-index: 10000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin: 0 !important;
+    height: 100vh !important;
+  }
+  .learn-mobile-drawer.open {
+    transform: translateX(0) !important;
+  }
+  .learn-drawer-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+  }
 
+  /* 3. Puzzle Trainer */
+  .puzzle-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .puzzle-board-col {
+    width: 100% !important;
+  }
+  .puzzle-board-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 1 !important;
+  }
+  .puzzle-sidebar-column {
+    width: 100% !important;
+  }
 
+  /* 4. Analysis Board (Evaluation Bar) */
+  .game-split-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .board-column-wrapper {
+    flex-direction: column !important;
+  }
+  .evaluation-bar-wrapper.horizontal {
+    width: 100% !important;
+    height: 16px !important;
+    flex-direction: row !important;
+    margin-bottom: 8px !important;
+  }
+  .evaluation-bar-container.horizontal {
+    width: 100% !important;
+    height: 100% !important;
+    flex-direction: row !important;
+  }
+  .evaluation-bar-fill.horizontal {
+    height: 100% !important;
+    width: var(--bar-percent) !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .evaluation-bar-score.horizontal {
+    top: 50% !important;
+    left: var(--label-pos) !important;
+  }
 
+  /* 5. Benchmark Workspace */
+  .configGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .tabletGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .cmdBox {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* 6. Pass & Play / Dashboard */
+  .modeList .mode-item-hoverable {
+    padding: 12px 8px !important;
+  }
+  .statsRow {
+    grid-template-columns: 1fr !important;
+  }
+  .match-setup-btn-sticky {
+  font-size: 14px !important;
+  cursor: pointer;
+  background: none !important;
+  border: none !important;
+  padding: 8px 4px !important;
+  margin: 0 8px !important;
+}
+.nav-link-hoverable:hover {
+  color: var(--color-text-primary) !important;
+}
+.nav-link-hoverable::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-brand-primary);
+  transform: scaleX(0);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 10px rgba(200, 159, 61, 0.6);
+}
+.nav-link-active {
+  color: var(--color-brand-primary) !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 12px rgba(200, 159, 61, 0.35);
+}
+.nav-link-active::after {
+  transform: scaleX(1);
+}
+
+/* Tab slide-in transitions */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.tab-transition-pane {
+  animation: slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Skeleton loader animations */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton-loader {
+  background: linear-gradient(90deg, var(--color-bg-elevated) 25%, var(--color-border-default) 50%, var(--color-bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 4px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Pulsing dot animation for engine telemetry search */
+@keyframes statusPulse {
+  0% { opacity: 0.45; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.45; transform: scale(0.9); }
+}
+.active-pulse-dot {
+  animation: statusPulse 1.6s infinite ease-in-out !important;
+}
+
+/* Redesign Premium Dashboard hovers */
+.stat-card-premium:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+}
+
+.mode-item-hoverable {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.mode-item-hoverable:hover {
+  background-color: rgba(255, 255, 255, 0.015) !important;
+  padding-left: 16px !important;
+}
+
+.mode-item-hoverable:hover .mode-title {
+  color: var(--color-brand-primary) !important;
+}
+
+.mode-item-hoverable .mode-ctaCol svg {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mode-item-hoverable:hover .mode-ctaCol {
+  color: var(--color-brand-primary) !important;
+}
+
+.mode-item-hoverable:hover .mode-ctaCol svg {
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   STRICT MOBILE-ONLY RESPONSIVE OVERRIDES (max-width: 767px)
+   ============================================================ */
+@media (max-width: 767px) {
+  /* 2. Documentation (Learn.jsx) */
+  .learn-mobile-container {
+    flex-direction: column !important;
+  }
+  .learn-mobile-drawer {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: 280px !important;
+    z-index: 10000 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    margin: 0 !important;
+    height: 100vh !important;
+  }
+  .learn-mobile-drawer.open {
+    transform: translateX(0) !important;
+  }
+  .learn-drawer-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    z-index: 9999;
+  }
+
+  /* 3. Puzzle Trainer */
+  .puzzle-main-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .puzzle-board-col {
+    width: 100% !important;
+  }
+  .puzzle-board-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    aspect-ratio: 1 !important;
+  }
+  .puzzle-sidebar-column {
+    width: 100% !important;
+  }
+
+  /* 4. Analysis Board (Evaluation Bar) */
+  .game-split-grid {
+    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .board-column-wrapper {
+    flex-direction: column !important;
+  }
+  .evaluation-bar-wrapper.horizontal {
+    width: 100% !important;
+    height: 16px !important;
+    flex-direction: row !important;
+    margin-bottom: 8px !important;
+  }
+  .evaluation-bar-container.horizontal {
+    width: 100% !important;
+    height: 100% !important;
+    flex-direction: row !important;
+  }
+  .evaluation-bar-fill.horizontal {
+    height: 100% !important;
+    width: var(--bar-percent) !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+  .evaluation-bar-score.horizontal {
+    top: 50% !important;
+    left: var(--label-pos) !important;
+  }
+
+  /* 5. Benchmark Workspace */
+  .configGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .tabletGrid {
+    grid-template-columns: 1fr !important;
+  }
+  .cmdBox {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* 6. Pass & Play / Dashboard */
+  .modeList .mode-item-hoverable {
+    padding: 12px 8px !important;
+  }
+  .statsRow {
+    grid-template-columns: 1fr !important;
+  }
+  .match-setup-btn-sticky {
+    position: sticky !important;
+    bottom: 16px !important;
+    z-index: 10 !important;
+  }
+  
+  /* 7. Chess Board Aspect Ratio */
+  .board-wrapper-mobile {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 !important;
+  }
+  .board-hud-wrapper-mobile {
+    max-width: 100% !important;
+  }
+}

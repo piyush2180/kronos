@@ -85,10 +85,10 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
   const selectedConfig = ENGINE_CONFIGS.find(c => c.key === selectedEngine) || ENGINE_CONFIGS[3];
 
   return (
-    <div style={s.root} className="animate-fade-in">
+    <div style={s.root} className="animate-fade-in game-split-grid">
 
       {/* ── Left: Board Preview (Vertically Centered, No details under board) ── */}
-      <div style={s.boardCol}>
+      <div style={s.boardCol} className="board-column-wrapper">
         <div style={s.boardWrap}>
           <ChessBoard
             fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -104,7 +104,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
       </div>
 
       {/* ── Right: Configuration Panel ────────────────────────────────────── */}
-      <div style={s.configCol}>
+      <div style={s.configCol} className="sidebar-column-wrapper">
 
         {/* Header */}
         <div style={s.panelHeader}>
@@ -231,7 +231,7 @@ export default function MatchSetupPage({ onStart, defaultDifficulty, defaultTime
         </div>
 
         {/* ── Start Match Button (Pinned) ────────────────────────────────── */}
-        <div style={s.startFooter}>
+        <div style={s.startFooter} className="match-setup-btn-sticky">
           <button onClick={handleStart} className="btn-primary" style={s.startBtn}>
             <PlayCircle size={18} />
             <span>Start Match</span>

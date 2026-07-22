@@ -9,12 +9,13 @@ import InteractiveDemos from './learn/InteractiveDemos';
 import BenchmarkExplorer from './learn/BenchmarkExplorer';
 import ResearchDocs from './learn/ResearchDocs';
 import AlgorithmTable from './learn/AlgorithmTable';
-import { FileCode, ShieldCheck, Cpu, Play } from 'lucide-react';
+import { FileCode, ShieldCheck, Cpu, Play, Menu, X } from 'lucide-react';
 import { colors, spacing, geometry, typography } from '../theme/designTokens';
 
 export default function Learn() {
   const [activeSection, setActiveSection] = useState('chess-fundamentals');
   const [inspectedSourceFile, setInspectedSourceFile] = useState('src/engine/minimax.js');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleSelectSource = (filePath) => {
     setInspectedSourceFile(filePath);
@@ -48,12 +49,27 @@ export default function Learn() {
   };
 
   return (
-    <div style={{ display: 'flex', gap: spacing.xl, width: '100%', alignItems: 'flex-start', padding: `${spacing.xl} 0` }} className="animate-fade-in">
+    <div style={{ display: 'flex', gap: spacing.xl, width: '100%', alignItems: 'flex-start', padding: `${spacing.xl} 0` }} className="animate-fade-in learn-mobile-container">
+      {/* Mobile Drawer Overlay */}
+      <div 
+        className={`learn-drawer-overlay desktop-only ${isSidebarOpen ? 'open' : ''}`}
+        style={{ display: isSidebarOpen ? 'block' : 'none' }}
+        onClick={() => setIsSidebarOpen(false)}
+      />
+
       {/* 1. Left Column: Table of Contents Navigation */}
-      <LearnSidebar activeSection={activeSection} setActiveSection={setActiveSection} />
+      <LearnSidebar activeSection={activeSection} setActiveSection={setActiveSection} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
       {/* 2. Center Column: Main Interactive Documentation Stream */}
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: spacing.xl }}>
+        {/* Mobile menu toggle */}
+        <div className="desktop-only" style={{ marginBottom: spacing.md }}>
+          <button className="btn-secondary" onClick={() => setIsSidebarOpen(true)}>
+            <Menu size={16} />
+            <span>Contents</span>
+          </button>
+        </div>
+
         {renderCenterContent()}
 
         {/* Master Algorithm Performance Matrix */}

@@ -39,15 +39,15 @@ export default function App() {
   }, []);
 
   // Responsive state listeners
-  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
-  const [isTablet, setIsTablet] = useState(() => window.innerWidth >= 640 && window.innerWidth <= 1024);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  const [isTablet, setIsTablet] = useState(() => window.innerWidth >= 768 && window.innerWidth <= 1024);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       const w = window.innerWidth;
-      setIsMobile(w < 640);
-      setIsTablet(w >= 640 && w <= 1024);
+      setIsMobile(w < 768);
+      setIsTablet(w >= 768 && w <= 1024);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -839,9 +839,7 @@ const styles = {
     flex: 1,
     display: 'flex',
     width: '100%',
-    height: 'calc(100vh - 64px)',
-    minHeight: 0,
-    overflow: 'hidden',
+    overflowY: 'auto',
   },
   scrollPage: {
     flex: 1,

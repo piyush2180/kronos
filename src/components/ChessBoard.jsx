@@ -426,14 +426,14 @@ export default function ChessBoard({
   const totalWidth = hasEvalBar ? `calc(${boardSize} + 28px)` : boardSize;
 
   return (
-    <div style={{ ...styles.boardHUDWrapper, maxWidth: totalWidth }}>
+    <div style={{ ...styles.boardHUDWrapper, maxWidth: totalWidth }} className="board-hud-wrapper-mobile">
       {renderHUD(topSide, true)}
 
-      <div style={{ ...styles.boardRow, height: boardSize }}>
+      <div style={{ ...styles.boardRow, height: boardSize }} className="board-column-wrapper">
         {hasEvalBar && (
           <EvaluationBar score={evalScore} orientation={boardOrientation} />
         )}
-        <div style={{ ...styles.boardContainer, width: boardSize, height: boardSize }}>
+        <div style={{ ...styles.boardContainer, width: boardSize, height: boardSize }} className="board-wrapper-mobile">
           <Chessboard options={boardOptions} />
         </div>
       </div>

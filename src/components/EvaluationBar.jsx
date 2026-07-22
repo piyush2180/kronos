@@ -56,30 +56,33 @@ export default function EvaluationBar({ score, orientation }) {
   const labelColor = whiteAhead ? '#1c1410' : '#e8dcc8';
 
   return (
-    <div style={styles.wrapper} className="evaluation-bar-wrapper">
-      <div style={styles.barContainer} className="evaluation-bar-container">
+    <div style={styles.wrapper} className="evaluation-bar-wrapper horizontal">
+      <div style={styles.barContainer} className="evaluation-bar-container horizontal">
         {/* Black section (top) */}
         <div style={{
           ...styles.section,
           height: `${topHeight}%`,
+          '--bar-percent': `${topHeight}%`,
           backgroundColor: topColor,
-        }} />
+        }} className="evaluation-bar-fill horizontal" />
 
         {/* Bottom section */}
         <div style={{
           ...styles.section,
           height: `${100 - topHeight}%`,
+          '--bar-percent': `${100 - topHeight}%`,
           backgroundColor: bottomColor,
-        }} />
+        }} className="evaluation-bar-fill horizontal" />
 
         {/* Score label floating at the divider */}
         <div style={{
           ...styles.scoreBadge,
           top: labelTop,
-          transform: 'translateY(-50%)',
+          transform: 'translate(-50%, -50%)',
           backgroundColor: labelBg,
           color: labelColor,
-        }} className="evaluation-bar-score">
+          '--label-pos': labelTop,
+        }} className="evaluation-bar-score horizontal">
           {displayScore}
         </div>
       </div>

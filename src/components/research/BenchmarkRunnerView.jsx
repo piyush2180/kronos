@@ -93,7 +93,7 @@ export default function BenchmarkRunnerView({ onAddLog, onTournamentComplete }) 
           )}
         </div>
 
-        <div style={styles.configGrid}>
+        <div style={styles.configGrid} className="configGrid">
           <div style={styles.configField}>
             <label style={styles.label}>Engine A</label>
             <select style={styles.select} value={engineA} onChange={e => setEngineA(e.target.value)} disabled={isRunning}>
@@ -153,7 +153,7 @@ export default function BenchmarkRunnerView({ onAddLog, onTournamentComplete }) 
           For publishable experimental papers and multi-hundred game SPRT calibration runs, execute the tournament in Node headless CLI. Results generated in <code>benchmark/output/</code> can be imported into the Research Archive above.
         </p>
 
-        <div style={styles.cmdBox}>
+        <div style={styles.cmdBox} className="cmdBox">
           <code style={styles.cmdCode}>{cliCommand}</code>
           <button style={styles.copyBtn} onClick={handleCopyCli}>
             {copied ? <CheckCircle2 size={14} color="#34D399" /> : <Copy size={14} />}
